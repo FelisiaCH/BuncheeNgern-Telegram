@@ -1,0 +1,2376 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#2EE8B4">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192x192.png">
+<title>FinTrack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* 🎨 Reset & Theme Variables */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06090F;
+  --bg-card:#0B1020;
+  --bg-input:#0E1526;
+  --bg-hover:#131D30;
+  --teal:#2EE8B4;
+  --teal-dim:rgba(46,232,180,.1);
+  --teal-glow:rgba(46,232,180,.18);
+  --teal-brd:rgba(46,232,180,.3);
+  --green:#30D67E;
+  --green-dim:rgba(48,214,126,.08);
+  --green-brd:rgba(48,214,126,.22);
+  --red:#FF4D6D;
+  --red-dim:rgba(255,77,109,.08);
+  --red-brd:rgba(255,77,109,.22);
+  --indigo:#818CF8;
+  --indigo-dim:rgba(129,140,248,.08);
+  --indigo-brd:rgba(129,140,248,.22);
+  --amber:#FFAA33;
+  --amber-dim:rgba(255,170,51,.08);
+  --amber-brd:rgba(255,170,51,.22);
+  --txt:#EDF0FF;
+  --txt-sub:#6B7FA3;
+  --txt-muted:#2A3550;
+  --brd:rgba(255,255,255,.055);
+  --brd-focus:rgba(46,232,180,.45);
+  --r:18px;--r-sm:13px;--r-xs:9px;
+  --shadow:0 8px 40px rgba(0,0,0,.55);
+  --ease:.22s cubic-bezier(.4,0,.2,1)
+}
+html{height:100%}
+body{
+  font-family:'Outfit',system-ui,sans-serif;
+  background:var(--bg);color:var(--txt);
+  min-height:100dvh;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale
+}
+input,select,button{font-family:'Outfit',system-ui,sans-serif}
+button{cursor:pointer}
+.hidden{display:none!important}
+.screen{min-height:100dvh;display:flex;flex-direction:column}
+
+/* ⚠️ Config Warning Bar */
+.cfg-bar{
+  position:fixed;top:0;left:0;right:0;z-index:9999;
+  padding:9px 16px;font-size:12px;font-weight:500;text-align:center;
+  background:rgba(255,170,51,.08);border-bottom:1px solid var(--amber-brd);
+  color:var(--amber)
+}
+
+/* ⏳ Loading Overlay & Spinner */
+.ov{
+  position:fixed;inset:0;z-index:800;
+  background:rgba(6,9,15,.8);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center
+}
+.ov-card{
+  background:var(--bg-card);border:1px solid var(--brd);
+  border-radius:var(--r);padding:28px 40px;text-align:center;min-width:190px
+}
+.spin{
+  width:30px;height:30px;border:2.5px solid var(--brd);border-top-color:var(--teal);
+  border-radius:50%;margin:0 auto 14px;animation:spin .7s linear infinite
+}
+.spin-btn{width:20px;height:20px;margin:0 auto}
+.ov-txt{font-size:13.5px;color:var(--txt-sub);font-weight:500}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* 🔔 Toast Notifications */
+.toast{
+  position:fixed;top:68px;left:50%;
+  transform:translateX(-50%) translateY(-10px);
+  background:var(--bg-card);border:1px solid var(--green-brd);
+  border-radius:12px;padding:12px 22px;color:var(--green);
+  font-size:13px;font-weight:600;
+  display:flex;align-items:center;gap:8px;z-index:9999;
+  opacity:0;pointer-events:none;white-space:nowrap;
+  box-shadow:var(--shadow);transition:opacity .25s,transform .25s
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.err{border-color:var(--red-brd);color:var(--red)}
+.toast.warn{border-color:var(--amber-brd);color:var(--amber)}
+
+/* 🚀 Splash Loading Screen */
+#scr-load{background:var(--bg)}
+.splash{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100dvh;padding:24px
+}
+.splash-ring{
+  width:80px;height:80px;border-radius:26px;
+  background:linear-gradient(135deg,#0E1526,#1A2A4A);
+  border:1px solid rgba(46,232,180,.25);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:22px;position:relative;
+  box-shadow:0 0 60px rgba(46,232,180,.12),inset 0 1px 0 rgba(255,255,255,.06)
+}
+.splash-ring::after{
+  content:'';position:absolute;inset:-1px;border-radius:27px;
+  background:linear-gradient(135deg,rgba(46,232,180,.4),transparent 60%);
+  mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:destination-out;mask-composite:exclude;pointer-events:none
+}
+.splash-name{font-size:28px;font-weight:800;letter-spacing:-.8px;color:var(--txt);margin-bottom:6px}
+.splash-tagline{font-size:14px;font-weight:400;color:var(--txt-sub);margin-bottom:44px}
+.splash-spin{
+  width:24px;height:24px;border:2px solid var(--brd);border-top-color:var(--teal);
+  border-radius:50%;animation:spin .7s linear infinite
+}
+
+/* 🔐 Login Screen & Card */
+#scr-login{
+  justify-content:center;align-items:center;padding:20px;
+  background:
+    radial-gradient(ellipse 70% 40% at 50% 0%,rgba(46,232,180,.07) 0%,transparent 70%),
+    radial-gradient(ellipse 50% 30% at 80% 100%,rgba(129,140,248,.05) 0%,transparent 60%),
+    var(--bg)
+}
+.login-card{
+  width:100%;max-width:400px;
+  background:rgba(11,16,32,.9);
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  border:1px solid var(--brd);border-radius:24px;padding:38px 24px 30px;
+  box-shadow:var(--shadow),0 0 80px rgba(46,232,180,.06),inset 0 1px 0 rgba(255,255,255,.04)
+}
+.lc-head{text-align:center;margin-bottom:32px}
+.lc-logo{
+  width:64px;height:64px;border-radius:22px;
+  background:linear-gradient(145deg,#0E1526,#1C2E50);
+  border:1px solid rgba(46,232,180,.3);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 16px;
+  box-shadow:0 0 40px rgba(46,232,180,.15),inset 0 1px 0 rgba(46,232,180,.1)
+}
+.lc-title{font-size:22px;font-weight:800;letter-spacing:-.5px;color:var(--txt)}
+.lc-sub{font-size:13px;font-weight:400;color:var(--txt-sub);margin-top:4px}
+
+/* 📋 Form Fields & Inputs */
+.fg{margin-bottom:16px}
+.fl{
+  display:block;font-size:10.5px;font-weight:700;
+  color:var(--txt-sub);text-transform:uppercase;
+  letter-spacing:.85px;margin-bottom:8px
+}
+.fi{
+  width:100%;padding:13px 15px;
+  background:var(--bg-input);border:1px solid var(--brd);
+  border-radius:var(--r-sm);color:var(--txt);font-size:15px;
+  font-weight:400;outline:none;
+  transition:border-color var(--ease),box-shadow var(--ease);
+  -webkit-appearance:none;appearance:none
+}
+.fi:focus,.fs:focus{border-color:var(--brd-focus);box-shadow:0 0 0 3px rgba(46,232,180,.08)}
+.fi::placeholder{color:var(--txt-muted)}
+.fs{
+  width:100%;padding:13px 38px 13px 15px;
+  background:var(--bg-input);border:1px solid var(--brd);
+  border-radius:var(--r-sm);color:var(--txt);font-size:15px;
+  font-weight:400;outline:none;-webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7FA3' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;background-size:16px;
+  transition:border-color var(--ease),box-shadow var(--ease)
+}
+option{background:#0E1526}
+
+/* 🔑 PIN Input & Toggle */
+.pin-wrap{position:relative}
+.pin-toggle{
+  position:absolute;right:13px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--txt-muted);cursor:pointer;
+  padding:5px;display:flex;align-items:center;
+  transition:color var(--ease)
+}
+.pin-toggle:hover{color:var(--txt-sub)}
+
+/* 🔴 PIN Attempt Dots */
+.dots-row{display:flex;justify-content:center;gap:8px;margin:12px 0 4px}
+.adot{
+  width:9px;height:9px;border-radius:50%;background:var(--brd);
+  transition:background var(--ease),transform var(--ease),box-shadow var(--ease)
+}
+.adot.hit{
+  background:var(--red);
+  box-shadow:0 0 8px rgba(255,77,109,.5);
+  transform:scale(1.2)
+}
+
+/* 💬 Inline Status Messages */
+.msg{
+  display:flex;align-items:flex-start;gap:9px;
+  padding:12px 14px;border-radius:var(--r-xs);
+  font-size:13px;line-height:1.6;margin-top:12px;font-weight:500
+}
+.msg.err{background:var(--red-dim);border:1px solid var(--red-brd);color:var(--red)}
+.msg.ok{background:var(--green-dim);border:1px solid var(--green-brd);color:var(--green)}
+.msg.warn{background:var(--amber-dim);border:1px solid var(--amber-brd);color:var(--amber)}
+
+/* 🔘 Buttons */
+.btn{
+  width:100%;padding:15px;border:none;border-radius:var(--r-sm);
+  color:#fff;font-size:15.5px;font-weight:700;letter-spacing:.1px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  cursor:pointer;transition:opacity var(--ease),transform var(--ease),background var(--ease);
+  position:relative;overflow:hidden
+}
+.btn-teal{
+  background:linear-gradient(135deg,#1DB89B,#2EE8B4);
+  box-shadow:0 4px 24px rgba(46,232,180,.22),inset 0 1px 0 rgba(255,255,255,.15)
+}
+.btn-red{
+  background:linear-gradient(135deg,#C43358,#FF4D6D);
+  box-shadow:0 4px 24px rgba(255,77,109,.22),inset 0 1px 0 rgba(255,255,255,.1)
+}
+.btn:active:not(:disabled){transform:scale(.98);opacity:.88}
+.btn:disabled{opacity:.38;cursor:not-allowed;box-shadow:none!important}
+.btn-ghost{
+  background:transparent;border:1px solid var(--brd);
+  color:var(--txt-sub);box-shadow:none;font-size:12.5px;font-weight:600
+}
+
+/* 🎚️ Segmented Toggle Controls */
+.seg-wrap{
+  display:flex;background:var(--bg-input);border:1px solid var(--brd);
+  border-radius:var(--r-sm);padding:4px;gap:3px
+}
+.seg{
+  flex:1;min-width:0;padding:10px 6px;background:transparent;border:none;
+  border-radius:var(--r-xs);color:var(--txt-sub);
+  font-size:13.5px;font-weight:500;font-family:'Outfit',system-ui,sans-serif;
+  cursor:pointer;transition:background var(--ease),color var(--ease),border-color var(--ease),transform var(--ease),opacity var(--ease);text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.seg.inc.on{background:var(--green-dim);color:var(--green);font-weight:700}
+.seg.exp.on{background:var(--red-dim);color:var(--red);font-weight:700}
+.seg.cash.on{background:var(--amber-dim);color:var(--amber);font-weight:700}
+.seg.qr.on{background:var(--teal-dim);color:var(--teal);font-weight:700}
+
+/* 🏪 Branch Chip Picker */
+.branch-grid{display:flex;flex-wrap:wrap;gap:6px}
+.branch-chip{
+  flex:0 1 auto;max-width:100%;padding:9px 14px;
+  background:var(--bg-input);border:1px solid var(--brd);
+  border-radius:var(--r-xs);color:var(--txt-sub);
+  font-size:13px;font-weight:500;font-family:'Outfit',system-ui,sans-serif;
+  cursor:pointer;transition:background var(--ease),color var(--ease),border-color var(--ease),transform var(--ease),opacity var(--ease);text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.branch-chip.on{background:var(--indigo-dim);color:var(--indigo);font-weight:700;border-color:var(--indigo-brd)}
+
+/* 💱 Currency & Price Input */
+.pg{
+  display:flex;background:var(--bg-input);border:1px solid var(--brd);
+  border-radius:var(--r-sm);overflow:hidden;
+  transition:border-color var(--ease),box-shadow var(--ease)
+}
+.pg:focus-within{border-color:var(--brd-focus);box-shadow:0 0 0 3px rgba(46,232,180,.08)}
+.cur-sel{
+  padding:13px 10px;background:rgba(46,232,180,.07);
+  border:none;border-right:1px solid var(--brd);
+  color:var(--teal);font-size:13px;font-weight:700;
+  font-family:'Outfit',system-ui,sans-serif;
+  outline:none;-webkit-appearance:none;appearance:none;
+  min-width:74px;text-align:center;text-align-last:center;cursor:pointer
+}
+.prc-in{
+  flex:1;padding:13px 14px;background:transparent;border:none;
+  color:var(--txt);font-size:16px;font-weight:500;
+  font-family:'Outfit',system-ui,sans-serif;outline:none
+}
+.prc-in::placeholder{color:var(--txt-muted)}
+.prc-in::-webkit-outer-spin-button,
+.prc-in::-webkit-inner-spin-button{-webkit-appearance:none}
+.prc-in[type=number]{-moz-appearance:textfield;appearance:textfield}
+
+/* 📎 Slip Upload Zone */
+.upload-zone{
+  border:2px dashed rgba(46,232,180,.2);border-radius:var(--r-sm);
+  padding:22px 16px;text-align:center;cursor:pointer;
+  transition:background var(--ease),color var(--ease),border-color var(--ease),transform var(--ease),opacity var(--ease);background:rgba(46,232,180,.02)
+}
+.upload-zone:hover,.upload-zone.over{
+  border-color:var(--teal);background:var(--teal-dim)
+}
+.uz-ico{margin:0 auto 10px;color:var(--teal);opacity:.7}
+.uz-txt{font-size:14px;font-weight:500;color:var(--txt-sub);margin-bottom:3px}
+.uz-hint{font-size:11.5px;color:var(--txt-muted)}
+.slip-prev{
+  width:100%;border-radius:var(--r-xs);max-height:200px;
+  object-fit:cover;display:block;margin-top:12px
+}
+.clear-slip-btn{
+  display:inline-flex;align-items:center;gap:5px;margin-top:10px;
+  padding:7px 14px;background:var(--red-dim);border:1px solid var(--red-brd);
+  border-radius:8px;color:var(--red);font-size:12px;font-weight:600;
+  cursor:pointer;font-family:'Outfit',system-ui,sans-serif
+}
+
+/* 🧭 App Header & User Chip */
+.app-hdr{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(6,9,15,.88);-webkit-backdrop-filter:blur(28px);backdrop-filter:blur(28px);
+  border-bottom:1px solid var(--brd);
+  height:58px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px
+}
+.hdr-brand{display:flex;align-items:center;gap:10px}
+.hdr-badge{
+  width:30px;height:30px;border-radius:9px;
+  background:linear-gradient(135deg,#0E1526,#1A2A4A);
+  border:1px solid rgba(46,232,180,.25);
+  display:flex;align-items:center;justify-content:center
+}
+.hdr-name{font-size:16px;font-weight:800;letter-spacing:-.3px;color:var(--txt)}
+.hdr-r{display:flex;align-items:center;gap:8px}
+.user-chip{
+  background:var(--bg-hover);border:1px solid var(--brd);
+  border-radius:20px;padding:5px 12px 5px 8px;
+  font-size:12px;font-weight:500;color:var(--txt-sub);
+  display:flex;align-items:center;gap:6px;
+  max-width:148px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+}
+.chip-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0}
+.lo-btn{
+  background:none;border:none;color:var(--txt-muted);padding:8px;
+  border-radius:8px;display:flex;align-items:center;cursor:pointer;
+  transition:color var(--ease)
+}
+.lo-btn:hover{color:var(--red)}
+
+/* 📑 Tab Layout & Headers */
+.tab-body{
+  padding:74px 16px 100px;max-width:480px;
+  margin:0 auto;width:100%
+}
+.tab-top{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:22px
+}
+.tab-ttl{font-size:21px;font-weight:800;letter-spacing:-.6px}
+.date-chip{
+  font-size:11px;font-weight:600;color:var(--txt-sub);
+  background:var(--bg-card);border:1px solid var(--brd);
+  border-radius:20px;padding:4px 12px;white-space:nowrap
+}
+.ref-btn{
+  display:inline-flex;align-items:center;gap:6px;padding:6px 14px;
+  background:var(--bg-hover);border:1px solid var(--brd);border-radius:20px;
+  color:var(--txt-sub);font-size:12px;font-weight:600;
+  font-family:'Outfit',system-ui,sans-serif;cursor:pointer;
+  transition:background var(--ease),color var(--ease),border-color var(--ease),transform var(--ease),opacity var(--ease)
+}
+.ref-btn:active{transform:scale(.96)}
+
+/* 🧭 Bottom Navigation */
+.bot-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:rgba(6,9,15,.95);-webkit-backdrop-filter:blur(28px);backdrop-filter:blur(28px);
+  border-top:1px solid var(--brd);
+  display:flex;padding:6px 24px;
+  padding-bottom:max(6px,env(safe-area-inset-bottom));gap:8px
+}
+.nb{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:10px 8px;background:none;border:none;border-radius:13px;
+  color:var(--txt-muted);font-size:10.5px;font-weight:600;
+  font-family:'Outfit',system-ui,sans-serif;cursor:pointer;
+  transition:background var(--ease),color var(--ease),border-color var(--ease),transform var(--ease),opacity var(--ease)
+}
+.nb.on{background:var(--teal-dim);color:var(--teal)}
+.nb svg{transition:transform var(--ease)}
+.nb.on svg{transform:scale(1.08)}
+
+/* 📊 Dashboard Metric Cards */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px}
+.mc{
+  background:var(--bg-card);border:1px solid var(--brd);
+  border-radius:var(--r);padding:18px 16px;
+  position:relative;overflow:hidden
+}
+.mc::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px
+}
+.mc.g::before{background:linear-gradient(90deg,var(--green),transparent 80%)}
+.mc.p::before{background:linear-gradient(90deg,var(--indigo),transparent 80%)}
+.mc.r{grid-column:1/-1}
+.mc.r::before{background:linear-gradient(90deg,var(--red),transparent 80%)}
+.mc-lbl{
+  font-size:10px;font-weight:700;color:var(--txt-sub);
+  text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px
+}
+.mc-val{
+  font-size:30px;font-weight:900;letter-spacing:-1.5px;line-height:1;
+  font-variant-numeric:tabular-nums
+}
+.mc-val.gv{color:var(--green)}
+.mc-val.pv{color:var(--indigo)}
+.mc-val.rv{color:var(--red)}
+.mc.r .mc-val{font-size:36px}
+.mc-cur{font-size:11.5px;font-weight:600;color:var(--txt-sub);margin-top:6px}
+
+/* 📜 Recent Entries List */
+.sec-top{
+  display:flex;align-items:center;justify-content:space-between;
+  margin:20px 0 11px
+}
+.sec-ttl{font-size:14.5px;font-weight:700}
+.cnt-badge{
+  padding:3px 11px;background:var(--bg-hover);
+  border:1px solid var(--brd);border-radius:20px;
+  font-size:11px;font-weight:600;color:var(--txt-sub)
+}
+.elist{display:flex;flex-direction:column;gap:8px}
+.ei{
+  display:flex;align-items:center;gap:11px;
+  padding:13px;background:var(--bg-card);border:1px solid var(--brd);
+  border-radius:13px;transition:border-color var(--ease)
+}
+.ei-ic{
+  width:40px;height:40px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;flex-shrink:0
+}
+.ei-ic.inc{background:var(--green-dim)}
+.ei-ic.exp{background:var(--red-dim)}
+.ei-info{flex:1;min-width:0}
+.ei-name{
+  font-size:14px;font-weight:600;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.ei-meta{font-size:11.5px;color:var(--txt-sub);margin-top:2px;line-height:1.6}
+.ei-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.ei-amt{font-size:15px;font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ei-amt.inc{color:var(--green)}
+.ei-amt.exp{color:var(--red)}
+.pm-b{
+  font-size:10px;font-weight:700;padding:3px 8px;
+  border-radius:6px;letter-spacing:.4px;text-transform:uppercase
+}
+.pm-cash{background:var(--amber-dim);color:var(--amber)}
+.pm-qr{background:var(--teal-dim);color:var(--teal)}
+.slip-a{
+  font-size:11px;font-weight:600;color:var(--teal);text-decoration:none;
+  display:inline-flex;align-items:center;gap:3px;margin-top:3px
+}
+.empty{
+  text-align:center;padding:48px 20px;
+  color:var(--txt-muted);font-size:14px;font-weight:500
+}
+
+.dvd{height:1px;background:var(--brd);margin:18px 0}
+
+/* 🏷️ Dashboard Branch Filter */
+.branch-filter{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.sf{
+  flex:0 1 auto;max-width:100%;padding:9px 14px;
+  background:var(--bg-card);border:1px solid var(--brd);
+  border-radius:var(--r-sm);color:var(--txt-sub);
+  font-size:12.5px;font-weight:600;font-family:'Outfit',system-ui,sans-serif;
+  cursor:pointer;transition:background var(--ease),color var(--ease),border-color var(--ease),transform var(--ease),opacity var(--ease);text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.sf.on{
+  background:rgba(129,140,248,.13);color:var(--indigo);font-weight:700;
+  border-color:rgba(129,140,248,.3);
+  box-shadow:inset 0 0 0 1px rgba(129,140,248,.22)
+}
+
+/* 💱 Currency Tab Switcher */
+.cur-tabs{display:flex;gap:6px;margin-bottom:14px}
+.ctab{
+  flex:1;padding:10px 6px;
+  background:var(--bg-card);border:1px solid var(--brd);
+  border-radius:var(--r-sm);color:var(--txt-sub);
+  font-size:13.5px;font-weight:700;
+  font-family:'Outfit',system-ui,sans-serif;
+  cursor:pointer;transition:background var(--ease),color var(--ease),border-color var(--ease),transform var(--ease),opacity var(--ease);text-align:center;
+  letter-spacing:.3px;opacity:.55
+}
+.ctab.on{background:var(--teal-dim);border-color:var(--teal-brd);color:var(--teal);opacity:1}
+.ctab.has{opacity:1}
+
+/* 🔽 Combo Dropdown Selector */
+.combo-wrap{position:relative}
+.combo-input{padding-right:44px!important}
+.combo-toggle{
+  position:absolute;right:0;top:0;bottom:0;width:44px;
+  background:none;border:none;color:var(--txt-sub);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:0 var(--r-sm) var(--r-sm) 0;
+  transition:color var(--ease),transform var(--ease)
+}
+.combo-toggle:hover{color:var(--teal)}
+.combo-toggle.open{color:var(--teal);transform:rotate(180deg)}
+.combo-drop{
+  position:absolute;top:calc(100% + 5px);left:0;right:0;z-index:500;
+  background:var(--bg-card);border:1px solid var(--teal-brd);
+  border-radius:var(--r-sm);overflow:hidden;
+  box-shadow:0 8px 32px rgba(0,0,0,.65),0 0 0 1px rgba(46,232,180,.1)
+}
+.combo-opt{
+  padding:12px 16px;font-size:14px;font-weight:500;
+  color:var(--txt);cursor:pointer;
+  transition:background var(--ease);
+  border:none;background:none;width:100%;text-align:left;
+  font-family:'Outfit',system-ui,sans-serif;display:block
+}
+.combo-opt:not(:last-child){border-bottom:1px solid var(--brd)}
+.combo-opt:hover,.combo-opt:focus{background:var(--teal-dim);color:var(--teal);outline:none}
+
+/* 📅 Date Navigator */
+.date-nav{
+  display:flex;align-items:center;gap:8px;
+  background:var(--bg-card);border:1px solid var(--brd);
+  border-radius:var(--r-sm);padding:7px 10px;margin-bottom:12px
+}
+.date-nav-lbl{
+  flex:1;text-align:center;font-size:13px;font-weight:700;
+  color:var(--txt);letter-spacing:.2px
+}
+.nav-arrow{
+  width:32px;height:32px;background:var(--bg-hover);border:1px solid var(--brd);
+  border-radius:var(--r-xs);color:var(--txt-sub);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:background var(--ease),color var(--ease),border-color var(--ease),transform var(--ease),opacity var(--ease);flex-shrink:0;padding:0
+}
+.nav-arrow:hover:not(:disabled){color:var(--teal);border-color:var(--teal-brd);background:var(--teal-dim)}
+.nav-arrow:disabled{opacity:.28;cursor:not-allowed}
+
+/* 🔐 Login Layout Tweaks */
+.login-wrap{flex:2;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-footer{text-align:center;padding:14px 0 20px;font-size:12px;font-weight:500;color:var(--txt-muted)}
+#l-pin{padding-right:48px}
+#l-btn{margin-top:18px}
+#f-file{display:none}
+#sub-btn{margin-top:16px}
+
+/* ☑️ Remember-Me Checkbox */
+.rem-me-row{display:flex;align-items:center;justify-content:space-between;margin:14px 0 4px}
+.rem-me-lbl{
+  display:flex;align-items:center;gap:10px;cursor:pointer;
+  padding:4px 2px;user-select:none;-webkit-user-select:none
+}
+.rem-me-cb{
+  -webkit-appearance:none;appearance:none;
+  width:19px;height:19px;border-radius:5px;flex-shrink:0;
+  background:var(--bg-input);border:1.5px solid var(--brd);
+  cursor:pointer;position:relative;
+  transition:background var(--ease),border-color var(--ease),box-shadow var(--ease)
+}
+.rem-me-cb:checked{background:var(--teal);border-color:var(--teal)}
+.rem-me-cb:checked::after{
+  content:'';position:absolute;
+  left:5px;top:2px;width:5px;height:9px;
+  border:2.5px solid #06090F;border-top:none;border-left:none;
+  transform:rotate(43deg)
+}
+.rem-me-cb:focus-visible{box-shadow:0 0 0 3px rgba(46,232,180,.2)}
+.rem-me-txt{font-size:13px;font-weight:500;color:var(--txt-sub);line-height:1.3}
+.rem-me-en{display:block;font-size:11px;font-weight:400;color:var(--txt-muted);margin-top:1px}
+
+/* 🌐 Language Switcher */
+.lang-switch{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.lang-btn{
+  display:inline-flex;align-items:center;gap:5px;padding:7px 12px;
+  background:var(--bg-input);border:1px solid var(--brd);
+  border-radius:20px;color:var(--txt-sub);font-size:12px;font-weight:600;
+  font-family:'Outfit',system-ui,sans-serif;cursor:pointer;
+  transition:background var(--ease),color var(--ease),border-color var(--ease),transform var(--ease),opacity var(--ease)
+}
+.lang-btn .flag{font-size:16px;line-height:1}
+.lang-btn.on{background:var(--teal-dim);border-color:var(--teal-brd);color:var(--teal)}
+.more-menu .lang-switch{justify-content:flex-start}
+
+/* ☰ More Menu & Dropdown */
+.more-btn{
+  background:var(--bg-hover);border:1px solid var(--brd);color:var(--txt-sub);
+  width:34px;height:34px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:background var(--ease),color var(--ease),border-color var(--ease),transform var(--ease),opacity var(--ease)
+}
+.more-btn:hover{color:var(--teal);border-color:var(--teal-brd)}
+.more-btn.on{color:var(--teal);border-color:var(--teal-brd);background:var(--teal-dim)}
+.more-btn-login{position:fixed;top:18px;right:18px;z-index:120}
+.more-menu{
+  position:fixed;top:62px;right:16px;z-index:130;
+  width:248px;max-width:calc(100vw - 32px);
+  max-height:calc(100dvh - 90px);overflow-y:auto;overscroll-behavior:contain;
+  background:var(--bg-card);border:1px solid var(--brd);border-radius:var(--r-sm);
+  box-shadow:var(--shadow);padding:14px;
+  display:flex;flex-direction:column
+}
+.more-menu::-webkit-scrollbar{width:5px}
+.more-menu::-webkit-scrollbar-track{background:transparent}
+.more-menu::-webkit-scrollbar-thumb{background:var(--brd);border-radius:6px}
+.more-menu-sec{display:flex;flex-direction:column;gap:8px;min-width:0}
+.more-menu-sec + .more-menu-sec{
+  margin-top:13px;padding-top:13px;border-top:1px solid var(--brd)
+}
+.more-menu-lbl{
+  font-size:10px;font-weight:700;color:var(--txt-sub);
+  text-transform:uppercase;letter-spacing:.8px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+}
+.menu-subdvd{height:1px;background:var(--brd);margin:2px 0}
+.menu-action-btn{
+  width:100%;padding:11px 14px;border-radius:var(--r-sm);
+  background:var(--teal-dim);border:1px solid var(--teal-brd);
+  color:var(--teal);font-size:12.5px;font-weight:700;
+  font-family:'Outfit',system-ui,sans-serif;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:background var(--ease),color var(--ease),border-color var(--ease),transform var(--ease),opacity var(--ease)
+}
+.menu-action-btn:hover{background:var(--teal-glow)}
+.menu-action-btn:active{transform:scale(.97)}
+
+/* 🔗 Script URL Save Row */
+.script-url-row{display:flex;gap:8px;margin-top:8px}
+.script-url-row .fi{flex:1;min-width:0}
+.script-save-btn{
+  flex-shrink:0;white-space:nowrap;padding:0 16px;border-radius:var(--r-sm);
+  background:var(--teal-dim);border:1px solid var(--teal-brd);
+  color:var(--teal);font-size:13px;font-weight:700;
+  font-family:'Outfit',system-ui,sans-serif;cursor:pointer;
+  transition:background var(--ease),color var(--ease),border-color var(--ease),transform var(--ease),opacity var(--ease)
+}
+.script-save-btn:hover{background:var(--teal-glow)}
+.script-save-btn:active{transform:scale(.97)}
+.more-menu .fl{margin-bottom:0;white-space:normal;overflow-wrap:break-word}
+.more-menu .script-url-row{flex-direction:column;gap:8px;margin-top:0}
+.more-menu .script-save-btn{width:100%;padding:11px 14px}
+
+/* 🏬 Branch Management List */
+.branch-manage-list{display:flex;flex-direction:column;gap:6px}
+.branch-row{
+  display:flex;align-items:center;gap:8px;padding:8px 10px;
+  background:var(--bg-input);border:1px solid var(--brd);border-radius:var(--r-sm)
+}
+.branch-row-icon{flex-shrink:0;font-size:14px;line-height:1}
+.branch-row-name{
+  flex:1;min-width:0;font-size:12.5px;color:var(--txt);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+}
+.branch-del-btn{
+  flex-shrink:0;width:26px;height:26px;border-radius:8px;
+  background:transparent;border:1px solid transparent;color:var(--txt-sub);
+  font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background var(--ease),color var(--ease),border-color var(--ease),transform var(--ease),opacity var(--ease)
+}
+.branch-del-btn:hover{background:var(--red-dim);border-color:var(--red-brd);color:var(--red)}
+.branch-del-btn:active{transform:scale(.9)}
+.branch-empty-hint{font-size:11.5px;color:var(--txt-muted);text-align:center;padding:6px 0}
+.branch-add-row{display:flex;flex-direction:column;gap:8px}
+.branch-add-row .fi{width:100%}
+/* 🛠 Dev Console Overlay */
+#dev-console{position:fixed;bottom:0;left:0;right:0;height:55vh;background:#050810;border-top:2px solid var(--teal);z-index:9999;display:flex;flex-direction:column;font-family:'Courier New',Courier,monospace}
+.dev-console-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg-input);border-bottom:1px solid var(--teal-brd);flex-shrink:0}
+.dev-console-title{color:var(--teal);font-size:13px;font-weight:700}
+.dev-console-acts{display:flex;gap:6px}
+.dev-console-btn{background:var(--teal-dim);border:1px solid var(--teal-brd);color:var(--teal);border-radius:6px;padding:3px 10px;font-size:11.5px;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent}
+.dev-console-log{flex:1;overflow-y:auto;padding:8px;font-size:11px;line-height:1.6;word-break:break-all;-webkit-overflow-scrolling:touch}
+.dev-log{padding:1px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.dev-log.log{color:#c8d3ea}
+.dev-log.warn{color:#ffd166}
+.dev-log.error{color:var(--red)}
+.dev-log-ts{color:#4a5470;margin-right:5px;font-size:10px;user-select:none}
+/* 📡 Push Subscription Panel */
+.push-token-box{display:flex;flex-direction:column;gap:6px;margin-top:2px}
+.push-token-text{background:var(--bg-input);border:1px solid var(--teal-brd);border-radius:8px;padding:8px;font-family:'Courier New',Courier,monospace;font-size:9px;line-height:1.5;word-break:break-all;max-height:90px;overflow-y:auto;color:var(--teal);-webkit-overflow-scrolling:touch;white-space:pre-wrap}
+</style>
+</head>
+<body>
+
+<div id="cfg-bar" class="cfg-bar hidden" data-i18n="cfgBarMsg">⚙️ กรุณากรอกและบันทึก Google Script URL ด้านล่างก่อนเข้าสู่ระบบ</div>
+
+<div id="ov" class="ov hidden">
+  <div class="ov-card">
+    <div class="spin"></div>
+    <div class="ov-txt" id="ov-msg" data-i18n="loadingGeneric">กำลังดำเนินการ...</div>
+  </div>
+</div>
+
+<div id="toast" class="toast">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><path d="M20 6L9 17l-5-5"/></svg>
+  <span id="toast-txt"></span>
+</div>
+
+<div id="more-menu" class="more-menu hidden">
+  <div class="more-menu-sec">
+    <div class="more-menu-lbl" data-i18n="menuLanguage">🌐 ภาษา / Language</div>
+    <div class="lang-switch" id="lang-switch-menu"></div>
+  </div>
+
+  <div class="more-menu-sec">
+    <div class="more-menu-lbl" data-i18n="menuCredentials">🔑 Credentials</div>
+    <select id="more-script-select" class="fs" onchange="pickSavedScript(this.value)"
+            aria-label="สลับสคริปต์ที่ใช้งาน" data-i18n-aria="menuActiveScript">
+      <option value="" data-i18n="selectSavedScript">-- เลือกสคริปต์ที่บันทึกไว้ --</option>
+    </select>
+    <label class="fl" data-i18n="labelScriptUrl">App Token or Web App URL / ใส่รหัสโทเค็น หรือ ลิงก์ URL</label>
+    <div class="script-url-row">
+      <input type="text" id="m-script-url" class="fi" placeholder="Enter App Token or Script URL"
+             autocomplete="off" data-i18n-placeholder="placeholderScriptUrl">
+      <button type="button" class="script-save-btn" onclick="saveScriptUrl('m-script-url')" data-i18n="btnSaveScript">บันทึกสคริปต์</button>
+    </div>
+  </div>
+
+  <div class="more-menu-sec">
+    <div class="more-menu-lbl" data-i18n="menuManagement">⚙️ Management</div>
+    <div id="manage-branch-list" class="branch-manage-list"></div>
+    <div class="branch-add-row">
+      <input type="text" id="m-branch-new" class="fi" placeholder="กรอกชื่อสาขาใหม่"
+             autocomplete="off" data-i18n-placeholder="placeholderNewBranch"
+             onkeydown="if(event.key==='Enter'){event.preventDefault();addBranch();}">
+      <button type="button" class="menu-action-btn" onclick="addBranch()" data-i18n="btnAddBranch">➕ เพิ่มสาขาใหม่</button>
+    </div>
+    <div class="menu-subdvd"></div>
+    <button type="button" class="menu-action-btn" onclick="requestNotificationPermissionExplicit()" data-i18n="btnRequestNotifPermission">🔑 Request Notification Permission / เปิดสิทธิ์แจ้งเตือน</button>
+    <button type="button" class="menu-action-btn" onclick="testNotification()" data-i18n="btnTestNotification">🔔 Test Notification / ทดสอบแจ้งเตือน</button>
+    <button type="button" class="menu-action-btn" onclick="openDevConsole()" data-i18n="btnOpenConsole">🛠 เปิด Developer Console</button>
+  </div>
+
+  <div class="more-menu-sec">
+    <div class="more-menu-lbl">📡 Web Push Subscription</div>
+    <button type="button" class="menu-action-btn" onclick="subscribeToPush()">📲 Subscribe / สมัครรับการแจ้งเตือน</button>
+    <div id="push-token-box" class="push-token-box hidden">
+      <div id="push-token-text" class="push-token-text"></div>
+      <button type="button" class="menu-action-btn" onclick="copyPushToken()">📋 คัดลอกรหัส Token</button>
+    </div>
+  </div>
+</div>
+
+<div id="scr-load" class="screen">
+  <div class="splash">
+    <div class="splash-ring">
+      <svg width="38" height="39" viewBox="0 0 24 24" fill="none" stroke="#2EE8B4" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+    </div>
+    <div class="splash-name">FinTrack</div>
+    <div class="splash-tagline" data-i18n="tagline">ระบบบัญชีรายรับ-รายจ่าย</div>
+    <div class="splash-spin"></div>
+  </div>
+</div>
+
+<div id="scr-login" class="screen hidden">
+  <button type="button" class="more-btn more-btn-login" id="more-btn-login" onclick="toggleMoreMenu(event)"
+          aria-label="เมนูเพิ่มเติม" data-i18n-aria="ariaMoreMenu">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+  </button>
+
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="lc-head">
+        <div class="lc-logo">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2EE8B4" stroke-width="2.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        </div>
+        <div class="lc-title">FinTrack</div>
+        <div class="lc-sub" data-i18n="tagline">ระบบบัญชีรายรับ-รายจ่าย</div>
+      </div>
+
+      <div class="fg">
+        <label class="fl" data-i18n="labelScriptUrl">Google Script URL / ลิงก์สคริปต์</label>
+        <select id="l-script-select" class="fs" onchange="pickSavedScript(this.value)"
+                aria-label="เลือกสคริปต์ที่บันทึกไว้" data-i18n-aria="selectSavedScript">
+          <option value="" data-i18n="selectSavedScript">-- เลือกสคริปต์ที่บันทึกไว้ --</option>
+        </select>
+        <div class="script-url-row">
+          <input type="text" id="l-script-url" class="fi" placeholder="Enter App Token or Script URL"
+                 autocomplete="off" data-i18n-placeholder="placeholderScriptUrl">
+          <button type="button" class="script-save-btn" onclick="saveScriptUrl()" data-i18n="btnSaveScript">บันทึกสคริปต์</button>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label class="fl" for="l-staff" data-i18n="labelStaffName">ชื่อพนักงาน</label>
+        <input type="text" id="l-staff" class="fi" placeholder="กรอกชื่อพนักงาน"
+               autocomplete="username" aria-label="ชื่อพนักงาน"
+               data-i18n-placeholder="placeholderStaffName" data-i18n-aria="labelStaffName">
+      </div>
+
+      <div class="fg">
+        <label class="fl" data-i18n="labelPin">รหัส PIN</label>
+        <div class="pin-wrap">
+          <input id="l-pin" type="password" inputmode="numeric" class="fi"
+                 placeholder="••••••" maxlength="8"
+                 oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+          <button type="button" class="pin-toggle" aria-label="แสดง/ซ่อนรหัส PIN" data-i18n-aria="ariaTogglePin" onclick="togglePin()">
+            <svg id="eye-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="rem-me-row">
+        <label class="rem-me-lbl" for="rem-me">
+          <input type="checkbox" id="rem-me" class="rem-me-cb">
+          <span class="rem-me-txt"><span data-i18n="rememberMe">จำฉันไว้ในระบบ</span>
+            <span class="rem-me-en" data-i18n-optional="rememberMeGloss">Remember Me</span>
+          </span>
+        </label>
+      </div>
+
+      <div class="dots-row hidden" id="dot-row">
+        <div class="adot" id="d1"></div>
+        <div class="adot" id="d2"></div>
+        <div class="adot" id="d3"></div>
+        <div class="adot" id="d4"></div>
+        <div class="adot" id="d5"></div>
+      </div>
+
+      <div id="l-msg" class="hidden"></div>
+
+      <button id="l-btn" class="btn btn-teal" onclick="doLogin()">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+        <span id="l-btn-txt" data-i18n="loginBtn">เข้าสู่ระบบ</span>
+      </button>
+    </div>
+  </div>
+  <p class="login-footer" data-i18n="footerCopy">© 2026 FelisiaCH — Released under the MIT License</p>
+</div>
+
+<div id="scr-app" class="screen hidden">
+
+  <header class="app-hdr">
+    <div class="hdr-brand">
+      <div class="hdr-badge">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2EE8B4" stroke-width="2.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      </div>
+      <span class="hdr-name">FinTrack</span>
+    </div>
+    <div class="hdr-r">
+      <button type="button" class="more-btn" id="more-btn-hdr" onclick="toggleMoreMenu(event)"
+              aria-label="เมนูเพิ่มเติม" data-i18n-aria="ariaMoreMenu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+      </button>
+      <div class="user-chip">
+        <div class="chip-dot"></div>
+        <span id="hdr-user">—</span>
+      </div>
+      <button class="lo-btn" onclick="doLogout()" title="ออกจากระบบ" data-i18n-title="logoutTitle">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div id="tab-rec" class="tab-body">
+    <div class="tab-top">
+      <span class="tab-ttl" data-i18n="tabRecordTitle">บันทึกรายการ</span>
+      <span class="date-chip" id="f-date-lbl"></span>
+    </div>
+
+    <div class="fg">
+      <label class="fl" data-i18n="labelType">ประเภทรายการ</label>
+      <div class="seg-wrap" id="sg-type">
+        <button class="seg inc on" onclick="setSeg('type','income',this)">↑ <span data-i18n="typeIncome">รายรับ</span></button>
+        <button class="seg exp" onclick="setSeg('type','expense',this)">↓ <span data-i18n="typeExpense">รายจ่าย</span></button>
+      </div>
+    </div>
+
+    <div class="fg">
+      <label class="fl" data-i18n="labelItemName">ชื่อรายการ</label>
+      <div class="combo-wrap">
+        <input type="text" id="f-item" class="fi combo-input" placeholder="ระบุหรือเลือกชื่อรายการ" autocomplete="off"
+               data-i18n-placeholder="placeholderItemName">
+        <button type="button" class="combo-toggle" id="combo-btn" onclick="toggleCombo()" tabindex="-1" aria-label="เลือกรายการ" data-i18n-aria="ariaSelectItem">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="combo-drop hidden" id="combo-drop"></div>
+      </div>
+    </div>
+
+    <div class="fg">
+      <label class="fl" data-i18n="labelAmount">จำนวนเงิน</label>
+      <div class="pg">
+        <select id="f-cur" class="cur-sel" aria-label="สกุลเงิน" data-i18n-aria="ariaCurrency">
+          <option value="LAK">LAK ₭</option>
+          <option value="THB">THB ฿</option>
+          <option value="USD">USD $</option>
+        </select>
+        <input type="number" id="f-price" class="prc-in" placeholder="0" inputmode="decimal" min="0" step="any">
+      </div>
+    </div>
+
+    <div class="fg">
+      <label class="fl" data-i18n="labelBranch">สาขา</label>
+      <div class="branch-grid" id="sg-branch"></div>
+    </div>
+
+    <div class="fg">
+      <label class="fl" data-i18n="labelPaymentMethod">ช่องทางชำระเงิน</label>
+      <div class="seg-wrap" id="sg-pay">
+        <button class="seg cash on" onclick="setPay('Cash',this)">💵 <span data-i18n="payCash">เงินสด</span></button>
+        <button class="seg qr" onclick="setPay('QR',this)">📱 Lao QR / OnePay</button>
+      </div>
+    </div>
+
+    <div id="slip-grp" class="fg hidden">
+      <label class="fl" data-i18n="labelAttachSlip">แนบสลิป</label>
+      <input type="file" id="f-file" accept="image/*" onchange="onFileChg(this)">
+      <div class="upload-zone" id="uz"
+           onclick="document.getElementById('f-file').click()"
+           ondragover="onDragOver(event)" ondragleave="onDragLeave()" ondrop="onDrop(event)">
+        <div id="uz-ph">
+          <div class="uz-ico">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          </div>
+          <div class="uz-txt" data-i18n="uploadZoneText">แตะเพื่อเลือกรูปสลิป</div>
+          <div class="uz-hint" data-i18n="uploadZoneHint">PNG / JPG — ขนาดไม่เกิน 5 MB</div>
+        </div>
+        <img id="slip-img" class="slip-prev hidden" alt="Slip preview">
+      </div>
+      <button id="clr-slip" class="clear-slip-btn hidden" onclick="clearSlip(event)">✕ <span data-i18n="clearSlipBtn">ลบสลิป</span></button>
+    </div>
+
+    <div id="f-msg" class="hidden"></div>
+    <button id="sub-btn" class="btn btn-teal" onclick="doSubmit()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+      <span id="sub-txt" data-i18n="submitBtn">บันทึกรายการ</span>
+    </button>
+  </div>
+
+  <div id="tab-dash" class="tab-body hidden">
+    <div class="tab-top">
+      <span class="tab-ttl" data-i18n="dashTitle">สรุปรายวัน</span>
+      <button class="ref-btn" onclick="forceLoadDash()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+        <span data-i18n="refreshBtn">รีเฟรช</span>
+      </button>
+    </div>
+
+    <div class="date-nav">
+      <button class="nav-arrow" id="nav-prev" onclick="navDay(-1)" title="วันก่อนหน้า" data-i18n-title="navPrevTitle">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <span class="date-nav-lbl" id="dash-date-lbl">—</span>
+      <button class="nav-arrow" id="nav-next" onclick="navDay(1)" title="วันถัดไป" data-i18n-title="navNextTitle">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+
+    <div class="branch-filter" id="branch-filter"></div>
+
+    <div class="cur-tabs">
+      <button class="ctab on" id="ctab-LAK" onclick="switchCurTab('LAK')">LAK ₭</button>
+      <button class="ctab" id="ctab-THB" onclick="switchCurTab('THB')">THB ฿</button>
+      <button class="ctab" id="ctab-USD" onclick="switchCurTab('USD')">USD $</button>
+    </div>
+
+    <div class="dash-grid">
+      <div class="mc g">
+        <div class="mc-lbl">💵 <span data-i18n="cardCashIncome">รายรับ เงินสด</span></div>
+        <div class="mc-val gv" id="d-cash">0</div>
+        <div class="mc-cur" id="d-cash-c">LAK ₭</div>
+      </div>
+      <div class="mc p">
+        <div class="mc-lbl">📱 <span data-i18n="cardQRIncome">รายรับ QR / OnePay</span></div>
+        <div class="mc-val pv" id="d-qr">0</div>
+        <div class="mc-cur" id="d-qr-c">LAK ₭</div>
+      </div>
+      <div class="mc r">
+        <div class="mc-lbl">↓ <span data-i18n="cardExpense">รายจ่ายรวม</span></div>
+        <div class="mc-val rv" id="d-exp">0</div>
+        <div class="mc-cur" id="d-exp-c">LAK ₭</div>
+      </div>
+    </div>
+
+    <div class="dvd"></div>
+    <div class="sec-top">
+      <span class="sec-ttl" data-i18n="recentEntries">รายการล่าสุด</span>
+      <span class="cnt-badge" id="d-cnt">—</span>
+    </div>
+    <div class="elist" id="d-list">
+      <div class="empty" data-i18n="emptyDashHint">กดปุ่มรีเฟรชเพื่อดูข้อมูล</div>
+    </div>
+  </div>
+
+  <nav class="bot-nav">
+    <button class="nb on" id="nb-rec" onclick="switchTab('rec')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4z"/></svg>
+      <span data-i18n="navRecord">บันทึก</span>
+    </button>
+    <button class="nb" id="nb-dash" onclick="switchTab('dash')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+      <span data-i18n="navSummary">สรุป</span>
+    </button>
+  </nav>
+</div>
+
+<script>
+// 🛠 Dev Console — intercept logs before anything else runs
+(function(){
+  const _orig={log:console.log,warn:console.warn,error:console.error};
+  function _esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function _devLog(type,args){
+    const el=document.getElementById('dev-console-log');
+    if(!el)return;
+    const ts=new Date().toISOString().slice(11,23);
+    const msg=Array.from(args).map(a=>{try{return typeof a==='object'?JSON.stringify(a,null,0):String(a);}catch{return '[obj]';}}).join(' ');
+    const d=document.createElement('div');
+    d.className='dev-log '+type;
+    d.innerHTML='<span class="dev-log-ts">'+ts+'</span>'+_esc(msg);
+    el.appendChild(d);
+    el.scrollTop=el.scrollHeight;
+  }
+  ['log','warn','error'].forEach(type=>{
+    console[type]=function(...args){_orig[type].apply(console,args);_devLog(type,args);};
+  });
+  window.onerror=function(msg,src,line,col){
+    _devLog('error',['[onerror] '+msg+' @ '+src+':'+line+':'+col]);
+  };
+  window.onunhandledrejection=function(e){
+    _devLog('error',['[unhandledrejection] '+(e.reason?.message||String(e.reason)||'unknown')]);
+  };
+})();
+
+// 🔧 Storage Keys, Branches & Constants
+const SCRIPTS_KEY       = 'savedScripts';
+const ACTIVE_SCRIPT_KEY = 'activeScriptUrl';
+
+let SCRIPT_URL = localStorage.getItem(ACTIVE_SCRIPT_KEY) || '';
+
+const BRANCHES_KEY    = 'savedBranches';
+const DEFAULT_BRANCHES = ['สาขา 1', 'สาขา 2'];
+const BRANCH_ICONS    = ['🏪', '🏬', '🏢', '🏭', '🏛️', '🏦'];
+
+function loadBranches() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(BRANCHES_KEY) || 'null');
+    if (Array.isArray(saved) && saved.length) return saved.map(String);
+  } catch { }
+  return [...DEFAULT_BRANCHES];
+}
+
+let BRANCHES    = loadBranches();
+let BRANCH_KEYS = ['All', ...BRANCHES];
+
+const CURRENCIES       = ['LAK', 'THB', 'USD'];
+const MAX_PIN_ATTEMPTS = 5;
+const TOAST_DURATION   = 3200;
+const MAX_FILE_SIZE    = 5 * 1024 * 1024;
+const MAX_IMG_PX       = 1280;
+const IMG_QUALITY      = 0.82;
+const API_TIMEOUT      = 15000;
+const VAPID_PUBLIC_KEY = 'YOUR_VAPID_PUBLIC_KEY_HERE';
+
+// 🗂️ App & Dashboard State
+const A = {
+  users:    [],
+  me:       null,
+  attempts: {},
+  fd: { type:'income', shop: BRANCHES[0], pay:'Cash' },
+  slip:     null,
+};
+let dashByBranchCur  = {};
+let dashByCur        = {};
+let dashEntries      = [];
+let activeCurTab     = 'LAK';
+let activeBranchFilter = 'All';
+let BRANCH_FILTER_IDS = {};
+let dashDate    = new Date();
+let loadDashSeq = 0;
+const rawApiCache  = {};
+
+// 🗣️ Language Settings
+const LANG_KEY = 'appLang';
+const LANGS = {
+  lo: { flag: '🇱🇦', label: 'ລາວ' },
+  th: { flag: '🇹🇭', label: 'ไทย' },
+  en: { flag: '🇺🇸', label: 'English' },
+};
+const DEFAULT_LANG = 'th';
+const _savedLang = localStorage.getItem(LANG_KEY);
+let currentLang = LANGS[_savedLang] ? _savedLang : DEFAULT_LANG;
+
+// 🌐 Translation Data
+const I18N = {
+  tagline:               { lo:'ລະບົບບັນຊີລາຍຮັບ-ລາຍຈ່າຍ',                         th:'ระบบบัญชีรายรับ-รายจ่าย',                          en:'Income & Expense Tracking System' },
+  cfgBarMsg:             { lo:'⚙️ ກະລຸນາປ້ອນ ແລະ ບັນທຶກ Google Script URL ດ້ານລຸ່ມກ່ອນເຂົ້າສູ່ລະບົບ', th:'⚙️ กรุณากรอกและบันทึก Google Script URL ด้านล่างก่อนเข้าสู่ระบบ', en:'⚙️ Please enter and save a Google Script URL below before signing in' },
+  loadingGeneric:        { lo:'ກຳລັງດຳເນີນການ...',                                th:'กำลังดำเนินการ...',                                en:'Processing...' },
+
+  labelStaffName:        { lo:'ຊື່ພະນັກງານ',          th:'ชื่อพนักงาน',          en:'Staff Name' },
+  placeholderStaffName:  { lo:'ປ້ອນຊື່ພະນັກງານ',       th:'กรอกชื่อพนักงาน',       en:'Enter staff name' },
+  labelPin:              { lo:'ລະຫັດ PIN',            th:'รหัส PIN',             en:'PIN Code' },
+  ariaTogglePin:         { lo:'ສະແດງ/ເຊື່ອງລະຫັດ PIN', th:'แสดง/ซ่อนรหัส PIN',     en:'Show/Hide PIN' },
+  rememberMe:            { lo:'ຈື່ຂ້ອຍໄວ້ໃນລະບົບ',      th:'จำฉันไว้ในระบบ',        en:'Remember Me' },
+  rememberMeGloss:       { lo:'Remember Me',          th:'Remember Me',          en:'' },
+  loginBtn:              { lo:'ເຂົ້າສູ່ລະບົບ',          th:'เข้าสู่ระบบ',           en:'Sign In' },
+  loginBtnLocked:        { lo:'ບັນຊີຖືກລັອກ',          th:'บัญชีถูกล็อก',          en:'Account Locked' },
+  footerCopy:            { lo:'© 2026 FelisiaCH — ເຜີຍແຜ່ພາຍໃຕ້ໃບອະນຸຍາດ MIT', th:'© 2026 FelisiaCH — เผยแพร่ภายใต้สัญญาอนุญาต MIT', en:'© 2026 FelisiaCH — Released under the MIT License' },
+
+  labelScriptUrl:        { lo:'App Token or Web App URL / ໂທເຄັນແອັບ ຫຼື ລິ້ງ Web App URL', th:'App Token or Web App URL / ใส่รหัสโทเค็น หรือ ลิงก์ URL', en:'App Token or Web App URL' },
+  placeholderScriptUrl:  { lo:'ວາງລິ້ງເຕັມ ຫຼື ວາງສະເພາະ Token', th:'วางลิงก์เต็ม หรือวางเฉพาะ Token', en:'Paste the full URL, or just the Token' },
+  btnSaveScript:         { lo:'ບັນທຶກສະຄຣິບ',          th:'บันทึกสคริปต์',         en:'Save Script' },
+  selectSavedScript:     { lo:'-- ເລືອກສະຄຣິບທີ່ບັນທຶກໄວ້ --', th:'-- เลือกสคริปต์ที่บันทึกไว้ --', en:'-- Select a saved script --' },
+  promptScriptNickname:  { lo:'ຕັ້ງຊື່ສະຄຣິບນີ້ (ເຊັ່ນ: Sheet Main)', th:'ตั้งชื่อเล่นให้สคริปต์นี้ (เช่น Sheet Main)', en:'Give this script a nickname (e.g. Sheet Main)' },
+  warnEnterScriptUrl:    { lo:'⚠️ ກະລຸນາປ້ອນ Google Script URL', th:'⚠️ กรุณากรอก Google Script URL', en:'⚠️ Please enter a Google Script URL' },
+  warnNoScriptUrl:       { lo:'⚠️ ກະລຸນາບັນທຶກ ແລະ ເລືອກ Google Script URL ກ່ອນ', th:'⚠️ กรุณาบันทึกและเลือก Google Script URL ก่อน', en:'⚠️ Please save and select a Google Script URL first' },
+  toastScriptSaved:      { lo:'✅ ບັນທຶກສະຄຣິບສຳເລັດ!',  th:'✅ บันทึกสคริปต์สำเร็จ!', en:'✅ Script saved!' },
+  toastScriptSwitched:   { lo:'🔄 ສະລັບສະຄຣິບທີ່ໃຊ້ງານແລ້ວ', th:'🔄 สลับสคริปต์ที่ใช้งานแล้ว', en:'🔄 Active script switched' },
+
+  logoutTitle:           { lo:'ອອກຈາກລະບົບ',          th:'ออกจากระบบ',           en:'Log Out' },
+  ariaMoreMenu:          { lo:'ເມນູເພີ່ມເຕີມ',         th:'เมนูเพิ่มเติม',         en:'More options' },
+  menuLanguage:          { lo:'🌐 ພາສາ / Language',    th:'🌐 ภาษา / Language',    en:'🌐 Language Options' },
+  menuActiveScript:      { lo:'ສະຄຣິບທີ່ໃຊ້ງານ',        th:'สคริปต์ที่ใช้งาน',       en:'Active Script' },
+  menuCredentials:       { lo:'🔑 ຂໍ້ມູນເຂົ້າສູ່ລະບົບ / Credentials', th:'🔑 ข้อมูลเชื่อมต่อ / Credentials', en:'🔑 Credentials' },
+  menuManagement:        { lo:'⚙️ ການຈັດການ / Management', th:'⚙️ การจัดการ / Management', en:'⚙️ Management' },
+
+  placeholderNewBranch:  { lo:'ປ້ອນຊື່ສາຂາໃໝ່',         th:'กรอกชื่อสาขาใหม่',       en:'Enter new branch name' },
+  btnAddBranch:          { lo:'➕ ເພີ່ມສາຂາໃໝ່ / Add Branch', th:'➕ เพิ่มสาขาใหม่ / Add Branch', en:'➕ Add New Branch' },
+  ariaDeleteBranch:      { lo:'ລຶບສາຂານີ້',            th:'ลบสาขานี้',            en:'Delete this branch' },
+  warnEnterBranchName:   { lo:'⚠️ ກະລຸນາປ້ອນຊື່ສາຂາ',   th:'⚠️ กรุณากรอกชื่อสาขา',  en:'⚠️ Please enter a branch name' },
+  warnBranchExists:      { lo:'⚠️ ມີສາຂານີ້ຢູ່ແລ້ວ',     th:'⚠️ มีสาขานี้อยู่แล้ว',    en:'⚠️ This branch already exists' },
+  warnNeedOneBranch:     { lo:'⚠️ ຕ້ອງມີຢ່າງໜ້ອຍ 1 ສາຂາ', th:'⚠️ ต้องมีอย่างน้อย 1 สาขา', en:'⚠️ At least one branch is required' },
+  confirmDeleteBranch:   { lo:'ທ່ານຕ້ອງການລຶບສາຂາ "{name}" ແທ້ບໍ?', th:'ต้องการลบสาขา "{name}" ใช่หรือไม่?', en:'Delete the branch "{name}"?' },
+  toastBranchAdded:      { lo:'✅ ເພີ່ມສາຂາສຳເລັດ!',     th:'✅ เพิ่มสาขาสำเร็จ!',    en:'✅ Branch added!' },
+  toastBranchRemoved:    { lo:'🗑️ ລຶບສາຂາແລ້ວ',         th:'🗑️ ลบสาขาแล้ว',        en:'🗑️ Branch removed' },
+
+  tabRecordTitle:        { lo:'ບັນທຶກລາຍການ',          th:'บันทึกรายการ',         en:'Record Entry' },
+  labelType:             { lo:'ປະເພດລາຍການ',          th:'ประเภทรายการ',         en:'Entry Type' },
+  typeIncome:            { lo:'ລາຍຮັບ',               th:'รายรับ',               en:'Income' },
+  typeExpense:           { lo:'ລາຍຈ່າຍ',              th:'รายจ่าย',              en:'Expense' },
+  labelItemName:         { lo:'ຊື່ລາຍການ',            th:'ชื่อรายการ',           en:'Item Name' },
+  placeholderItemName:   { lo:'ລະບຸ ຫຼື ເລືອກຊື່ລາຍການ', th:'ระบุหรือเลือกชื่อรายการ', en:'Type or pick an item name' },
+  ariaSelectItem:        { lo:'ເລືອກລາຍການ',          th:'เลือกรายการ',          en:'Select item' },
+  labelAmount:           { lo:'ຈຳນວນເງິນ',            th:'จำนวนเงิน',            en:'Amount' },
+  ariaCurrency:          { lo:'ສະກຸນເງິນ',            th:'สกุลเงิน',             en:'Currency' },
+  labelBranch:           { lo:'ສາຂາ',                 th:'สาขา',                 en:'Branch' },
+  labelPaymentMethod:    { lo:'ຊ່ອງທາງຊຳລະເງິນ',       th:'ช่องทางชำระเงิน',       en:'Payment Method' },
+  payCash:               { lo:'ເງິນສົດ',              th:'เงินสด',               en:'Cash' },
+  labelAttachSlip:       { lo:'ແນບສະລິບ',             th:'แนบสลิป',              en:'Attach Slip' },
+  uploadZoneText:        { lo:'ແຕະເພື່ອເລືອກຮູບສະລິບ', th:'แตะเพื่อเลือกรูปสลิป', en:'Tap to select slip image' },
+  uploadZoneHint:        { lo:'PNG / JPG — ຂະໜາດບໍ່ເກີນ 5 MB', th:'PNG / JPG — ขนาดไม่เกิน 5 MB', en:'PNG / JPG — up to 5 MB' },
+  clearSlipBtn:          { lo:'ລຶບສະລິບ',             th:'ลบสลิป',               en:'Remove Slip' },
+  submitBtn:             { lo:'ບັນທຶກລາຍການ',          th:'บันทึกรายการ',         en:'Save Entry' },
+  submitBtnSaving:       { lo:'ກຳລັງບັນທຶກ...',        th:'กำลังบันทึก...',        en:'Saving...' },
+
+  dashTitle:             { lo:'ສະຫຼຸບລາຍວັນ',          th:'สรุปรายวัน',           en:'Daily Summary' },
+  refreshBtn:            { lo:'ໂຫຼດຄືນໃໝ່',           th:'รีเฟรช',               en:'Refresh' },
+  navPrevTitle:          { lo:'ມື້ກ່ອນໜ້າ',            th:'วันก่อนหน้า',           en:'Previous day' },
+  navNextTitle:          { lo:'ມື້ຖັດໄປ',              th:'วันถัดไป',             en:'Next day' },
+  allBranches:           { lo:'ທຸກສາຂາ',              th:'ทุกสาขา',              en:'All Branches' },
+  cardCashIncome:        { lo:'ລາຍຮັບ ເງິນສົດ',        th:'รายรับ เงินสด',        en:'Cash Income' },
+  cardQRIncome:          { lo:'ລາຍຮັບ QR / OnePay',   th:'รายรับ QR / OnePay',   en:'QR / OnePay Income' },
+  cardExpense:           { lo:'ລາຍຈ່າຍລວມ',           th:'รายจ่ายรวม',           en:'Total Expenses' },
+  recentEntries:         { lo:'ລາຍການລ່າສຸດ',         th:'รายการล่าสุด',          en:'Recent Entries' },
+  emptyDashHint:         { lo:'ກົດປຸ່ມໂຫຼດຄືນໃໝ່ເພື່ອເບິ່ງຂໍ້ມູນ', th:'กดปุ่มรีเฟรชเพื่อดูข้อมูล', en:'Tap refresh to load data' },
+
+  navRecord:             { lo:'ບັນທຶກ',               th:'บันทึก',               en:'Record' },
+  navSummary:            { lo:'ສະຫຼຸບ',               th:'สรุป',                 en:'Summary' },
+
+  errConnectSheets:      { lo:'❌ ເຊື່ອມຕໍ່ Google Sheets ບໍ່ໄດ້', th:'❌ เชื่อมต่อ Google Sheets ไม่ได้', en:'❌ Could not connect to Google Sheets' },
+  errAccountLocked:      { lo:'🔒 ບັນຊີຖືກລັອກຊົ່ວຄາວ ກະລຸນາຕິດຕໍ່ແອັດມິນ', th:'🔒 บัญชีถูกล็อกชั่วคราว กรุณาติดต่อแอดมิน', en:'🔒 Account temporarily locked. Please contact admin' },
+  warnEnterStaffName:    { lo:'⚠️ ກະລຸນາປ້ອນຊື່ພະນັກງານ', th:'⚠️ กรุณากรอกชื่อพนักงาน', en:'⚠️ Please enter your staff name' },
+  warnEnterPin:          { lo:'⚠️ ກະລຸນາປ້ອນລະຫັດ PIN', th:'⚠️ กรุณากรอกรหัส PIN', en:'⚠️ Please enter your PIN' },
+  errWrongPin:           { lo:'❌ ລະຫັດ PIN ບໍ່ຖືກຕ້ອງ ກະລຸນາລອງໃໝ່ອີກຄັ້ງ', th:'❌ รหัส PIN ไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง', en:'❌ Incorrect PIN. Please try again' },
+  attemptsLeft:          { lo:'ຍັງເຫຼືອອີກ {n} ຄັ້ງກ່ອນຖືກລັອກ', th:'เหลืออีก {n} ครั้งก่อนถูกล็อก', en:'{n} attempt(s) left before lockout' },
+  errGeneric:            { lo:'❌ ເກີດຂໍ້ຜິດພາດ: {msg}', th:'❌ เกิดข้อผิดพลาด: {msg}', en:'❌ An error occurred: {msg}' },
+  confirmLogout:         { lo:'ທ່ານຕ້ອງການອອກຈາກລະບົບແທ້ບໍ?', th:'ต้องการออกจากระบบหรือไม่?', en:'Are you sure you want to log out?' },
+  errFileTooLarge:       { lo:'❌ ໄຟລ໌ໃຫຍ່ເກີນ 5 MB', th:'❌ ไฟล์ใหญ่เกิน 5 MB', en:'❌ File exceeds 5 MB' },
+  errLoadImage:          { lo:'❌ ໂຫຼດຮູບພາບບໍ່ໄດ້', th:'❌ โหลดรูปภาพไม่ได้', en:'❌ Could not load image' },
+  warnEnterItemName:     { lo:'⚠️ ກະລຸນາປ້ອນຊື່ລາຍການ', th:'⚠️ กรุณากรอกชื่อรายการ', en:'⚠️ Please enter an item name' },
+  warnEnterValidAmount:  { lo:'⚠️ ກະລຸນາປ້ອນຈຳນວນເງິນໃຫ້ຖືກຕ້ອງ', th:'⚠️ กรุณากรอกจำนวนเงินให้ถูกต้อง', en:'⚠️ Please enter a valid amount' },
+  warnAttachSlip:        { lo:'⚠️ ກະລຸນາແນບສະລິບການໂອນເງິນ (ຕ້ອງມີເມື່ອເລືອກ Lao QR / OnePay)', th:'⚠️ กรุณาแนบสลิปการโอนเงิน (ต้องมีเมื่อเลือก Lao QR / OnePay)', en:'⚠️ Please attach a transfer slip (required for Lao QR / OnePay)' },
+  ovUploadingSlip:       { lo:'ກຳລັງອັບໂຫຼດສະລິບ…', th:'กำลังอัพโหลดสลิป…', en:'Uploading slip…' },
+  ovSavingEntry:         { lo:'ກຳລັງບັນທຶກລາຍການ…', th:'กำลังบันทึกรายการ…', en:'Saving entry…' },
+  toastSaveSuccess:      { lo:'✅ ບັນທຶກລາຍການສຳເລັດ!', th:'✅ บันทึกรายการสำเร็จ!', en:'✅ Entry saved successfully!' },
+  notifyIncomeTitle:     { lo:'🟢 ບັນທຶກລາຍຮັບສຳເລັດ / Income Saved', th:'🟢 บันทึกรายรับสำเร็จ / Income Saved', en:'🟢 Income Saved' },
+  notifyExpenseTitle:    { lo:'🔴 ບັນທຶກລາຍຈ່າຍສຳເລັດ / Expense Saved', th:'🔴 บันทึกรายจ่ายสำเร็จ / Expense Saved', en:'🔴 Expense Saved' },
+  btnTestNotification:   { lo:'🔔 ທົດສອບແຈ້ງເຕືອນ / Test Notification', th:'🔔 ทดสอบแจ้งเตือน / Test Notification', en:'🔔 Test Notification' },
+  btnOpenConsole:        { lo:'🛠 ເປີດ Developer Console', th:'🛠 เปิด Developer Console', en:'🛠 Open Developer Console' },
+  btnRequestNotifPermission: { lo:'🔑 ເປີດສິດແຈ້ງເຕືອນ / Request Permission', th:'🔑 เปิดสิทธิ์แจ้งเตือน / Request Permission', en:'🔑 Request Notification Permission' },
+  notifPermResultGranted:    { lo:'✅ ສະຖານະການອະນຸຍາດ: granted — ການແຈ້ງເຕືອນລະບົບສາມາດໃຊ້ງານໄດ້ແລ້ວ!', th:'✅ สถานะการอนุญาต: granted — ตอนนี้การแจ้งเตือนระบบใช้งานได้แล้ว!', en:'✅ Permission status: granted — system notifications can now be used!' },
+  notifPermResultDefault:    { lo:'ℹ️ ສະຖານະການອະນຸຍາດ: default — ທ່ານຍັງບໍ່ໄດ້ເລືອກອະນຸຍາດ ຫຼື ປະຕິເສດ', th:'ℹ️ สถานะการอนุญาต: default — คุณยังไม่ได้เลือกอนุญาตหรือปฏิเสธ', en:'ℹ️ Permission status: default — you have not chosen to allow or block yet' },
+  notifPermResultDenied:     { lo:'🔒 ສະຖານະການອະນຸຍາດ: denied — ການແຈ້ງເຕືອນຖືກບລັອກໄວ້ ກະລຸນາແກ້ໄຂການຕັ້ງຄ່າເວັບໄຊ', th:'🔒 สถานะการอนุญาต: denied — การแจ้งเตือนถูกบล็อกไว้ กรุณาแก้ไขการตั้งค่าเว็บไซต์', en:'🔒 Permission status: denied — notifications are blocked; please fix the site settings' },
+  notifNotSupported:     { lo:'⚠️ ບຣາວເຊີນີ້ບໍ່ຮອງຮັບການແຈ້ງເຕືອນ', th:'⚠️ เบราว์เซอร์นี้ไม่รองรับการแจ้งเตือน', en:'⚠️ This browser does not support notifications' },
+  notifTestTitle:        { lo:'🔔 ນີ້ແມ່ນການແຈ້ງເຕືອນທົດສອບ', th:'🔔 นี่คือการแจ้งเตือนทดสอบ', en:'🔔 This is a Test Notification' },
+  notifTestBody:         { lo:'ຖ້າທ່ານເຫັນອັນນີ້ ການແຈ້ງເຕືອນເຮັດວຽກປົກກະຕິ ✅', th:'ถ้าคุณเห็นข้อความนี้ แสดงว่าการแจ้งเตือนทำงานปกติ ✅', en:'If you can see this, notifications are working correctly ✅' },
+  notifTestFailed:       { lo:'❌ ສົ່ງການແຈ້ງເຕືອນທົດສອບບໍ່ສຳເລັດ — ກວດສອບ console', th:'❌ ส่งการแจ้งเตือนทดสอบไม่สำเร็จ — ตรวจสอบ console', en:'❌ Failed to send test notification — check the console' },
+  notifDeniedHelp:       {
+    lo:  '🔒 ການແຈ້ງເຕືອນຖືກບລັອກໄວ້ສຳລັບເວັບໄຊນີ້\n\nວິທີແກ້ໄຂໃນ Chrome (Mac):\n1. ກົດໄອຄອນ 🔒 ຫຼື ⓘ ທາງຊ້າຍຂອງທີ່ຢູ່ເວັບ\n2. ຊອກຫາ "Notifications" ແລ້ວປ່ຽນເປັນ "Allow"\n3. ໂຫຼດໜ້ານີ້ໃໝ່ (Reload) ແລ້ວກົດທົດສອບອີກຄັ້ງ\n\nຫຼືໄປທີ່ Chrome ▸ Settings ▸ Privacy and security ▸ Site settings ▸ Notifications ແລ້ວລຶບເວັບໄຊນີ້ອອກຈາກລາຍການ "Not allowed to send notifications"\n\nສຳລັບ macOS: ກວດສອບ System Settings ▸ Notifications ▸ Google Chrome ວ່າເປີດໃຊ້ງານຢູ່ນຳ',
+    th:  '🔒 การแจ้งเตือนถูกบล็อกไว้สำหรับเว็บไซต์นี้\n\nวิธีแก้ไขใน Chrome (Mac):\n1. คลิกไอคอน 🔒 หรือ ⓘ ทางซ้ายของแถบที่อยู่เว็บ\n2. มองหา "Notifications" แล้วเปลี่ยนเป็น "Allow"\n3. โหลดหน้านี้ใหม่ (Reload) แล้วกดทดสอบอีกครั้ง\n\nหรือไปที่ Chrome ▸ Settings ▸ Privacy and security ▸ Site settings ▸ Notifications แล้วลบเว็บไซต์นี้ออกจากรายการ "Not allowed to send notifications"\n\nสำหรับ macOS: ตรวจสอบ System Settings ▸ Notifications ▸ Google Chrome ว่าเปิดใช้งานอยู่ด้วย',
+    en:  '🔒 Notifications are blocked for this site\n\nHow to fix it in Chrome (Mac):\n1. Click the 🔒 or ⓘ icon to the left of the address bar\n2. Find "Notifications" and change it to "Allow"\n3. Reload this page and click Test again\n\nOr go to Chrome ▸ Settings ▸ Privacy and security ▸ Site settings ▸ Notifications, and remove this site from the "Not allowed to send notifications" list\n\nOn macOS, also check System Settings ▸ Notifications ▸ Google Chrome to make sure notifications are enabled there too'
+  },
+  errUploadFailed:       { lo:'ອັບໂຫຼດສະລິບລົ້ມເຫຼວ', th:'อัพโหลดสลิปล้มเหลว', en:'Slip upload failed' },
+  errSaveFailed:         { lo:'ບັນທຶກລົ້ມເຫຼວ', th:'บันทึกล้มเหลว', en:'Save failed' },
+  ovLoadingData:         { lo:'ກຳລັງໂຫຼດຂໍ້ມູນ {date}…', th:'กำลังโหลดข้อมูล {date}…', en:'Loading data for {date}…' },
+  errLoadDataFailed:     { lo:'❌ ໂຫຼດຂໍ້ມູນບໍ່ສຳເລັດ', th:'❌ โหลดข้อมูลไม่สำเร็จ', en:'❌ Failed to load data' },
+  entriesCount:          { lo:'{n} ລາຍການ', th:'{n} รายการ', en:'{n} entries' },
+  emptyEntriesToday:     { lo:'📭 ບໍ່ມີລາຍການສຳລັບມື້ນີ້', th:'📭 ไม่มีรายการสำหรับวันนี้', en:'📭 No entries for today' },
+  emptyEntriesForDate:   { lo:'📭 ບໍ່ມີລາຍການສຳລັບວັນທີ {date}', th:'📭 ไม่มีรายการสำหรับวันที่ {date}', en:'📭 No entries for {date}' },
+  actionCashIncome:      { lo:'↑ ລາຍຮັບເງິນສົດ', th:'↑ รายรับเงินสด', en:'↑ Cash Income' },
+  actionQRIncome:        { lo:'↑ ລາຍຮັບ QR', th:'↑ รายรับ QR', en:'↑ QR Income' },
+  actionExpense:         { lo:'↓ ລາຍຈ່າຍ', th:'↓ รายจ่าย', en:'↓ Expense' },
+  slipLink:              { lo:'🔗 ສະລິບ', th:'🔗 สลิป', en:'🔗 Slip' },
+};
+
+// 🔤 Translation Helpers
+function t(key, vars) {
+  const entry = I18N[key];
+  let str = entry ? (entry[currentLang] ?? entry[DEFAULT_LANG] ?? entry.en ?? '') : key;
+  if (vars) Object.entries(vars).forEach(([k, v]) => { str = str.replaceAll(`{${k}}`, String(v)); });
+  return str;
+}
+
+function setLang(lang) {
+  if (!LANGS[lang] || lang === currentLang) return;
+  currentLang = lang;
+  localStorage.setItem(LANG_KEY, lang);
+  applyTranslations();
+}
+
+function renderLangSwitchers() {
+  const wrap = $('lang-switch-menu');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  Object.entries(LANGS).forEach(([code, info]) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `lang-btn${code === currentLang ? ' on' : ''}`;
+    btn.setAttribute('aria-label', info.label);
+    btn.innerHTML = `<span class="flag">${info.flag}</span><span>${esc(info.label)}</span>`;
+    btn.addEventListener('click', () => { setLang(code); closeMoreMenu(); });
+    wrap.appendChild(btn);
+  });
+}
+
+function applyTranslations() {
+  document.documentElement.lang = currentLang;
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t(el.dataset.i18nTitle); });
+  document.querySelectorAll('[data-i18n-optional]').forEach(el => {
+    const txt = t(el.dataset.i18nOptional);
+    el.textContent = txt;
+    el.classList.toggle('hidden', !txt);
+  });
+
+  renderLangSwitchers();
+  renderScriptSelectors();
+  renderBranchSegments();
+  renderBranchFilters();
+  renderManageBranchesList();
+
+  if (!$('scr-app').classList.contains('hidden')) {
+    $('f-date-lbl').textContent = fmtDateTab(new Date());
+    if (!$('tab-dash').classList.contains('hidden')) refreshDashUI();
+  }
+}
+
+// 🧾 Item Picker & Combo Dropdown
+const ITEM_OPTIONS = ['Service','Charger Port','Charger Kit','Charging Cable','Screen Protector','Battery','Headphones','Power Adapter'];
+
+function initCombo() {
+  const drop = $('combo-drop');
+  ITEM_OPTIONS.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'combo-opt';
+    btn.textContent = opt;
+    btn.addEventListener('mousedown', e => { e.preventDefault(); pickCombo(opt); });
+    drop.appendChild(btn);
+  });
+  document.addEventListener('click', e => {
+    if (!e.target?.closest('.combo-wrap')) closeCombo();
+  });
+}
+function toggleCombo() {
+  const drop = $('combo-drop');
+  const isOpen = !drop.classList.contains('hidden');
+  if (isOpen) { closeCombo(); } else {
+    drop.classList.remove('hidden');
+    $('combo-btn').classList.add('open');
+    $('f-item').focus();
+  }
+}
+function closeCombo() {
+  $('combo-drop').classList.add('hidden');
+  $('combo-btn').classList.remove('open');
+}
+function pickCombo(val) {
+  $('f-item').value = val;
+  closeCombo();
+  $('f-item').focus();
+}
+
+// 🏪 Branch Management
+function renderBranchSegments() {
+  const wrap = $('sg-branch');
+  if (!wrap) return;
+  const current = BRANCHES.includes(A.fd.shop) ? A.fd.shop : BRANCHES[0];
+  A.fd.shop = current;
+  wrap.innerHTML = '';
+  BRANCHES.forEach((name, i) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `branch-chip${name === current ? ' on' : ''}`;
+    btn.textContent = `${BRANCH_ICONS[i % BRANCH_ICONS.length]} ${name}`;
+    btn.addEventListener('click', () => setSeg('shop', name, btn));
+    wrap.appendChild(btn);
+  });
+}
+
+function renderBranchFilters() {
+  const wrap = $('branch-filter');
+  if (!wrap) return;
+  if (!BRANCH_KEYS.includes(activeBranchFilter)) activeBranchFilter = 'All';
+  wrap.innerHTML = '';
+  BRANCH_FILTER_IDS = {};
+
+  const allBtn = document.createElement('button');
+  allBtn.type = 'button';
+  allBtn.id = 'sf-All';
+  allBtn.className = `sf${activeBranchFilter === 'All' ? ' on' : ''}`;
+  allBtn.textContent = `🏢 ${t('allBranches')}`;
+  allBtn.addEventListener('click', () => switchBranchFilter('All'));
+  wrap.appendChild(allBtn);
+  BRANCH_FILTER_IDS['All'] = 'sf-All';
+
+  BRANCHES.forEach((name, i) => {
+    const id = `sf-branch-${i}`;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = id;
+    btn.className = `sf${activeBranchFilter === name ? ' on' : ''}`;
+    btn.textContent = `${BRANCH_ICONS[i % BRANCH_ICONS.length]} ${name}`;
+    btn.addEventListener('click', () => switchBranchFilter(name));
+    wrap.appendChild(btn);
+    BRANCH_FILTER_IDS[name] = id;
+  });
+}
+
+function selectBranchSegment(value) {
+  const target = BRANCHES.includes(value) ? value : BRANCHES[0];
+  A.fd.shop = target;
+  document.querySelectorAll('#sg-branch .branch-chip').forEach((btn, i) => btn.classList.toggle('on', BRANCHES[i] === target));
+}
+
+function commitBranches(list) {
+  BRANCHES    = list;
+  BRANCH_KEYS = ['All', ...BRANCHES];
+  localStorage.setItem(BRANCHES_KEY, JSON.stringify(BRANCHES));
+
+  if (!BRANCHES.includes(A.fd.shop)) A.fd.shop = BRANCHES[0] || '';
+  if (!BRANCH_KEYS.includes(activeBranchFilter)) activeBranchFilter = 'All';
+
+  renderBranchSegments();
+  renderBranchFilters();
+  renderManageBranchesList();
+
+  if (!$('scr-app').classList.contains('hidden') && !$('tab-dash').classList.contains('hidden')) {
+    dashByBranchCur = buildTotals(dashEntries);
+    dashByCur       = dashByBranchCur[activeBranchFilter];
+    refreshDashUI();
+  }
+}
+
+function addBranch() {
+  const input = $('m-branch-new');
+  const name  = (input?.value || '').trim();
+  if (!name) { showToast(t('warnEnterBranchName'), 'warn'); return; }
+  if (BRANCHES.includes(name)) { showToast(t('warnBranchExists'), 'warn'); return; }
+
+  commitBranches([...BRANCHES, name]);
+  if (input) input.value = '';
+  showToast(t('toastBranchAdded'));
+}
+
+function removeBranch(name) {
+  if (BRANCHES.length <= 1) { showToast(t('warnNeedOneBranch'), 'warn'); return; }
+  if (!confirm(t('confirmDeleteBranch', { name }))) return;
+
+  commitBranches(BRANCHES.filter(b => b !== name));
+  showToast(t('toastBranchRemoved'));
+}
+
+function renderManageBranchesList() {
+  const wrap = $('manage-branch-list');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+
+  if (!BRANCHES.length) {
+    const hint = document.createElement('div');
+    hint.className = 'branch-empty-hint';
+    hint.textContent = t('warnNeedOneBranch');
+    wrap.appendChild(hint);
+    return;
+  }
+
+  BRANCHES.forEach((name, i) => {
+    const row = document.createElement('div');
+    row.className = 'branch-row';
+
+    const icon = document.createElement('span');
+    icon.className = 'branch-row-icon';
+    icon.textContent = BRANCH_ICONS[i % BRANCH_ICONS.length];
+
+    const label = document.createElement('span');
+    label.className = 'branch-row-name';
+    label.textContent = name;
+    label.title = name;
+
+    const delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'branch-del-btn';
+    delBtn.textContent = '❌';
+    delBtn.setAttribute('aria-label', t('ariaDeleteBranch'));
+    delBtn.addEventListener('click', () => removeBranch(name));
+
+    row.append(icon, label, delBtn);
+    wrap.appendChild(row);
+  });
+}
+
+// 🛠️ DOM & Format Helpers
+const $  = id => document.getElementById(id);
+const p2 = n  => String(n).padStart(2,'0');
+
+function nowStamp() {
+  const d = new Date();
+  return `${p2(d.getDate())}-${p2(d.getMonth()+1)}-${d.getFullYear()} ${p2(d.getHours())}:${p2(d.getMinutes())}:${p2(d.getSeconds())}`;
+}
+function fmtN(n) {
+  return new Intl.NumberFormat('en-US',{maximumFractionDigits:2}).format(Number(n)||0);
+}
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showScr(id) {
+  ['scr-load','scr-login','scr-app'].forEach(s => $(s).classList.toggle('hidden', s!==id));
+}
+// 💬 Toast, Overlay & Messages
+function setMsg(id, html, type) {
+  const el = $(id);
+  if (!html) { el.classList.add('hidden'); return; }
+  el.className = `msg ${type||'err'}`;
+  el.innerHTML = html;
+  el.classList.remove('hidden');
+}
+function showToast(msg, type) {
+  $('toast-txt').textContent = msg;
+  const t = $('toast');
+  t.className = `toast${type ? ' '+type : ''}`;
+  void t.offsetWidth;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), TOAST_DURATION);
+}
+function showOv(msg) {
+  $('ov-msg').textContent = msg || t('loadingGeneric');
+  $('ov').classList.remove('hidden');
+}
+function hideOv() { $('ov').classList.add('hidden'); }
+
+// 🔊 Play Sound and Show Notification
+const NOTIF_AUTO_CLOSE_MS = 4500;
+
+const NOTIF_CHIME_DATA_URI = 'data:audio/wav;base64,UklGRoQJAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YWAJAAB/p722lmtKQVR7o7q2mW9NQlJ3n7i3m3NQQ1Fzm7W3nndURE9wl7O2oHtXRk5tk7C2on5bSE5qkK21pIJeSk1njKq0poViTE1liKezp4hlTk1jhaSyqItpUE1hgqGwqY5sU05ff56vqpFvVU5de5utqpNzWE9ceZirqpV2W1BbdpWpqpd5XVFac5Knqpl8YFJZcY+lqpp/Y1RZb4yjqZyBZVVYbYmhqJ2EaFdYa4aep56Ga1lYaYScp5+IbltYZ4GZpaCLcFxYZn+XpKCNc15ZZXyVo6COdWBaZHqSoaCQeGNaY3iQoKCSemVbYnaNnqCTfGdcYXSLnaCUfmldYXKJm6CVgWteYXCHmZ+Wg21gYW+Fl56XhG9hYW6ClZ6YhnFjYWyAk52YiHNkYWt+kpyZiXVmYWp9kJuZi3dnYmp7jpqZjHlpYml5jJiZjXtqY2h4ipeZjn1sZGh2iJaZj35uZWd1h5WYkIBvZmd0hZOYkYJxZ2dyg5KXkoNzaGdxgpCXkoV0aWdwgI+Wk4Z2amdwf42Vk4d3a2hvfYyVk4h5bGhufIqUk4l6bmlueomTk4p8b2lteYiSk4t9cGpteIaRk4x+cWptd4WQk4yAc2tsdoOPko2BdGxsdYKNko2CdW1sdIGMkY6Ddm5sdICLkY6EeG5tc3+KkI6FeW9tcn2JkI6GenBtcnyIj4+He3FtcXuHjo+IfHJucXqGjY6IfXNucXmEjY6JfnRvcXmDjI6Jf3VvcHiCi46KgHZwcHeBio6KgXdxcHeAiY2KgnhxcHZ/iI2Lg3lycXV+iIyLhHpzcXV+h4yLhHtzcXV9houLhXx0cXR8hYuLhn11cnR7hIqLhn52cnR7g4qLhn93cnR6gomLh393c3R5goiKh4B4c3N5gYiKiIF5dHN4gIeKiIF6dHR4f4aKiIJ6dXR3f4aJiIN7dXR3foWJiIN8dnR3fYSIiIR9dnR3fYOIiIR9d3R2fIOIiIR+eHV2e4KHiIV+eHV2e4GHiIV/eXV2eoGGiIWAenZ2eoCGiIaAenZ2eoCFh4aBe3Z2eX+Fh4aBe3d2eX+Eh4aCfHd2eX6Dh4aCfHh2eH2DhoaCfXh2eH2ChoaDfnl3eH2ChoaDfnl3eHyBhYaDfnp3eHyBhYaEf3p3eHuAhIaEf3t4eHuAhIaEgHt4eHt/hIWEgHx4eHp/g4WEgXx5eHp/g4WEgXx5eHp+goWEgX15eHp+goWEgn16eHp9goSEgn56eHp9gYSEgn56eXl9gYSEgn57eXl8gIOEgn97eXl8gIOEg397eXl8gIOEg4B8eXl8f4KEg4B8enl7f4KEg4B9enl7f4KEg4B9enl7foGDg4F9enp7foGDg4F+e3p7foGDg4F+e3p7fYGDg4F+e3p7fYCDg4F+fHp6fYCCg4J/fHp6fYCCg4J/fHp6fH+Cg4J/fHt6fH+Cg4KAfXt6fH+Bg4KAfXt6fH+BgoKAfXt7fH6BgoKAfnt7fH6BgoKAfnx7fH6AgoKBfnx7e36AgoKBfnx7e32AgoKBf3x7e32AgYKBf3x7e31/gYKBf317e31/gYKBf317e31/gYKBf318e31/gYKBf318e3x/tbaASUd7sreETEZ3r7iIT0VzrLiMU0VwqbiPVkVspbiSWUVporiVXUVmn7eYYEZjm7ebZEdhmLadZ0helLSga0lckbOibktajbKkcUxYirCldU5Xh66neFBVg6yoe1JUgKqpf1RTfaiqglZTeqarhVlSd6Orh1tSdKGril5Scp6rjWBSb5urj2NSbZmrkWZSapaqlGhTaJOqlmtUZpGpmG5UZY6omXBWY4unm3NXYommnHZYYIaknXhZX4OjnntbXoGhn31dXX6goIBeXXyeoYJgXHqcoYRiXHiaoYZkXHWYoYlmXHOWoYtoXHKUoYxqXHCSoY5sXG6QoJBuXWyOoJFwXWuMn5NyXmqKnpR1X2iHnpV3YGeFnJZ5YWaDm5d7YmaBmph9Y2V/mZh/ZWR+mJmAZmR8lpmCaGR6lZqEaWN4k5qGa2N3kpqHbGN1kJqJbmN0jpmKb2RyjZmLcWRxi5mNc2RwipiOdGVviJiPdmZuhpeQeGZthZaQeWdsg5WRe2hrgpWSfGlrgJSSfmpqfpOTf2tqfZGTgWxqfJCTgm1peo+Ug25peY6UhXBpeI2UhnFpd4yUh3JqdoqTiHNqdYmTiXVqdIiTinZqc4aSi3drcoWSjHhrcYSRjHpscIORjXttcIGQjXxtb4CPjn1ub3+Pjn9vb36Oj4Bwbn2Nj4FxbnyMj4JxbnuLj4NybnqKj4RzbnmJj4V0bniIj4V1bneHj4Z2bnaGjod3b3aFjoh4b3WEjoh5b3SDjYl6cHSCjYl7cHOBjIp8cXOAjIp9cXN/i4t+cnJ+i4t/c3J+iouAc3J9iYuBdHJ8iYuBdXJ7iIuCdXJ6h4uDdnJ6houEd3J5houEeHJ4hYuFeXJ4hIuFeXJ3g4uGenN3g4qGe3N2goqHfHN2gYqHfHR2gImIfXR1gImIfnV1f4iIf3V1foiIf3Z1fYeIgHZ1fYeIgHd1fIaJgXd0fIaJgnh0e4WIgnh1e4SIg3l1eoSIg3p1eoOIhHp1eYOIhHt1eYKIhHt1eIGIhXx2eIGHhX12eICHhX12d4CHhn53d3+Ghn53d36Ghn93d36Fhn94d32FhoB4d32FhoB5d3yEhoF5d3yEhoF5d3yDhoJ6d3uDhoJ6d3uChoJ7d3qChoN7d3qBhoN8d3qBhoN8d3qAhYR9eHmAhYR9eHmAhYR+eHl/hYR+eHl/hIR/eXl+hIR/eXl+hIR/eXh9g4WAenh9g4WAenh9g4WAenh8goWBe3h8goWBe3l8goSBe3l8gYSCfHl7gYSCfHl7gYSCfXl7gISCfXl7gISDfXl6gISDfnl6f4ODfnp6f4ODfnp6foODf3p6foODf3p6foKDf3t6foKDgHt6fYKDgHt6fYKDgHt6fYGDgHx6fYGDgXx6fIGDgXx6fIGDgX16fICDgX16fICDgX16fICDgn16e3+Dgn57e3+Cgn57e3+Cgn57e3+Cgn97e36Cgn97e36Cgn97e36Cgn98e36Bgn98e32BgoB8e32BgoB8e32BgoB8e32AgoB9e32AgoB9e32AgoF9e3yAgoF9e3yAgoF+e3x/goF+e3x/goF+e3x/gYF+fHx/gYF+fHw=';
+
+function requestNotificationPermission() {
+  if (!('Notification' in window) || Notification.permission !== 'default') return;
+  Notification.requestPermission().catch(() => {});
+}
+
+function requestNotificationPermissionExplicit() {
+  closeMoreMenu();
+  if (!('Notification' in window)) { alert(t('notifNotSupported')); return; }
+
+  Notification.requestPermission().then(perm => {
+    if (perm === 'granted') {
+      alert(t('notifPermResultGranted'));
+      subscribeToPush();
+    } else if (perm === 'denied') {
+      alert(t('notifPermResultDenied'));
+    } else {
+      alert(t('notifPermResultDefault'));
+    }
+  }).catch(() => alert(t('notifTestFailed')));
+}
+
+// 📡 Web Push Subscription
+function urlBase64ToUint8Array(base64String) {
+  const pad = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const b64 = (base64String + pad).replace(/-/g, '+').replace(/_/g, '/');
+  const raw = atob(b64);
+  return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+}
+
+async function subscribeToPush() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    console.warn('[push] PushManager not supported on this browser');
+    showToast('Web Push not supported on this browser', 'err');
+    return;
+  }
+  const perm = await Notification.requestPermission();
+  if (perm !== 'granted') {
+    console.warn('[push] permission not granted:', perm);
+    return;
+  }
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) {
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+      });
+      console.log('[push] new subscription created:', sub.endpoint.slice(0, 60) + '...');
+    } else {
+      console.log('[push] existing subscription found:', sub.endpoint.slice(0, 60) + '...');
+    }
+    localStorage.setItem('pushSubscription', JSON.stringify(sub));
+    _showPushTokenPanel(sub);
+    showToast('Push subscription active ✓', '');
+  } catch (e) {
+    console.error('[push] subscribe failed:', e.message);
+    showToast('Push subscribe failed: ' + e.message, 'err');
+  }
+}
+
+function _showPushTokenPanel(sub) {
+  const box  = $('push-token-box');
+  const text = $('push-token-text');
+  if (!box || !text || !sub) return;
+  text.textContent = JSON.stringify(sub.toJSON ? sub.toJSON() : sub, null, 2);
+  box.classList.remove('hidden');
+}
+
+function copyPushToken() {
+  const text = $('push-token-text')?.textContent;
+  if (!text) return;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text)
+      .then(() => showToast('Token copied ✓', ''))
+      .catch(() => _fallbackCopy(text));
+  } else {
+    _fallbackCopy(text);
+  }
+}
+
+function _fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try { document.execCommand('copy'); showToast('Token copied ✓', ''); }
+  catch { showToast('Copy failed — select text manually', 'err'); }
+  document.body.removeChild(ta);
+}
+
+function playNotifChime() {
+  const vibrate = () => {
+    console.warn('[chime] audio blocked by autoplay policy — vibrating instead');
+    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+  };
+  try { new Audio(NOTIF_CHIME_DATA_URI).play().catch(vibrate); } catch { vibrate(); }
+}
+
+function _swNotify(title, opts) {
+  const fallback = (err) => {
+    console.warn('[_swNotify] SW path failed ('+(err?.message||err||'unknown')+') — falling back to new Notification()');
+    try { const n = new Notification(title, opts); setTimeout(() => n.close(), NOTIF_AUTO_CLOSE_MS); }
+    catch(e2) { console.error('[_swNotify] Notification() fallback also failed:', e2.message); }
+  };
+  if ('serviceWorker' in navigator) {
+    console.log('[_swNotify] via SW | controller:', !!navigator.serviceWorker.controller);
+    navigator.serviceWorker.ready
+      .then(reg => { console.log('[_swNotify] SW ready, scope:', reg.scope); return reg.showNotification(title, opts); })
+      .catch(fallback);
+  } else {
+    console.warn('[_swNotify] serviceWorker API unavailable — using direct Notification()');
+    fallback();
+  }
+}
+
+function notifyTransaction(isIncome, shop, price, cur) {
+  const title = isIncome ? t('notifyIncomeTitle') : t('notifyExpenseTitle');
+  const body  = `${shop}: ${isIncome ? '+' : '-'}${fmtN(price)} ${cur}`;
+  showToast(`${title} — ${body}`, isIncome ? '' : 'err');
+
+  const perm = 'Notification' in window ? Notification.permission : 'not-supported';
+  console.log(`[notifyTransaction] type:${isIncome?'income':'expense'} | notif-perm:${perm}`);
+
+  if (!('Notification' in window) || Notification.permission !== 'granted') {
+    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+    return;
+  }
+  playNotifChime();
+  _swNotify(title, { body, icon: './icon-192x192.png', badge: './icon-192x192.png' });
+}
+
+function testNotification() {
+  closeMoreMenu();
+  if (!('Notification' in window)) { showToast(t('notifNotSupported'), 'err'); return; }
+
+  if (Notification.permission === 'denied') { alert(t('notifDeniedHelp')); return; }
+
+  if (Notification.permission === 'default') {
+    Notification.requestPermission().then(perm => {
+      if (perm === 'granted')      fireTestNotification();
+      else if (perm === 'denied')  alert(t('notifDeniedHelp'));
+      else                         showToast(t('notifNotSupported'), 'warn');
+    }).catch(() => showToast(t('notifTestFailed'), 'err'));
+    return;
+  }
+
+  fireTestNotification();
+}
+
+function fireTestNotification() {
+  playNotifChime();
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready
+      .then(reg => reg.showNotification(t('notifTestTitle'), { body: t('notifTestBody'), icon: './icon-192x192.png' }))
+      .catch(() => showToast(t('notifTestFailed'), 'err'));
+  } else {
+    try { new Notification(t('notifTestTitle'), { body: t('notifTestBody') }); }
+    catch { showToast(t('notifTestFailed'), 'err'); }
+  }
+}
+
+// 🛠 Dev Console Controls
+function openDevConsole() {
+  closeMoreMenu();
+  document.getElementById('dev-console').classList.remove('hidden');
+  const perm       = 'Notification' in window ? Notification.permission : 'not-supported';
+  const swSupp     = 'serviceWorker' in navigator;
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || !!navigator.standalone;
+  console.log(`[diagnostics] notif-perm:${perm} | SW:${swSupp} | standalone:${standalone} | UA:${navigator.userAgent.slice(0,90)}`);
+  if (swSupp) {
+    navigator.serviceWorker.getRegistration().then(reg => {
+      const state = reg ? (reg.active ? 'active' : reg.installing ? 'installing' : 'waiting') : 'none';
+      console.log(`[SW] state:${state} | controller:${!!navigator.serviceWorker.controller} | scope:${reg?.scope||'n/a'}`);
+    }).catch(e => console.error('[SW] getRegistration error:', e.message));
+    if ('PushManager' in window) {
+      navigator.serviceWorker.ready
+        .then(reg => reg.pushManager.getSubscription())
+        .then(sub => console.log(`[push] subscription:${sub ? 'active | endpoint:' + sub.endpoint.slice(0,55) + '...' : 'none'}`))
+        .catch(e  => console.error('[push] getSubscription error:', e.message));
+    }
+  }
+}
+function closeDevConsole() {
+  document.getElementById('dev-console').classList.add('hidden');
+}
+function clearDevConsole() {
+  document.getElementById('dev-console-log').innerHTML = '';
+}
+
+// 📡 API Request Layer
+function _apiFetch(input, init) {
+  const ctrl  = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), API_TIMEOUT);
+  return fetch(input, { ...init, signal: ctrl.signal })
+    .then(r => {
+      clearTimeout(timer);
+      if (!r.ok) throw new Error(`HTTP ${r.status}${r.statusText ? ' ' + r.statusText : ''}`);
+      return r.json();
+    })
+    .catch(e => {
+      clearTimeout(timer);
+      if (e.name === 'AbortError') throw new Error(`Request timed out after ${API_TIMEOUT / 1000}s — the server took too long to respond`);
+      if (e instanceof TypeError)  throw new Error(`Network error — check your internet connection (${e.message})`);
+      throw e;
+    });
+}
+function apiGet(params) {
+  const url = new URL(SCRIPT_URL);
+  Object.entries(params).forEach(([k,v]) => url.searchParams.set(k, String(v)));
+  return _apiFetch(url, { redirect:'follow' });
+}
+function apiPost(data) {
+  return _apiFetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+    body: JSON.stringify(data),
+    redirect: 'follow',
+  });
+}
+
+// 💾 Session Storage
+const SESSION_KEY = 'userSession';
+function saveSession(staffName, shop) {
+  localStorage.setItem(SESSION_KEY, JSON.stringify({ staffName, shop }));
+}
+function loadSession() {
+  try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch { return null; }
+}
+function clearSession() { localStorage.removeItem(SESSION_KEY); }
+
+// 🔑 Token Input Filter
+const SCRIPT_URL_TEMPLATE = 'https://script.google.com/macros/s/${token}/exec';
+const SCRIPT_TOKEN_RE     = /\/macros\/s\/([a-zA-Z0-9_-]+)\/exec/;
+
+function extractScriptToken(input) {
+  const trimmed = String(input || '').trim();
+  const match = trimmed.match(SCRIPT_TOKEN_RE);
+  return match ? match[1] : trimmed;
+}
+
+function buildScriptUrl(input) {
+  const token = extractScriptToken(input);
+  return token ? SCRIPT_URL_TEMPLATE.replace('${token}', token) : '';
+}
+
+// 🔗 Saved Script URL List
+function getSavedScripts() {
+  try { return JSON.parse(localStorage.getItem(SCRIPTS_KEY) || '[]'); } catch { return []; }
+}
+function setSavedScripts(list) { localStorage.setItem(SCRIPTS_KEY, JSON.stringify(list)); }
+
+function setActiveScript(url) {
+  SCRIPT_URL = url || '';
+  if (SCRIPT_URL) localStorage.setItem(ACTIVE_SCRIPT_KEY, SCRIPT_URL);
+  else localStorage.removeItem(ACTIVE_SCRIPT_KEY);
+  $('cfg-bar').classList.toggle('hidden', !!SCRIPT_URL);
+  if ($('l-script-url')) $('l-script-url').value = SCRIPT_URL;
+  if ($('m-script-url')) $('m-script-url').value = SCRIPT_URL;
+  renderScriptSelectors();
+}
+
+function renderScriptSelectors() {
+  const scripts = getSavedScripts();
+  const opts = `<option value="">${esc(t('selectSavedScript'))}</option>` +
+    scripts.map(s => `<option value="${esc(s.url)}"${s.url === SCRIPT_URL ? ' selected' : ''}>${esc(s.nickname)}</option>`).join('');
+  if ($('l-script-select'))    $('l-script-select').innerHTML    = opts;
+  if ($('more-script-select')) $('more-script-select').innerHTML = opts;
+}
+
+async function saveScriptUrl(inputId = 'l-script-url') {
+  const raw = ($(inputId)?.value || '').trim();
+  if (!raw) { showToast(t('warnEnterScriptUrl'), 'warn'); return; }
+  const url = buildScriptUrl(raw);
+  const nickname = (prompt(t('promptScriptNickname')) || '').trim();
+  if (!nickname) return;
+
+  const scripts = getSavedScripts();
+  const idx = scripts.findIndex(s => s.nickname === nickname);
+  if (idx >= 0) scripts[idx] = { nickname, url }; else scripts.push({ nickname, url });
+  setSavedScripts(scripts);
+
+  setActiveScript(url);
+  showToast(t('toastScriptSaved'));
+  closeMoreMenu();
+  await loadUsersForLogin();
+}
+
+async function pickSavedScript(url) {
+  if (!url || url === SCRIPT_URL) return;
+  setActiveScript(url);
+  closeMoreMenu();
+
+  if ($('scr-app').classList.contains('hidden')) {
+    await loadUsersForLogin();
+  } else {
+    Object.keys(rawApiCache).forEach(k => delete rawApiCache[k]);
+    showToast(t('toastScriptSwitched'));
+    if (!$('tab-dash').classList.contains('hidden')) { hardResetDash(); loadDash(); }
+  }
+}
+
+// ☰ More Menu Toggle
+function toggleMoreMenu(e) {
+  if (e) e.stopPropagation();
+  const menu = $('more-menu');
+  const willOpen = menu.classList.contains('hidden');
+  menu.classList.toggle('hidden', !willOpen);
+  if (willOpen) menu.scrollTop = 0;
+  document.querySelectorAll('.more-btn').forEach(b => b.classList.toggle('on', willOpen));
+}
+function closeMoreMenu() {
+  $('more-menu').classList.add('hidden');
+  document.querySelectorAll('.more-btn').forEach(b => b.classList.remove('on'));
+}
+
+document.addEventListener('click', e => {
+  if (!e.target?.closest('#more-menu') && !e.target?.closest('.more-btn')) closeMoreMenu();
+});
+
+// 🚀 App Init & Bootstrap
+async function init() {
+  applyTranslations();
+  $('l-script-url').value = SCRIPT_URL;
+  $('m-script-url').value = SCRIPT_URL;
+  renderScriptSelectors();
+
+  if (!SCRIPT_URL) {
+    $('cfg-bar').classList.remove('hidden');
+    showScr('scr-login');
+    setMsg('l-msg', t('cfgBarMsg'), 'warn');
+    return;
+  }
+  $('cfg-bar').classList.add('hidden');
+
+  const session = loadSession();
+  if (session?.staffName) {
+    A.me = session.staffName;
+    selectBranchSegment(session.shop);
+    enterApp(session.staffName);
+    return;
+  }
+  await loadUsersForLogin();
+}
+
+// 👤 Load Users for Login
+async function loadUsersForLogin() {
+  showScr('scr-load');
+  try {
+    const data = await apiGet({ action: 'getUsers' });
+    if (data.error) throw new Error(data.error);
+    A.users = data.users || [];
+    showScr('scr-login');
+    setMsg('l-msg');
+  } catch(e) {
+    showScr('scr-login');
+    setMsg('l-msg', `${t('errConnectSheets')}<br><small style="opacity:.75">${esc(e.message)}</small>`, 'err');
+    showToast(t('errGeneric', { msg: e.message }), 'err');
+  }
+}
+
+// 🪪 Login Form Helpers
+function togglePin() {
+  const inp = $('l-pin');
+  const toText = inp.type === 'password';
+  inp.type = toText ? 'text' : 'password';
+  $('eye-ico').innerHTML = toText
+    ? '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22"/>'
+    : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+}
+
+function updDots(name) {
+  const cnt = A.attempts[name] || 0;
+  $('dot-row').classList.toggle('hidden', cnt === 0);
+  for (let i = 1; i <= 5; i++) $(`d${i}`).classList.toggle('hit', i <= cnt);
+}
+
+function checkLocked(name) {
+  if ((A.attempts[name] || 0) >= MAX_PIN_ATTEMPTS) return true;
+  const u = A.users.find(x => x.staffName === name);
+  return u?.status === 'Locked';
+}
+
+function setBtnLogin(txt, disabled) {
+  $('l-btn').disabled = disabled;
+  const ico = disabled
+    ? `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>`
+    : `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>`;
+  $('l-btn').innerHTML = `${ico}<span id="l-btn-txt">${esc(txt)}</span>`;
+}
+
+$('l-staff').addEventListener('input', () => {
+  const name = $('l-staff').value.trim();
+  if (!name) { updDots(''); setMsg('l-msg'); setBtnLogin(t('loginBtn'), false); return; }
+  updDots(name);
+  if (checkLocked(name)) {
+    setMsg('l-msg', t('errAccountLocked'), 'err');
+    setBtnLogin(t('loginBtnLocked'), true);
+  } else {
+    setMsg('l-msg'); setBtnLogin(t('loginBtn'), false);
+  }
+});
+$('l-staff').addEventListener('keydown', e => { if (e.key === 'Enter') $('l-pin').focus(); });
+$('l-pin').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+// 🔐 Login Submission Flow
+async function doLogin() {
+  const name = $('l-staff').value.trim();
+  const pin  = $('l-pin').value.trim();
+  setMsg('l-msg');
+
+  if (!SCRIPT_URL) { setMsg('l-msg', t('warnNoScriptUrl'), 'warn'); return; }
+  if (!name) { setMsg('l-msg', t('warnEnterStaffName'), 'warn'); return; }
+  if (!pin)  { setMsg('l-msg', t('warnEnterPin'), 'warn'); return; }
+
+  if (checkLocked(name)) {
+    setMsg('l-msg', t('errAccountLocked'), 'err');
+    setBtnLogin(t('loginBtnLocked'), true); return;
+  }
+
+  $('l-btn').disabled = true;
+  $('l-btn').innerHTML = '<div class="spin spin-btn"></div>';
+
+  try {
+    const res = await apiPost({ action:'validateUser', staffName:name, pin });
+
+    if (res.success) {
+      A.me = name;
+      A.attempts[name] = 0;
+      const userRec = A.users.find(x => x.staffName === name);
+      const shop = BRANCHES.includes(userRec?.shop) ? userRec.shop : BRANCHES[0];
+      A.fd.shop = shop;
+      if ($('rem-me').checked) saveSession(name, shop);
+      enterApp(name);
+      return;
+    }
+
+    if (res.locked) {
+      const u = A.users.find(x => x.staffName === name);
+      if (u) u.status = 'Locked';
+      setMsg('l-msg', t('errAccountLocked'), 'err');
+      setBtnLogin(t('loginBtnLocked'), true); return;
+    }
+
+    A.attempts[name] = (A.attempts[name] || 0) + 1;
+    updDots(name);
+    const cnt = A.attempts[name];
+
+    if (cnt >= MAX_PIN_ATTEMPTS) {
+      try { await apiPost({ action:'lockUser', staffName:name }); } catch(_) {}
+      const u = A.users.find(x => x.staffName === name);
+      if (u) u.status = 'Locked';
+      setMsg('l-msg', t('errAccountLocked'), 'err');
+      setBtnLogin(t('loginBtnLocked'), true);
+    } else {
+      const rem = MAX_PIN_ATTEMPTS - cnt;
+      setMsg('l-msg',`${t('errWrongPin')}<br><small style="opacity:.8">${t('attemptsLeft',{n:rem})}</small>`,'err');
+      setBtnLogin(t('loginBtn'), false);
+    }
+
+  } catch(e) {
+    setMsg('l-msg', t('errGeneric',{msg:esc(e.message)}), 'err');
+    showToast(t('errGeneric', { msg: e.message }), 'err');
+    setBtnLogin(t('loginBtn'), false);
+  }
+}
+
+// 🚪 Enter App & Logout
+function enterApp(name) {
+  $('hdr-user').textContent = name;
+  $('f-date-lbl').textContent = fmtDateTab(new Date());
+  dashDate = new Date();
+  Object.keys(rawApiCache).forEach(k => delete rawApiCache[k]);
+  selectBranchSegment(A.fd.shop);
+  showScr('scr-app');
+  $('l-pin').value = '';
+  $('l-pin').type  = 'password';
+  $('l-staff').value = '';
+  setMsg('l-msg'); updDots('');
+  $('l-btn').innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg><span id="l-btn-txt">${esc(t('loginBtn'))}</span>`;
+  $('l-btn').disabled = false;
+}
+
+function doLogout() {
+  if (!confirm(t('confirmLogout'))) return;
+  clearSession();
+  A.me = null;
+  A.fd.shop = BRANCHES[0];
+  showScr('scr-login');
+  if (!A.users.length) {
+    apiGet({ action: 'getUsers' }).then(data => {
+      if (!data.error) A.users = data.users || [];
+    }).catch(() => {});
+  }
+}
+
+// 🏷️ Entry Type & Payment Toggles
+function setSeg(key, val, btn) {
+  A.fd[key] = val;
+  btn.closest('.seg-wrap, .branch-grid').querySelectorAll('.seg, .branch-chip').forEach(s => s.classList.remove('on'));
+  btn.classList.add('on');
+  if (key === 'type') {
+    const isExp = val === 'expense';
+    $('sub-btn').className = `btn ${isExp ? 'btn-red' : 'btn-teal'}`;
+    $('sub-btn').style.cssText = 'margin-top:16px';
+  }
+}
+
+function setPay(val, btn) {
+  A.fd.pay = val;
+  btn.closest('.seg-wrap').querySelectorAll('.seg').forEach(s => s.classList.remove('on'));
+  btn.classList.add('on');
+  const isQR = val === 'QR';
+  $('slip-grp').classList.toggle('hidden', !isQR);
+  if (!isQR) clearSlip();
+}
+
+// 📎 Slip Upload, Compression & Drag-Drop
+async function onFileChg(inp) {
+  const file = inp.files[0];
+  if (!file) return;
+  if (file.size > MAX_FILE_SIZE) { showToast(t('errFileTooLarge'),'err'); return; }
+  await loadFile(file);
+}
+async function loadFile(file) {
+  try {
+    const result = await compressImg(file);
+    A.slip = result;
+    const fr = new FileReader();
+    fr.onload = () => {
+      const img = $('slip-img');
+      img.src = (fr.result);
+      img.classList.remove('hidden');
+      $('uz-ph').style.display = 'none';
+      $('clr-slip').classList.remove('hidden');
+    };
+    fr.readAsDataURL(file);
+  } catch(e) {
+    showToast(t('errLoadImage'),'err');
+  }
+}
+async function compressImg(file) {
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        let { width:w, height:h } = img;
+        if (w > MAX_IMG_PX) { h = h * MAX_IMG_PX / w; w = MAX_IMG_PX; }
+        if (h > MAX_IMG_PX) { w = w * MAX_IMG_PX / h; h = MAX_IMG_PX; }
+        const cv = document.createElement('canvas');
+        cv.width = Math.round(w); cv.height = Math.round(h);
+        const ctx = cv.getContext('2d');
+        if (!ctx) { reject(new Error('canvas 2d unavailable')); return; }
+        ctx.drawImage(img, 0, 0, cv.width, cv.height);
+        cv.toBlob(blob => {
+          if (!blob) { reject(new Error('canvas toBlob failed')); return; }
+          const fr2 = new FileReader();
+          fr2.onload = () => resolve({ b64: String(fr2.result).split(',')[1], mime:'image/jpeg', name:`slip_${Date.now()}.jpg` });
+          fr2.onerror = reject; fr2.readAsDataURL(blob);
+        }, 'image/jpeg', IMG_QUALITY);
+      };
+      img.onerror = reject; img.src = (fr.result);
+    };
+    fr.onerror = reject; fr.readAsDataURL(file);
+  });
+}
+function clearSlip(e) {
+  if (e) e.stopPropagation();
+  A.slip = null; $('f-file').value = '';
+  $('slip-img').classList.add('hidden'); $('slip-img').src = '';
+  $('uz-ph').style.display = ''; $('clr-slip').classList.add('hidden');
+}
+function onDragOver(e) { e.preventDefault(); $('uz').classList.add('over'); }
+function onDragLeave()  { $('uz').classList.remove('over'); }
+function onDrop(e) {
+  e.preventDefault(); $('uz').classList.remove('over');
+  const f = e.dataTransfer?.files[0];
+  if (f?.type.startsWith('image/')) loadFile(f);
+}
+
+// 📝 Entry Submission Flow
+async function doSubmit() {
+  const item  = $('f-item').value.trim();
+  const price = parseFloat($('f-price').value);
+  const cur   = $('f-cur').value;
+  setMsg('f-msg');
+
+  if (!item)               { setMsg('f-msg', t('warnEnterItemName'),'warn'); return; }
+  if (!price || price <= 0){ setMsg('f-msg', t('warnEnterValidAmount'),'warn'); return; }
+  if (A.fd.pay === 'QR' && !A.slip) { setMsg('f-msg', t('warnAttachSlip'),'warn'); return; }
+
+  $('sub-btn').disabled = true;
+  $('sub-txt').textContent = t('submitBtnSaving');
+
+  try {
+    let slipUrl = '';
+
+    if (A.fd.pay === 'QR' && A.slip) {
+      showOv(t('ovUploadingSlip'));
+      const ur = await apiPost({ action:'uploadFile', fileName:A.slip.name, fileData:A.slip.b64, mimeType:A.slip.mime });
+      if (!ur.success) throw new Error(ur.error || t('errUploadFailed'));
+      slipUrl = ur.url;
+    }
+
+    showOv(t('ovSavingEntry'));
+    const ts  = nowStamp();
+    const tab = fmtDateTab(new Date());
+    const res = await apiPost({
+      action:        'submitEntry',
+      timestamp:     ts,
+      sheetTabName:  tab,
+      staffName:     A.me,
+      itemName:      item,
+      currency:      cur,
+      price:         price,
+      type:          A.fd.type === 'income' ? 'Income' : 'Expense',
+      shop:          A.fd.shop,
+      paymentMethod: A.fd.pay === 'QR' ? 'Lao QR / OnePay' : 'Cash',
+      slipUrl,
+    });
+    if (!res.success) throw new Error(res.error || t('errSaveFailed'));
+
+    hideOv();
+    showToast(t('toastSaveSuccess'));
+    notifyTransaction(A.fd.type === 'income', A.fd.shop, price, cur);
+    resetForm();
+  } catch(e) {
+    hideOv();
+    setMsg('f-msg', t('errGeneric',{msg:esc(e.message)}),'err');
+    showToast(t('errGeneric', { msg: e.message }), 'err');
+  }
+
+  $('sub-btn').disabled = false;
+  $('sub-txt').textContent = t('submitBtn');
+}
+
+function resetForm() {
+  $('f-item').value = ''; closeCombo(); $('f-price').value = ''; $('f-cur').value = 'LAK';
+  clearSlip(); setMsg('f-msg');
+  document.querySelectorAll('#sg-type .seg').forEach((s,i) => s.classList.toggle('on', i===0));
+  A.fd.type = 'income';
+  const sb = $('sub-btn');
+  sb.className = 'btn btn-teal'; sb.style.cssText = 'margin-top:16px';
+  selectBranchSegment(A.fd.shop);
+  document.querySelectorAll('#sg-pay .seg').forEach((s,i) => s.classList.toggle('on', i===0));
+  A.fd.pay = 'Cash'; $('slip-grp').classList.add('hidden');
+}
+
+// 📅 Date Helpers & Dashboard Navigation
+function fmtDateTab(d) {
+  return `${p2(d.getDate())}-${p2(d.getMonth()+1)}-${d.getFullYear()}`;
+}
+
+function dayStart(d) { const v = new Date(d); v.setHours(0,0,0,0); return v.getTime(); }
+function isAfterToday(d) { return dayStart(d) >  dayStart(new Date()); }
+function isOnToday(d)    { return dayStart(d) === dayStart(new Date()); }
+
+function updateDateNav() {
+  $('dash-date-lbl').textContent = fmtDateTab(dashDate);
+  $('nav-next').disabled = isOnToday(dashDate) || isAfterToday(dashDate);
+}
+
+function hardResetDash() {
+  dashEntries     = [];
+  dashByBranchCur = buildTotals([]);
+  dashByCur       = dashByBranchCur[activeBranchFilter];
+  CURRENCIES.forEach(c => $(`ctab-${c}`).classList.remove('has'));
+  renderDashCur(activeCurTab);
+  $('d-cnt').textContent = '—';
+  $('d-list').innerHTML  = '';
+}
+
+function navDay(delta) {
+  const d = new Date(dashDate);
+  d.setDate(d.getDate() + delta);
+  if (isAfterToday(d)) return;
+  dashDate = d;
+  hardResetDash();
+  loadDash();
+}
+
+function normToDateKey(val) {
+  const s = String(val ?? '').trim();
+  if (!s) return '';
+  let m;
+  m = s.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})/);
+  if (m) return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+  if (s.includes('T')) {
+    const d = new Date(s);
+    if (!isNaN(d.getTime())) return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;
+  }
+  m = s.match(/^(\d{4})[-\/](\d{2})[-\/](\d{2})/);
+  if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+  const d = new Date(s);
+  if (!isNaN(d.getTime())) return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;
+  return '';
+}
+
+function filterByDate(entries, targetDate) {
+  if (!entries.length) return [];
+  const appKey = `${targetDate.getFullYear()}-${p2(targetDate.getMonth()+1)}-${p2(targetDate.getDate())}`;
+  return entries.filter(e => normToDateKey(String(e.timestamp ?? '').trim()) === appKey);
+}
+
+// 📊 Dashboard Data Loading
+function forceLoadDash() {
+  delete rawApiCache[fmtDateTab(dashDate)];
+  loadDash();
+}
+
+async function loadDash() {
+  const seq      = ++loadDashSeq;
+  const snapDate = new Date(dashDate);
+  const tab      = fmtDateTab(snapDate);
+  const isToday  = isOnToday(snapDate);
+  updateDateNav();
+
+  if (!isToday && rawApiCache[tab] !== undefined) {
+    renderDash(filterByDate(rawApiCache[tab], snapDate));
+    return;
+  }
+
+  showOv(t('ovLoadingData', { date: tab }));
+  try {
+    const action = isToday ? 'getTodayData' : 'getDateData';
+    const data   = await apiGet({ action, date: tab });
+    if (seq !== loadDashSeq) return;
+    hideOv();
+    if (data.error) throw new Error(data.error);
+
+    const raw = data.entries || [];
+    rawApiCache[tab] = raw;
+    renderDash(filterByDate(raw, snapDate));
+  } catch (e) {
+    if (seq !== loadDashSeq) return;
+    hideOv();
+    renderDash([]);
+    $('d-list').innerHTML = `<div class="empty">${t('errLoadDataFailed')}<br><small style="opacity:.6">${esc(e.message)}</small></div>`;
+    showToast(t('errGeneric', { msg: e.message }), 'err');
+  }
+}
+
+// 💰 Dashboard Totals & Rendering
+function currSym(c) { return c==='THB'?'฿':c==='USD'?'$':'₭'; }
+
+function emptyTotals() {
+  const o = {};
+  CURRENCIES.forEach(c => { o[c] = {cash:0,qr:0,exp:0}; });
+  return o;
+}
+
+function buildTotals(entries) {
+  const result = {};
+  BRANCH_KEYS.forEach(s => { result[s] = emptyTotals(); });
+
+  entries.forEach(e => {
+    const p      = Number(e.price) || 0;
+    const cur    = e.currency || 'LAK';
+    const branch = e.shop || '';
+    const isCash = (e.paymentMethod||'').toLowerCase().includes('cash');
+
+    BRANCH_KEYS.forEach(s => { if (!result[s][cur]) result[s][cur] = {cash:0,qr:0,exp:0}; });
+
+    const add = bucket => {
+      if (e.type === 'Income') { if (isCash) bucket.cash += p; else bucket.qr += p; }
+      else bucket.exp += p;
+    };
+    add(result['All'][cur]);
+    if (result[branch]) add(result[branch][cur]);
+  });
+  return result;
+}
+
+function filteredEntries() {
+  if (activeBranchFilter === 'All') return dashEntries;
+  return dashEntries.filter(e => e.shop === activeBranchFilter);
+}
+
+function renderDash(entries) {
+  dashEntries     = entries;
+  dashByBranchCur = buildTotals(entries);
+  dashByCur       = dashByBranchCur[activeBranchFilter];
+  refreshDashUI();
+}
+
+function refreshDashUI() {
+  CURRENCIES.forEach(c => {
+    const d = dashByCur[c] || {cash:0,qr:0,exp:0};
+    $(`ctab-${c}`).classList.toggle('has', d.cash > 0 || d.qr > 0 || d.exp > 0);
+  });
+
+  const vis = filteredEntries();
+  $('d-cnt').textContent = t('entriesCount', { n: vis.length });
+  renderDashCur(activeCurTab);
+  renderEntryList(vis);
+}
+
+// 📜 Entry List Rendering
+function renderEntryList(entries) {
+  if (!entries.length) {
+    $('d-list').innerHTML = `<div class="empty">${
+      isOnToday(dashDate) ? t('emptyEntriesToday') : t('emptyEntriesForDate', { date: fmtDateTab(dashDate) })
+    }</div>`;
+    return;
+  }
+  $('d-list').innerHTML = [...entries].reverse().map(e => {
+    const isInc  = e.type === 'Income';
+    const isCash = (e.paymentMethod||'').toLowerCase().includes('cash');
+    const sym    = currSym(e.currency || 'LAK');
+    const amt    = fmtN(e.price);
+    const ts     = String(e.timestamp||'');
+    const time   = ts.includes(' ') ? ts.split(' ')[1] : ts;
+    const action = isInc
+      ? (isCash ? t('actionCashIncome') : t('actionQRIncome'))
+      : t('actionExpense');
+    const actionColor = isInc ? 'var(--green)' : 'var(--red)';
+    const slipEl = e.slipUrl
+      ? `&nbsp;·&nbsp;<a class="slip-a" href="${esc(e.slipUrl)}" target="_blank" rel="noopener">${t('slipLink')}</a>`
+      : '';
+    return `<div class="ei">
+      <div class="ei-ic ${isInc?'inc':'exp'}">${isInc?'↑':'↓'}</div>
+      <div class="ei-info">
+        <div class="ei-name">${esc(e.itemName)}</div>
+        <div class="ei-meta"><span style="color:${actionColor};font-weight:700">${action}</span> · 👤 ${esc(e.staffName)} · 🏪 ${esc(e.shop)}</div>
+        <div class="ei-meta" style="margin-top:1px;font-size:11px;color:var(--txt-muted)">⏱ ${time}${slipEl}</div>
+      </div>
+      <div class="ei-right">
+        <div class="ei-amt ${isInc?'inc':'exp'}">${isInc?'+':'-'}${amt}&nbsp;${sym}</div>
+        <div class="pm-b ${isCash?'pm-cash':'pm-qr'}">${isCash?'Cash':'QR'}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// 🔀 Dashboard Filter & Tab Switching
+function switchBranchFilter(branch) {
+  activeBranchFilter = branch;
+  Object.entries(BRANCH_FILTER_IDS).forEach(([s, id]) => { const el = $(id); if (el) el.classList.toggle('on', s === branch); });
+  dashByCur = dashByBranchCur[branch] || emptyTotals();
+  refreshDashUI();
+}
+
+function switchCurTab(cur) {
+  activeCurTab = cur;
+  CURRENCIES.forEach(c => $(`ctab-${c}`).classList.toggle('on', c === cur));
+  renderDashCur(cur);
+}
+
+function renderDashCur(cur) {
+  const d   = dashByCur[cur] || {cash:0,qr:0,exp:0};
+  const lbl = `${cur} ${currSym(cur)}`;
+  $('d-cash').textContent = fmtN(d.cash); $('d-cash-c').textContent = lbl;
+  $('d-qr').textContent   = fmtN(d.qr);  $('d-qr-c').textContent   = lbl;
+  $('d-exp').textContent  = fmtN(d.exp);  $('d-exp-c').textContent  = lbl;
+}
+
+// 🧭 Tab Navigation
+function switchTab(tab) {
+  ['rec','dash'].forEach(t => {
+    $(`tab-${t}`).classList.toggle('hidden', t !== tab);
+    $(`nb-${t}`).classList.toggle('on', t === tab);
+  });
+  if (tab === 'dash') loadDash();
+}
+
+// ✅ Run on Page Load
+document.addEventListener('DOMContentLoaded', () => {
+  requestNotificationPermission();
+  initCombo();
+  renderBranchSegments();
+  renderBranchFilters();
+  renderManageBranchesList();
+  init();
+  // Restore push subscription panel if already subscribed
+  if ('serviceWorker' in navigator && 'PushManager' in window && Notification.permission === 'granted') {
+    navigator.serviceWorker.ready
+      .then(reg => reg.pushManager.getSubscription())
+      .then(sub => { if (sub) _showPushTokenPanel(sub); })
+      .catch(() => {});
+  }
+});
+</script>
+<div id="dev-console" class="hidden">
+  <div class="dev-console-bar">
+    <span class="dev-console-title">🛠 Dev Console</span>
+    <div class="dev-console-acts">
+      <button class="dev-console-btn" onclick="clearDevConsole()">🗑 Clear</button>
+      <button class="dev-console-btn" onclick="closeDevConsole()">✕ Close</button>
+    </div>
+  </div>
+  <div id="dev-console-log" class="dev-console-log"></div>
+</div>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./service-worker.js')
+    .then(r  => console.log('[SW] registered | scope:', r.scope))
+    .catch(e => console.error('[SW] registration failed:', e.message));
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "FinTrack",
+  "short_name": "FinTrack",
+  "description": "Income & Expense Tracking System",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#06090F",
+  "theme_color": "#2EE8B4",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
