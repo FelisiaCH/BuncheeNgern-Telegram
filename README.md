@@ -95,25 +95,36 @@ The notification reaches every subscribed device through the browser's own push 
 
 ### Step 2 — Deploy the Google Apps Script Backend
 
-1. Open [script.google.com](https://script.google.com/) and create a **New project**.
+> ## 🚨 CRITICAL WARNING — Container-Bound Script Required
+>
+> Do **not** create your project from [script.google.com](https://script.google.com/) using **New project**. That creates a **Standalone Script**, which is **not bound to your spreadsheet**.
+>
+> If you use a Standalone Script, the **`onNewTransaction` On-Change trigger in Step 4 will be impossible to configure** — the **"From spreadsheet" (จากสเปรดชีต)** event source and the **"On change" (เมื่อมีการเปลี่ยนแปลง)** event type will not appear as options in the Trigger dialog at all, because a standalone script has no spreadsheet to bind to. Cross-device push notifications will silently never fire.
+>
+> **You must create a Container-Bound Script instead:**
+>
+> 1. Open the Google Sheet you created in Step 1 directly in your browser.
+> 2. In the top menu bar, click **Extensions (ส่วนขยาย)**.
+> 3. Click **Apps Script**.
+> 4. This opens a script editor that is permanently bound to this specific spreadsheet. Only this type of project will show "From spreadsheet" and "On change" as trigger options in Step 4.
 
-2. Delete the empty `Code.gs` content, then paste in the full contents of [Code.gs](Code.gs) from this repository.
+1. With the container-bound editor open (from Extensions → Apps Script above), delete the empty `Code.gs` content, then paste in the full contents of [Code.gs](Code.gs) from this repository.
 
-3. **Enable V8 Runtime — this is required.**
+2. **Enable V8 Runtime — this is required.**
    - Click the gear icon **⚙️ Project Settings** in the left sidebar.
    - Under **Runtime version**, select **V8**.
    - Click **Save**.
 
    > The ECDSA P-256 signing engine uses `BigInt()`, which requires V8. The default Rhino runtime does not support BigInt and will fail.
 
-4. Fill in your spreadsheet credentials **directly inside the Apps Script editor** — never commit real values to this repository:
+3. Fill in your spreadsheet credentials **directly inside the Apps Script editor** — never commit real values to this repository:
 
    ```js
    const SPREADSHEET_ID  = 'YOUR_GOOGLE_SHEET_ID_HERE';
    const DRIVE_FOLDER_ID = 'YOUR_DRIVE_FOLDER_ID_HERE';
    ```
 
-5. Fill in your VAPID credentials (generated in [Step 3](#step-3--generate-and-configure-vapid-credentials) below):
+4. Fill in your VAPID credentials (generated in [Step 3](#step-3--generate-and-configure-vapid-credentials) below):
 
    ```js
    const PUSH_VAPID_PUBLIC  = 'YOUR_VAPID_PUBLIC_KEY_HERE';
@@ -121,13 +132,13 @@ The notification reaches every subscribed device through the browser's own push 
    const PUSH_VAPID_SUBJECT = 'mailto:your-email@example.com';
    ```
 
-6. Click **Deploy → New deployment**:
+5. Click **Deploy → New deployment**:
    - Type: **Web app**
    - Execute as: **Me**
    - Who has access: **Anyone**
    - Click **Deploy** and authorize all Google permission requests.
 
-7. Copy the deployment URL. It follows this format:
+6. Copy the deployment URL. It follows this format:
 
    ```text
    https://script.google.com/macros/s/[YOUR_DEPLOYMENT_ID]/exec
@@ -210,6 +221,8 @@ This trigger fires `onNewTransaction()` automatically every time a new row is ap
 
 4. Click **Save**. Google will ask you to re-authorize — accept all permissions.
 
+> If **"From spreadsheet"** or **"On change"** does not appear in the dropdown options, your script project is a Standalone Script, not a Container-Bound Script. Go back to [Step 2](#step-2--deploy-the-google-apps-script-backend) and re-create the project via **Extensions → Apps Script** from inside the Google Sheet itself.
+>
 > `onNewTransaction` only acts when `e.changeType === 'INSERT_ROW'`. Edits, deletions, and other changes are ignored. When a new row is detected, it reads the Staff Name, Item Name, Currency, Price, Type, and Shop from that row and calls `broadcastPushNotification(title, body)`, which loops through every subscription stored in the `PushSubscriptions` sheet and dispatches a Web Push to each one.
 
 ---
