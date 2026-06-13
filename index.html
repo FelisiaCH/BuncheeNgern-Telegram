@@ -679,9 +679,6 @@ option{background:#0E1526}
 .dev-log.warn{color:#ffd166}
 .dev-log.error{color:var(--red)}
 .dev-log-ts{color:#4a5470;margin-right:5px;font-size:10px;user-select:none}
-/* 📡 Push Subscription Panel */
-.push-token-box{display:flex;flex-direction:column;gap:6px;margin-top:2px}
-.push-token-text{background:var(--bg-input);border:1px solid var(--teal-brd);border-radius:8px;padding:8px;font-family:'Courier New',Courier,monospace;font-size:9px;line-height:1.5;word-break:break-all;max-height:90px;overflow-y:auto;color:var(--teal);-webkit-overflow-scrolling:touch;white-space:pre-wrap}
 </style>
 </head>
 <body>
@@ -718,12 +715,6 @@ option{background:#0E1526}
              autocomplete="off" data-i18n-placeholder="placeholderScriptUrl">
       <button type="button" class="script-save-btn" onclick="saveScriptUrl('m-script-url')" data-i18n="btnSaveScript">บันทึกสคริปต์</button>
     </div>
-    <label class="fl" data-i18n="labelVapidKey">VAPID Public Key (สำหรับ Web Push)</label>
-    <div class="script-url-row">
-      <input type="text" id="m-vapid-key" class="fi" placeholder="Paste your VAPID public key"
-             autocomplete="off" data-i18n-placeholder="placeholderVapidKey">
-      <button type="button" class="script-save-btn" onclick="saveVapidKey()" data-i18n="btnSaveVapidKey">บันทึก VAPID Key</button>
-    </div>
   </div>
 
   <div class="more-menu-sec">
@@ -736,18 +727,8 @@ option{background:#0E1526}
       <button type="button" class="menu-action-btn" onclick="addBranch()" data-i18n="btnAddBranch">➕ เพิ่มสาขาใหม่</button>
     </div>
     <div class="menu-subdvd"></div>
-    <button type="button" class="menu-action-btn" onclick="requestNotificationPermissionExplicit()" data-i18n="btnRequestNotifPermission">🔑 Request Notification Permission / เปิดสิทธิ์แจ้งเตือน</button>
     <button type="button" class="menu-action-btn" onclick="testNotification()" data-i18n="btnTestNotification">🔔 Test Notification / ทดสอบแจ้งเตือน</button>
     <button type="button" class="menu-action-btn" onclick="openDevConsole()" data-i18n="btnOpenConsole">🛠 เปิด Developer Console</button>
-  </div>
-
-  <div class="more-menu-sec">
-    <div class="more-menu-lbl">📡 Web Push Subscription</div>
-    <button type="button" class="menu-action-btn" onclick="subscribeToPush()">📲 Subscribe / สมัครรับการแจ้งเตือน</button>
-    <div id="push-token-box" class="push-token-box hidden">
-      <div id="push-token-text" class="push-token-text"></div>
-      <button type="button" class="menu-action-btn" onclick="copyPushToken()">📋 คัดลอกรหัส Token</button>
-    </div>
   </div>
 </div>
 
@@ -1038,10 +1019,8 @@ option{background:#0E1526}
 // 🔧 Storage Keys, Branches & Constants
 const SCRIPTS_KEY       = 'savedScripts';
 const ACTIVE_SCRIPT_KEY = 'activeScriptUrl';
-const VAPID_KEY_STORAGE = 'vapidPublicKey';
 
 let SCRIPT_URL = localStorage.getItem(ACTIVE_SCRIPT_KEY) || '';
-let VAPID_PUBLIC_KEY = localStorage.getItem(VAPID_KEY_STORAGE) || '';
 
 const BRANCHES_KEY    = 'savedBranches';
 const DEFAULT_BRANCHES = ['สาขา 1', 'สาขา 2'];
@@ -1357,103 +1336,6 @@ function requestNotificationPermission() {
   Notification.requestPermission().catch(() => {});
 }
 
-function requestNotificationPermissionExplicit() {
-  closeMoreMenu();
-  if (!('Notification' in window)) { alert(t('notifNotSupported')); return; }
-
-  Notification.requestPermission().then(perm => {
-    if (perm === 'granted') {
-      alert(t('notifPermResultGranted'));
-      subscribeToPush();
-    } else if (perm === 'denied') {
-      alert(t('notifPermResultDenied'));
-    } else {
-      alert(t('notifPermResultDefault'));
-    }
-  }).catch(() => alert(t('notifTestFailed')));
-}
-
-// 📡 Web Push Subscription
-function urlBase64ToUint8Array(base64String) {
-  const pad = '='.repeat((4 - (base64String.length % 4)) % 4);
-  const b64 = (base64String + pad).replace(/-/g, '+').replace(/_/g, '/');
-  const raw = atob(b64);
-  return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
-}
-
-async function subscribeToPush() {
-  if (!VAPID_PUBLIC_KEY) {
-    console.warn('[push] no VAPID public key configured');
-    showToast(t('warnNoVapidKey'), 'warn');
-    return;
-  }
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-    console.warn('[push] PushManager not supported on this browser');
-    showToast('Web Push not supported on this browser', 'err');
-    return;
-  }
-  const perm = await Notification.requestPermission();
-  if (perm !== 'granted') {
-    console.warn('[push] permission not granted:', perm);
-    return;
-  }
-  try {
-    const reg = await navigator.serviceWorker.ready;
-    let sub = await reg.pushManager.getSubscription();
-    if (!sub) {
-      sub = await reg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
-      });
-      console.log('[push] new subscription created:', sub.endpoint.slice(0, 60) + '...');
-    } else {
-      console.log('[push] existing subscription found:', sub.endpoint.slice(0, 60) + '...');
-    }
-    localStorage.setItem('pushSubscription', JSON.stringify(sub));
-    _showPushTokenPanel(sub);
-    showToast('Push subscription active ✓', '');
-
-    // Persist to backend so onNewTransaction() can broadcast to this device
-    apiPost({ action: 'savePushSubscription', subscription: JSON.stringify(sub.toJSON ? sub.toJSON() : sub) })
-      .then(res => console.log('[push] subscription saved to backend:', res.status))
-      .catch(e  => console.warn('[push] failed to save subscription to backend:', e.message));
-  } catch (e) {
-    console.error('[push] subscribe failed:', e.message);
-    showToast('Push subscribe failed: ' + e.message, 'err');
-  }
-}
-
-function _showPushTokenPanel(sub) {
-  const box  = $('push-token-box');
-  const text = $('push-token-text');
-  if (!box || !text || !sub) return;
-  text.textContent = JSON.stringify(sub.toJSON ? sub.toJSON() : sub, null, 2);
-  box.classList.remove('hidden');
-}
-
-function copyPushToken() {
-  const text = $('push-token-text')?.textContent;
-  if (!text) return;
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(text)
-      .then(() => showToast('Token copied ✓', ''))
-      .catch(() => _fallbackCopy(text));
-  } else {
-    _fallbackCopy(text);
-  }
-}
-
-function _fallbackCopy(text) {
-  const ta = document.createElement('textarea');
-  ta.value = text;
-  ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
-  document.body.appendChild(ta);
-  ta.focus(); ta.select();
-  try { document.execCommand('copy'); showToast('Token copied ✓', ''); }
-  catch { showToast('Copy failed — select text manually', 'err'); }
-  document.body.removeChild(ta);
-}
-
 function playNotifChime() {
   const vibrate = () => {
     console.warn('[chime] audio blocked by autoplay policy — vibrating instead');
@@ -1538,12 +1420,6 @@ function openDevConsole() {
       const state = reg ? (reg.active ? 'active' : reg.installing ? 'installing' : 'waiting') : 'none';
       console.log(`[SW] state:${state} | controller:${!!navigator.serviceWorker.controller} | scope:${reg?.scope||'n/a'}`);
     }).catch(e => console.error('[SW] getRegistration error:', e.message));
-    if ('PushManager' in window) {
-      navigator.serviceWorker.ready
-        .then(reg => reg.pushManager.getSubscription())
-        .then(sub => console.log(`[push] subscription:${sub ? 'active | endpoint:' + sub.endpoint.slice(0,55) + '...' : 'none'}`))
-        .catch(e  => console.error('[push] getSubscription error:', e.message));
-    }
   }
 }
 function closeDevConsole() {
@@ -1633,14 +1509,6 @@ function renderScriptSelectors() {
   if ($('more-script-select')) $('more-script-select').innerHTML = opts;
 }
 
-function saveVapidKey() {
-  const raw = ($('m-vapid-key')?.value || '').trim();
-  if (!raw) { showToast(t('warnEnterVapidKey'), 'warn'); return; }
-  VAPID_PUBLIC_KEY = raw;
-  localStorage.setItem(VAPID_KEY_STORAGE, raw);
-  showToast(t('toastVapidSaved'));
-}
-
 async function saveScriptUrl(inputId = 'l-script-url') {
   const raw = ($(inputId)?.value || '').trim();
   if (!raw) { showToast(t('warnEnterScriptUrl'), 'warn'); return; }
@@ -1696,7 +1564,6 @@ async function init() {
   applyTranslations();
   $('l-script-url').value = SCRIPT_URL;
   $('m-script-url').value = SCRIPT_URL;
-  $('m-vapid-key').value  = VAPID_PUBLIC_KEY;
   renderScriptSelectors();
 
   if (!SCRIPT_URL) {
@@ -2246,13 +2113,6 @@ document.addEventListener('DOMContentLoaded', () => {
   renderBranchFilters();
   renderManageBranchesList();
   init();
-  // Restore push subscription panel if already subscribed
-  if ('serviceWorker' in navigator && 'PushManager' in window && Notification.permission === 'granted') {
-    navigator.serviceWorker.ready
-      .then(reg => reg.pushManager.getSubscription())
-      .then(sub => { if (sub) _showPushTokenPanel(sub); })
-      .catch(() => {});
-  }
 });
 </script>
 <div id="dev-console" class="hidden">

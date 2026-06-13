@@ -1,4 +1,4 @@
-const CACHE = 'fintrack-v4';
+const CACHE = 'fintrack-v5';
 const ASSETS = ['./', './index.html', './lang.js'];
 
 self.addEventListener('install', e => {
@@ -18,32 +18,5 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request))
-  );
-});
-
-// 🔔 Background push notification from server
-self.addEventListener('push', e => {
-  let data = {};
-  try { data = e.data ? e.data.json() : {}; } catch { data = { body: e.data ? e.data.text() : '' }; }
-
-  const title = data.title || 'FinTrack อัปเดตยอดเงิน';
-  const opts  = {
-    body:  data.body  || data.text || 'มีรายการใหม่',
-    icon:  data.icon  || './icon-192x192.png',
-    badge: data.badge || './icon-192x192.png',
-    data:  data,
-  };
-  e.waitUntil(self.registration.showNotification(title, opts));
-});
-
-// 🔔 Bring app to foreground when notification is tapped
-self.addEventListener('notificationclick', e => {
-  e.notification.close();
-  e.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
-      const existing = list.find(c => c.url.includes('index.html') || c.url.endsWith('/'));
-      if (existing) return existing.focus();
-      return clients.openWindow('./');
-    })
   );
 });
