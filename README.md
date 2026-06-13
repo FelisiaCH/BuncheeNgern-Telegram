@@ -210,43 +210,6 @@ Then open `http://localhost:8080` in your browser.
 
 ---
 
-## 🧹 Resetting Repository History (Advanced / Optional)
-
-If you ever need to permanently wipe your fork's commit history — for example, after accidentally committing a secret — you can reinitialize the repository locally and force-push a single clean commit.
-
-First, remove the existing Git history and start a fresh repository:
-
-```bash
-rm -rf .git
-git init
-git branch -M main
-```
-
-Next, stage and commit the current working tree as a single new initial commit:
-
-```bash
-git add .
-git commit -m "initial: clean history"
-```
-
-Finally, re-link your remote and overwrite the remote history with a force push:
-
-```bash
-git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
-git push -u origin main --force
-```
-
-> **Warning:** `git push --force` permanently overwrites the remote branch history. Anyone with an existing clone will need to re-clone the repository. Any secret that was ever committed should still be treated as compromised and rotated — force-pushing removes it from the branch, but GitHub may retain unreferenced objects for a short period before garbage collection.
-
-### 🖥️ Platform Compatibility
-
-The commands above use Unix-style syntax (`rm -rf`, forward-slash paths, etc.):
-
-- **macOS and Linux:** these commands work natively in the default Terminal — no changes needed.
-- **Windows:** run these commands in **Git Bash** (installed with Git for Windows) or **PowerShell**. In PowerShell, `rm -rf .git` works as an alias for `Remove-Item -Recurse -Force .git`; all other commands (`git init`, `git add`, `git commit`, `git remote`, `git push`) are identical across platforms since they are Git commands, not shell commands.
-
----
-
 ## 🧠 Why Serverless?
 
 FinTrack has no server to rent or maintain. The entire backend runs on Google's infrastructure plus Telegram's free Bot API:
@@ -470,43 +433,6 @@ python3 -m http.server 8080
 จากนั้นเปิด `http://localhost:8080` ในเบราว์เซอร์
 
 > Service Worker ต้องใช้ HTTPS หรือ `localhost` การ deploy บน GitHub Pages เป็น HTTPS อยู่แล้วจึงใช้งานได้ทันที
-
----
-
-## 🧹 การล้างประวัติ Git ของรีโพ (ขั้นสูง / ทางเลือก)
-
-หากต้องการล้างประวัติ commit ของฟอร์กอย่างถาวร — เช่น หลังจากที่มีการ commit ความลับเข้าไปโดยไม่ตั้งใจ — สามารถสร้างรีโพใหม่ในเครื่องและ force-push commit เดียวที่สะอาดได้
-
-ขั้นแรก ลบประวัติ Git เดิมและเริ่มรีโพใหม่:
-
-```bash
-rm -rf .git
-git init
-git branch -M main
-```
-
-จากนั้น stage และ commit ไฟล์ปัจจุบันทั้งหมดเป็น commit เริ่มต้นใหม่:
-
-```bash
-git add .
-git commit -m "initial: clean history"
-```
-
-สุดท้าย เชื่อม remote ใหม่และเขียนทับประวัติ remote ด้วย force push:
-
-```bash
-git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
-git push -u origin main --force
-```
-
-> **คำเตือน:** `git push --force` จะเขียนทับประวัติของ remote branch อย่างถาวร ผู้ที่มี clone อยู่แล้วต้อง clone ใหม่ ความลับใดที่เคย commit ไปแล้วยังต้องถือว่ารั่วไหลและต้องเปลี่ยนค่าใหม่ — การ force-push เพียงลบออกจาก branch แต่ GitHub อาจยังเก็บ object ที่ไม่ถูกอ้างอิงไว้ชั่วระยะหนึ่งก่อนล้างจริง
-
-### 🖥️ ความเข้ากันได้ของแพลตฟอร์ม
-
-คำสั่งด้านบนใช้ไวยากรณ์แบบ Unix (`rm -rf`, เครื่องหมาย `/` ในพาธ ฯลฯ):
-
-- **macOS และ Linux:** คำสั่งเหล่านี้ใช้งานได้ทันทีใน Terminal เริ่มต้น ไม่ต้องแก้ไขอะไร
-- **Windows:** ให้รันคำสั่งเหล่านี้ใน **Git Bash** (มาพร้อม Git for Windows) หรือ **PowerShell** ใน PowerShell คำสั่ง `rm -rf .git` เป็น alias ของ `Remove-Item -Recurse -Force .git` ส่วนคำสั่งอื่น (`git init`, `git add`, `git commit`, `git remote`, `git push`) เหมือนกันทุกแพลตฟอร์มเพราะเป็นคำสั่งของ Git ไม่ใช่ของ shell
 
 ---
 

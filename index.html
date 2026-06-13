@@ -667,18 +667,6 @@ option{background:#0E1526}
 .branch-empty-hint{font-size:11.5px;color:var(--txt-muted);text-align:center;padding:6px 0}
 .branch-add-row{display:flex;flex-direction:column;gap:8px}
 .branch-add-row .fi{width:100%}
-/* 🛠 Dev Console Overlay */
-#dev-console{position:fixed;bottom:0;left:0;right:0;height:55vh;background:#050810;border-top:2px solid var(--teal);z-index:9999;display:flex;flex-direction:column;font-family:'Courier New',Courier,monospace}
-.dev-console-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg-input);border-bottom:1px solid var(--teal-brd);flex-shrink:0}
-.dev-console-title{color:var(--teal);font-size:13px;font-weight:700}
-.dev-console-acts{display:flex;gap:6px}
-.dev-console-btn{background:var(--teal-dim);border:1px solid var(--teal-brd);color:var(--teal);border-radius:6px;padding:3px 10px;font-size:11.5px;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent}
-.dev-console-log{flex:1;overflow-y:auto;padding:8px;font-size:11px;line-height:1.6;word-break:break-all;-webkit-overflow-scrolling:touch}
-.dev-log{padding:1px 0;border-bottom:1px solid rgba(255,255,255,.04)}
-.dev-log.log{color:#c8d3ea}
-.dev-log.warn{color:#ffd166}
-.dev-log.error{color:var(--red)}
-.dev-log-ts{color:#4a5470;margin-right:5px;font-size:10px;user-select:none}
 </style>
 </head>
 <body>
@@ -980,9 +968,6 @@ option{background:#0E1526}
                onkeydown="if(event.key==='Enter'){event.preventDefault();addBranch();}">
         <button type="button" class="menu-action-btn" onclick="addBranch()" data-i18n="btnAddBranch">➕ เพิ่มสาขาใหม่</button>
       </div>
-      <div class="menu-subdvd"></div>
-      <button type="button" class="menu-action-btn" onclick="testNotification()" data-i18n="btnTestNotification">🔔 Test Notification / ทดสอบแจ้งเตือน</button>
-      <button type="button" class="menu-action-btn" onclick="openDevConsole()" data-i18n="btnOpenConsole">🛠 เปิด Developer Console</button>
     </div>
   </div>
 
@@ -1004,32 +989,6 @@ option{background:#0E1526}
 
 <script src="lang.js"></script>
 <script>
-// 🛠 Dev Console — intercept logs before anything else runs
-(function(){
-  const _orig={log:console.log,warn:console.warn,error:console.error};
-  function _esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-  function _devLog(type,args){
-    const el=document.getElementById('dev-console-log');
-    if(!el)return;
-    const ts=new Date().toISOString().slice(11,23);
-    const msg=Array.from(args).map(a=>{try{return typeof a==='object'?JSON.stringify(a,null,0):String(a);}catch{return '[obj]';}}).join(' ');
-    const d=document.createElement('div');
-    d.className='dev-log '+type;
-    d.innerHTML='<span class="dev-log-ts">'+ts+'</span>'+_esc(msg);
-    el.appendChild(d);
-    el.scrollTop=el.scrollHeight;
-  }
-  ['log','warn','error'].forEach(type=>{
-    console[type]=function(...args){_orig[type].apply(console,args);_devLog(type,args);};
-  });
-  window.onerror=function(msg,src,line,col){
-    _devLog('error',['[onerror] '+msg+' @ '+src+':'+line+':'+col]);
-  };
-  window.onunhandledrejection=function(e){
-    _devLog('error',['[unhandledrejection] '+(e.reason?.message||String(e.reason)||'unknown')]);
-  };
-})();
-
 // 🛠️ DOM Helper (must be defined before any early init calls below)
 const $ = id => document.getElementById(id);
 
@@ -1382,107 +1341,6 @@ function showOv(msg) {
   $('ov').classList.remove('hidden');
 }
 function hideOv() { $('ov').classList.add('hidden'); }
-
-// 🔊 Play Sound and Show Notification
-const NOTIF_AUTO_CLOSE_MS = 4500;
-
-const NOTIF_CHIME_DATA_URI = 'data:audio/wav;base64,UklGRoQJAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YWAJAAB/p722lmtKQVR7o7q2mW9NQlJ3n7i3m3NQQ1Fzm7W3nndURE9wl7O2oHtXRk5tk7C2on5bSE5qkK21pIJeSk1njKq0poViTE1liKezp4hlTk1jhaSyqItpUE1hgqGwqY5sU05ff56vqpFvVU5de5utqpNzWE9ceZirqpV2W1BbdpWpqpd5XVFac5Knqpl8YFJZcY+lqpp/Y1RZb4yjqZyBZVVYbYmhqJ2EaFdYa4aep56Ga1lYaYScp5+IbltYZ4GZpaCLcFxYZn+XpKCNc15ZZXyVo6COdWBaZHqSoaCQeGNaY3iQoKCSemVbYnaNnqCTfGdcYXSLnaCUfmldYXKJm6CVgWteYXCHmZ+Wg21gYW+Fl56XhG9hYW6ClZ6YhnFjYWyAk52YiHNkYWt+kpyZiXVmYWp9kJuZi3dnYmp7jpqZjHlpYml5jJiZjXtqY2h4ipeZjn1sZGh2iJaZj35uZWd1h5WYkIBvZmd0hZOYkYJxZ2dyg5KXkoNzaGdxgpCXkoV0aWdwgI+Wk4Z2amdwf42Vk4d3a2hvfYyVk4h5bGhufIqUk4l6bmlueomTk4p8b2lteYiSk4t9cGpteIaRk4x+cWptd4WQk4yAc2tsdoOPko2BdGxsdYKNko2CdW1sdIGMkY6Ddm5sdICLkY6EeG5tc3+KkI6FeW9tcn2JkI6GenBtcnyIj4+He3FtcXuHjo+IfHJucXqGjY6IfXNucXmEjY6JfnRvcXmDjI6Jf3VvcHiCi46KgHZwcHeBio6KgXdxcHeAiY2KgnhxcHZ/iI2Lg3lycXV+iIyLhHpzcXV+h4yLhHtzcXV9houLhXx0cXR8hYuLhn11cnR7hIqLhn52cnR7g4qLhn93cnR6gomLh393c3R5goiKh4B4c3N5gYiKiIF5dHN4gIeKiIF6dHR4f4aKiIJ6dXR3f4aJiIN7dXR3foWJiIN8dnR3fYSIiIR9dnR3fYOIiIR9d3R2fIOIiIR+eHV2e4KHiIV+eHV2e4GHiIV/eXV2eoGGiIWAenZ2eoCGiIaAenZ2eoCFh4aBe3Z2eX+Fh4aBe3d2eX+Eh4aCfHd2eX6Dh4aCfHh2eH2DhoaCfXh2eH2ChoaDfnl3eH2ChoaDfnl3eHyBhYaDfnp3eHyBhYaEf3p3eHuAhIaEf3t4eHuAhIaEgHt4eHt/hIWEgHx4eHp/g4WEgXx5eHp/g4WEgXx5eHp+goWEgX15eHp+goWEgn16eHp9goSEgn56eHp9gYSEgn56eXl9gYSEgn57eXl8gIOEgn97eXl8gIOEg397eXl8gIOEg4B8eXl8f4KEg4B8enl7f4KEg4B9enl7f4KEg4B9enl7foGDg4F9enp7foGDg4F+e3p7foGDg4F+e3p7fYGDg4F+e3p7fYCDg4F+fHp6fYCCg4J/fHp6fYCCg4J/fHp6fH+Cg4J/fHt6fH+Cg4KAfXt6fH+Bg4KAfXt6fH+BgoKAfXt7fH6BgoKAfnt7fH6BgoKAfnx7fH6AgoKBfnx7e36AgoKBfnx7e32AgoKBf3x7e32AgYKBf3x7e31/gYKBf317e31/gYKBf317e31/gYKBf318e31/gYKBf318e3x/tbaASUd7sreETEZ3r7iIT0VzrLiMU0VwqbiPVkVspbiSWUVporiVXUVmn7eYYEZjm7ebZEdhmLadZ0helLSga0lckbOibktajbKkcUxYirCldU5Xh66neFBVg6yoe1JUgKqpf1RTfaiqglZTeqarhVlSd6Orh1tSdKGril5Scp6rjWBSb5urj2NSbZmrkWZSapaqlGhTaJOqlmtUZpGpmG5UZY6omXBWY4unm3NXYommnHZYYIaknXhZX4OjnntbXoGhn31dXX6goIBeXXyeoYJgXHqcoYRiXHiaoYZkXHWYoYlmXHOWoYtoXHKUoYxqXHCSoY5sXG6QoJBuXWyOoJFwXWuMn5NyXmqKnpR1X2iHnpV3YGeFnJZ5YWaDm5d7YmaBmph9Y2V/mZh/ZWR+mJmAZmR8lpmCaGR6lZqEaWN4k5qGa2N3kpqHbGN1kJqJbmN0jpmKb2RyjZmLcWRxi5mNc2RwipiOdGVviJiPdmZuhpeQeGZthZaQeWdsg5WRe2hrgpWSfGlrgJSSfmpqfpOTf2tqfZGTgWxqfJCTgm1peo+Ug25peY6UhXBpeI2UhnFpd4yUh3JqdoqTiHNqdYmTiXVqdIiTinZqc4aSi3drcoWSjHhrcYSRjHpscIORjXttcIGQjXxtb4CPjn1ub3+Pjn9vb36Oj4Bwbn2Nj4FxbnyMj4JxbnuLj4NybnqKj4RzbnmJj4V0bniIj4V1bneHj4Z2bnaGjod3b3aFjoh4b3WEjoh5b3SDjYl6cHSCjYl7cHOBjIp8cXOAjIp9cXN/i4t+cnJ+i4t/c3J+iouAc3J9iYuBdHJ8iYuBdXJ7iIuCdXJ6h4uDdnJ6houEd3J5houEeHJ4hYuFeXJ4hIuFeXJ3g4uGenN3g4qGe3N2goqHfHN2gYqHfHR2gImIfXR1gImIfnV1f4iIf3V1foiIf3Z1fYeIgHZ1fYeIgHd1fIaJgXd0fIaJgnh0e4WIgnh1e4SIg3l1eoSIg3p1eoOIhHp1eYOIhHt1eYKIhHt1eIGIhXx2eIGHhX12eICHhX12d4CHhn53d3+Ghn53d36Ghn93d36Fhn94d32FhoB4d32FhoB5d3yEhoF5d3yEhoF5d3yDhoJ6d3uDhoJ6d3uChoJ7d3qChoN7d3qBhoN8d3qBhoN8d3qAhYR9eHmAhYR9eHmAhYR+eHl/hYR+eHl/hIR/eXl+hIR/eXl+hIR/eXh9g4WAenh9g4WAenh9g4WAenh8goWBe3h8goWBe3l8goSBe3l8gYSCfHl7gYSCfHl7gYSCfXl7gISCfXl7gISDfXl6gISDfnl6f4ODfnp6f4ODfnp6foODf3p6foODf3p6foKDf3t6foKDgHt6fYKDgHt6fYKDgHt6fYGDgHx6fYGDgXx6fIGDgXx6fIGDgX16fICDgX16fICDgX16fICDgn16e3+Dgn57e3+Cgn57e3+Cgn57e3+Cgn97e36Cgn97e36Cgn97e36Cgn98e36Bgn98e32BgoB8e32BgoB8e32BgoB8e32AgoB9e32AgoB9e32AgoF9e3yAgoF9e3yAgoF+e3x/goF+e3x/goF+e3x/gYF+fHx/gYF+fHw=';
-
-function requestNotificationPermission() {
-  if (!('Notification' in window) || Notification.permission !== 'default') return;
-  Notification.requestPermission().catch(() => {});
-}
-
-function playNotifChime() {
-  const vibrate = () => {
-    console.warn('[chime] audio blocked by autoplay policy — vibrating instead');
-    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-  };
-  try { new Audio(NOTIF_CHIME_DATA_URI).play().catch(vibrate); } catch { vibrate(); }
-}
-
-function _swNotify(title, opts) {
-  const fallback = (err) => {
-    console.warn('[_swNotify] SW path failed ('+(err?.message||err||'unknown')+') — falling back to new Notification()');
-    try { const n = new Notification(title, opts); setTimeout(() => n.close(), NOTIF_AUTO_CLOSE_MS); }
-    catch(e2) { console.error('[_swNotify] Notification() fallback also failed:', e2.message); }
-  };
-  if ('serviceWorker' in navigator) {
-    console.log('[_swNotify] via SW | controller:', !!navigator.serviceWorker.controller);
-    navigator.serviceWorker.ready
-      .then(reg => { console.log('[_swNotify] SW ready, scope:', reg.scope); return reg.showNotification(title, opts); })
-      .catch(fallback);
-  } else {
-    console.warn('[_swNotify] serviceWorker API unavailable — using direct Notification()');
-    fallback();
-  }
-}
-
-function notifyTransaction(isIncome, shop, price, cur) {
-  const title = isIncome ? t('notifyIncomeTitle') : t('notifyExpenseTitle');
-  const body  = `${shop}: ${isIncome ? '+' : '-'}${fmtN(price)} ${cur}`;
-  showToast(`${title} — ${body}`, isIncome ? '' : 'err');
-
-  const perm = 'Notification' in window ? Notification.permission : 'not-supported';
-  console.log(`[notifyTransaction] type:${isIncome?'income':'expense'} | notif-perm:${perm}`);
-
-  if (!('Notification' in window) || Notification.permission !== 'granted') {
-    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-    return;
-  }
-  playNotifChime();
-  _swNotify(title, { body, icon: './icon-192x192.png', badge: './icon-192x192.png' });
-}
-
-function testNotification() {
-  if (!('Notification' in window)) { showToast(t('notifNotSupported'), 'err'); return; }
-
-  if (Notification.permission === 'denied') { alert(t('notifDeniedHelp')); return; }
-
-  if (Notification.permission === 'default') {
-    Notification.requestPermission().then(perm => {
-      if (perm === 'granted')      fireTestNotification();
-      else if (perm === 'denied')  alert(t('notifDeniedHelp'));
-      else                         showToast(t('notifNotSupported'), 'warn');
-    }).catch(() => showToast(t('notifTestFailed'), 'err'));
-    return;
-  }
-
-  fireTestNotification();
-}
-
-function fireTestNotification() {
-  playNotifChime();
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.ready
-      .then(reg => reg.showNotification(t('notifTestTitle'), { body: t('notifTestBody'), icon: './icon-192x192.png' }))
-      .catch(() => showToast(t('notifTestFailed'), 'err'));
-  } else {
-    try { new Notification(t('notifTestTitle'), { body: t('notifTestBody') }); }
-    catch { showToast(t('notifTestFailed'), 'err'); }
-  }
-}
-
-// 🛠 Dev Console Controls
-function openDevConsole() {
-  document.getElementById('dev-console').classList.remove('hidden');
-  const perm       = 'Notification' in window ? Notification.permission : 'not-supported';
-  const swSupp     = 'serviceWorker' in navigator;
-  const standalone = window.matchMedia('(display-mode: standalone)').matches || !!navigator.standalone;
-  console.log(`[diagnostics] notif-perm:${perm} | SW:${swSupp} | standalone:${standalone} | UA:${navigator.userAgent.slice(0,90)}`);
-  if (swSupp) {
-    navigator.serviceWorker.getRegistration().then(reg => {
-      const state = reg ? (reg.active ? 'active' : reg.installing ? 'installing' : 'waiting') : 'none';
-      console.log(`[SW] state:${state} | controller:${!!navigator.serviceWorker.controller} | scope:${reg?.scope||'n/a'}`);
-    }).catch(e => console.error('[SW] getRegistration error:', e.message));
-  }
-}
-function closeDevConsole() {
-  document.getElementById('dev-console').classList.add('hidden');
-}
-function clearDevConsole() {
-  document.getElementById('dev-console-log').innerHTML = '';
-}
 
 // 📡 API Request Layer
 function _apiFetch(input, init) {
@@ -1900,7 +1758,6 @@ async function doSubmit() {
 
     hideOv();
     showToast(t('toastSaveSuccess'));
-    notifyTransaction(A.fd.type === 'income', A.fd.shop, price, cur);
     resetForm();
   } catch(e) {
     hideOv();
@@ -2143,7 +2000,6 @@ function switchTab(tab) {
 
 // ✅ Run on Page Load
 document.addEventListener('DOMContentLoaded', () => {
-  requestNotificationPermission();
   initCombo();
   renderBranchSegments();
   renderBranchFilters();
@@ -2151,21 +2007,9 @@ document.addEventListener('DOMContentLoaded', () => {
   init();
 });
 </script>
-<div id="dev-console" class="hidden">
-  <div class="dev-console-bar">
-    <span class="dev-console-title">🛠 Dev Console</span>
-    <div class="dev-console-acts">
-      <button class="dev-console-btn" onclick="clearDevConsole()">🗑 Clear</button>
-      <button class="dev-console-btn" onclick="closeDevConsole()">✕ Close</button>
-    </div>
-  </div>
-  <div id="dev-console-log" class="dev-console-log"></div>
-</div>
 <script>
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./service-worker.js')
-    .then(r  => console.log('[SW] registered | scope:', r.scope))
-    .catch(e => console.error('[SW] registration failed:', e.message));
+  navigator.serviceWorker.register('./service-worker.js');
 }
 </script>
 </body>

@@ -126,9 +126,7 @@ function submitEntry(data) {
       '\n💸 รายการ: ' + data.itemName + ' [' + data.shop + ']' +
       '\n💰 ยอดเงิน: ' + data.price + ' ' + data.currency;
     sendTelegramNotification(message);
-  } catch (err) {
-    Logger.log('[Telegram] notification failed during submitEntry: ' + err.message);
-  }
+  } catch (err) {}
 
   return { success: true };
 }
@@ -204,11 +202,5 @@ function sendTelegramNotification(message) {
     muteHttpExceptions: true,
   };
 
-  const res  = UrlFetchApp.fetch(url, options);
-  const code = res.getResponseCode();
-  if (code >= 400) {
-    Logger.log('[Telegram] ' + code + ' ERROR — ' + res.getContentText().slice(0, 200));
-  } else {
-    Logger.log('[Telegram] ' + code + ' OK — message sent');
-  }
+  UrlFetchApp.fetch(url, options);
 }
