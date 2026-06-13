@@ -1,9 +1,10 @@
 # FinTrack
 
-**Income & Expense Tracking System** — an installable PWA for logging daily income and expenses across multiple branches, with a Google Sheets backend and instant cross-device Telegram notifications for every new transaction.
+**Income & Expense Tracking System** — an installable PWA for logging daily income and expenses across multiple branches, backed by a Google-authenticated Apps Script Web App over Google Sheets, with instant cross-device Telegram notifications for every new transaction.
 
 ![Frontend](https://img.shields.io/badge/frontend-HTML%20%2F%20CSS%20%2F%20JS-2EE8B4)
 ![Backend](https://img.shields.io/badge/backend-Google%20Apps%20Script-4285F4)
+![Auth](https://img.shields.io/badge/auth-Google%20Sign--in-EA4335)
 ![Notifications](https://img.shields.io/badge/notifications-Telegram%20Bot%20API-26A5E4)
 ![Build](https://img.shields.io/badge/build-none%20required-success)
 
@@ -146,9 +147,11 @@ Because the message is sent directly from the same server-side execution that wr
 
 4. Click **Deploy → New deployment**:
    - Type: **Web app**
-   - Execute as: **Me**
-   - Who has access: **Anyone**
+   - Execute as: **User accessing the web app**
+   - Who has access: **Anyone with Google account**
    - Click **Deploy** and authorize all Google permission requests.
+
+   > **Why these settings matter:** **Execute as: User accessing the web app** binds every request to the signed-in Google account of the person using FinTrack, instead of always running under your account. This initializes the Google Sign-in pipeline — each user authenticates with their own Google account on first use, and all spreadsheet operations run under their own session, eliminating cross-device "access denied" errors that occur with **Execute as: Me**.
 
 5. Copy the deployment URL. It follows this format:
 
@@ -405,9 +408,11 @@ FinTrack ส่งการแจ้งเตือนด้วย **Telegram Bo
 
 4. คลิก **Deploy → New deployment**:
    - Type: **Web app**
-   - Execute as: **Me**
-   - Who has access: **Anyone**
+   - Execute as: **User accessing the web app**
+   - Who has access: **Anyone with Google account**
    - คลิก **Deploy** และอนุญาตสิทธิ์ที่ Google ขอทั้งหมด
+
+   > **เหตุผลที่ต้องตั้งค่าแบบนี้:** การเลือก **Execute as: User accessing the web app** จะผูกทุกคำขอกับบัญชี Google ที่ผู้ใช้แต่ละคนล็อกอินอยู่ แทนที่จะรันด้วยบัญชีของคุณเสมอ การตั้งค่านี้เป็นจุดเริ่มต้นของระบบ Google Sign-in — ผู้ใช้แต่ละคนจะต้องล็อกอินด้วยบัญชี Google ของตนเองในการใช้งานครั้งแรก และการทำงานกับสเปรดชีตทั้งหมดจะรันภายใต้ session ของผู้ใช้คนนั้น ซึ่งช่วยแก้ปัญหา "access denied" ข้ามอุปกรณ์ที่เกิดจากการตั้งค่า **Execute as: Me**
 
 5. คัดลอก URL การ deploy ซึ่งจะมีรูปแบบดังนี้:
 

@@ -1,4 +1,5 @@
 // 🔧 Spreadsheet & Sheet Config
+// Deploy as: Execute as "User accessing the web app", access "Anyone with Google account"
 const SPREADSHEET_ID  = 'YOUR_GOOGLE_SHEET_ID_HERE';
 const DRIVE_FOLDER_ID = 'YOUR_DRIVE_FOLDER_ID_HERE';
 
