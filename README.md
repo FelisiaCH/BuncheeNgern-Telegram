@@ -149,11 +149,11 @@ Because the message is sent directly from the same server-side execution that wr
 
 4. Click **Deploy → New deployment**:
    - Type: **Web app**
-   - Execute as: **User accessing the web app**
-   - Who has access: **Anyone with Google account**
+   - Execute as: **Me**
+   - Who has access: **Anyone**
    - Click **Deploy** and authorize all Google permission requests.
 
-   > **Why these settings matter:** **Execute as: User accessing the web app** binds every request to the signed-in Google account of the person using FinTrack, instead of always running under your account. This initializes the Google Sign-in pipeline — each user authenticates with their own Google account on first use, and all spreadsheet operations run under their own session, eliminating cross-device "access denied" errors that occur with **Execute as: Me**.
+   > **Why these settings matter:** **Execute as: Me** runs every request under your own Google account permissions, and **Who has access: Anyone** allows the deployment to be called directly from the browser without a Google sign-in redirect. This avoids the CORS/Network Error that blocks `fetch()` requests when the script requires the caller's own Google session. FinTrack's optional "Sign in with Google" button on the login screen is separate — it only attaches the signed-in staff member's email to each entry for the Telegram notification, it does not change how the Apps Script executes.
 
 5. Copy the deployment URL. It follows this format:
 
@@ -375,11 +375,11 @@ FinTrack ส่งการแจ้งเตือนด้วย **Telegram Bo
 
 4. คลิก **Deploy → New deployment**:
    - Type: **Web app**
-   - Execute as: **User accessing the web app**
-   - Who has access: **Anyone with Google account**
+   - Execute as: **Me**
+   - Who has access: **Anyone**
    - คลิก **Deploy** และอนุญาตสิทธิ์ที่ Google ขอทั้งหมด
 
-   > **เหตุผลที่ต้องตั้งค่าแบบนี้:** การเลือก **Execute as: User accessing the web app** จะผูกทุกคำขอกับบัญชี Google ที่ผู้ใช้แต่ละคนล็อกอินอยู่ แทนที่จะรันด้วยบัญชีของคุณเสมอ การตั้งค่านี้เป็นจุดเริ่มต้นของระบบ Google Sign-in — ผู้ใช้แต่ละคนจะต้องล็อกอินด้วยบัญชี Google ของตนเองในการใช้งานครั้งแรก และการทำงานกับสเปรดชีตทั้งหมดจะรันภายใต้ session ของผู้ใช้คนนั้น ซึ่งช่วยแก้ปัญหา "access denied" ข้ามอุปกรณ์ที่เกิดจากการตั้งค่า **Execute as: Me**
+   > **เหตุผลที่ต้องตั้งค่าแบบนี้:** **Execute as: Me** จะรันทุกคำขอด้วยสิทธิ์บัญชี Google ของคุณเอง และ **Who has access: Anyone** จะทำให้เรียกใช้ deployment นี้ได้ตรงจากเบราว์เซอร์โดยไม่ต้อง redirect ไปล็อกอิน Google ก่อน ซึ่งช่วยแก้ปัญหา CORS/Network Error ที่บล็อกคำขอ `fetch()` เมื่อสคริปต์ต้องใช้ session ของผู้เรียกเอง ปุ่ม "เข้าสู่ระบบด้วย Google" ที่หน้า login ของ FinTrack เป็นคนละส่วนกัน — มีไว้เพียงแนบอีเมลของพนักงานที่ล็อกอินไปกับแต่ละรายการเพื่อแจ้งผ่าน Telegram เท่านั้น ไม่มีผลต่อการรัน Apps Script
 
 5. คัดลอก URL การ deploy ซึ่งจะมีรูปแบบดังนี้:
 

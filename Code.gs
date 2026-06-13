@@ -1,5 +1,5 @@
 // 🔧 Spreadsheet & Sheet Config
-// Deploy as: Execute as "User accessing the web app", access "Anyone with Google account"
+// Deploy as: Execute as "Me", access "Anyone"
 const SPREADSHEET_ID  = 'YOUR_GOOGLE_SHEET_ID_HERE';
 const DRIVE_FOLDER_ID = 'YOUR_DRIVE_FOLDER_ID_HERE';
 
@@ -122,7 +122,7 @@ function submitEntry(data) {
   sheet.getRange(sheet.getLastRow() + 1, 1, 1, row.length).setValues([row]);
 
   try {
-    const message = '🔔 มีรายการใหม่เข้ามา!\n👤 ผู้บันทึก: ' + data.staffName +
+    const message = '🔔 มีรายการใหม่เข้ามา!\n👤 ผู้บันทึก: ' + data.staffName + ' (' + (data.userEmail || '-') + ')' +
       '\n💸 รายการ: ' + data.itemName + ' [' + data.shop + ']' +
       '\n💰 ยอดเงิน: ' + data.price + ' ' + data.currency;
     sendTelegramNotification(message);

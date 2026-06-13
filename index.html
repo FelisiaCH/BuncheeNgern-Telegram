@@ -12,6 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 /* 🎨 Reset & Theme Variables */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -164,6 +165,8 @@ button{cursor:pointer}
 }
 .lc-title{font-size:22px;font-weight:800;letter-spacing:-.5px;color:var(--txt)}
 .lc-sub{font-size:13px;font-weight:400;color:var(--txt-sub);margin-top:4px}
+.g-signin-row{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:18px}
+.g-signin-hint{font-size:12px;color:var(--txt-sub);text-align:center}
 
 /* 📋 Form Fields & Inputs */
 .fg{margin-bottom:16px}
@@ -714,6 +717,11 @@ option{background:#0E1526}
 
       <div class="lang-switch" id="lang-switch-login"></div>
 
+      <div class="g-signin-row">
+        <div id="g-signin-btn"></div>
+        <div class="g-signin-hint" id="g-signin-hint" data-i18n="googleSignInHint">เข้าสู่ระบบด้วย Google (ไม่บังคับ)</div>
+      </div>
+
       <div class="fg">
         <label class="fl" data-i18n="labelScriptUrl">Google Script URL / ลิงก์สคริปต์</label>
         <select id="l-script-select" class="fs" onchange="pickSavedScript(this.value)"
@@ -1021,6 +1029,9 @@ const MAX_IMG_PX       = 1280;
 const IMG_QUALITY      = 0.82;
 const API_TIMEOUT      = 15000;
 
+const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID_HERE';
+const USER_EMAIL_KEY   = 'userEmail';
+
 // 🗂️ App & Dashboard State
 const A = {
   users:    [],
@@ -1028,6 +1039,7 @@ const A = {
   attempts: {},
   fd: { type:'income', shop: BRANCHES[0], pay:'Cash' },
   slip:     null,
+  userEmail: localStorage.getItem(USER_EMAIL_KEY) || '',
 };
 let dashByBranchCur  = {};
 let dashByCur        = {};
@@ -1383,6 +1395,30 @@ function loadSession() {
 }
 function clearSession() { localStorage.removeItem(SESSION_KEY); }
 
+// 🔐 Google Sign-In (Identity Services)
+function decodeJwtPayload(token) {
+  const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+  return JSON.parse(decodeURIComponent(atob(base64).split('').map(c =>
+    '%' + c.charCodeAt(0).toString(16).padStart(2, '0')).join('')));
+}
+
+function handleGoogleCredential(resp) {
+  const payload = decodeJwtPayload(resp.credential);
+  A.userEmail = payload.email || '';
+  localStorage.setItem(USER_EMAIL_KEY, A.userEmail);
+  if ($('g-signin-hint')) $('g-signin-hint').textContent = A.userEmail;
+}
+
+function initGoogleSignIn() {
+  if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID_HERE') return;
+  if (!window.google?.accounts?.id) { setTimeout(initGoogleSignIn, 300); return; }
+
+  google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleGoogleCredential });
+  google.accounts.id.renderButton($('g-signin-btn'), { theme: 'outline', size: 'medium', shape: 'pill' });
+
+  if (A.userEmail && $('g-signin-hint')) $('g-signin-hint').textContent = A.userEmail;
+}
+
 // 🔑 Token Input Filter
 const SCRIPT_URL_TEMPLATE = 'https://script.google.com/macros/s/${token}/exec';
 const SCRIPT_TOKEN_RE     = /\/macros\/s\/([a-zA-Z0-9_-]+)\/exec/;
@@ -1456,6 +1492,7 @@ async function pickSavedScript(url) {
 async function init() {
   loadTheme();
   applyTranslations();
+  initGoogleSignIn();
   $('l-script-url').value = SCRIPT_URL;
   $('set-script-url').value = SCRIPT_URL;
   renderScriptSelectors();
@@ -1746,6 +1783,7 @@ async function doSubmit() {
       timestamp:     ts,
       sheetTabName:  tab,
       staffName:     A.me,
+      userEmail:     A.userEmail || '',
       itemName:      item,
       currency:      cur,
       price:         price,

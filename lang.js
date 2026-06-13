@@ -8,6 +8,7 @@ const LANGS = {
 
 const I18N = {
   tagline:               { lo:'ລະບົບບັນຊີລາຍຮັບ-ລາຍຈ່າຍ', th:'ระบบบัญชีรายรับ-รายจ่าย', en:'Income & Expense Tracking System', vi:'Hệ thống Quản lý Thu Chi', my:'ဝင်ငွေနှင့် အသုံးစရိတ် မှတ်တမ်းစနစ်' },
+  googleSignInHint:      { lo:'ເຂົ້າສູ່ລະບົບດ້ວຍ Google (ບໍ່ບັງຄັບ)', th:'เข้าสู่ระบบด้วย Google (ไม่บังคับ)', en:'Sign in with Google (optional)', vi:'Đăng nhập bằng Google (không bắt buộc)', my:'Google ဖြင့် လော့ဂ်အင်ဝင်ပါ (မလိုအပ်)' },
   cfgBarMsg:             { lo:'⚙️ ກະລຸນາປ້ອນ ແລະ ບັນທຶກ Google Script URL ດ້ານລຸ່ມກ່ອນເຂົ້າສູ່ລະບົບ', th:'⚙️ กรุณากรอกและบันทึก Google Script URL ด้านล่างก่อนเข้าสู่ระบบ', en:'⚙️ Please enter and save a Google Script URL below before signing in', vi:'⚙️ Vui lòng nhập và lưu URL Google Script bên dưới trước khi đăng nhập', my:'⚙️ ဝင်ရောက်ရန် မီ အောက်ပါ Google Script URL ကို ရိုက်ထည့်ပြီး သိမ်းဆည်းပါ' },
   loadingGeneric:        { lo:'ກຳລັງດຳເນີນການ...', th:'กำลังดำเนินการ...', en:'Processing...', vi:'Đang xử lý...', my:'လုပ်ဆောင်နေသည်...' },
 
