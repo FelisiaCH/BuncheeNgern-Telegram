@@ -5,12 +5,12 @@ const DRIVE_FOLDER_ID = 'YOUR_DRIVE_FOLDER_ID_HERE';
 
 // 📲 Telegram Bot Notification Config
 const TELEGRAM_BOT_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN_HERE';
-const TELEGRAM_CHAT_ID   = 'YOUR_TELEGRAM_CHAT_ID_HERE';
+const TELEGRAM_CHAT_IDS  = ['YOUR_TELEGRAM_CHAT_ID_HERE'];
 
 const TIMESTAMP_FORMAT = 'dd-MM-yyyy HH:mm:ss';
 
 const ENTRY_HEADERS = ['Timestamp', 'Staff Name', 'Item Name', 'Currency',
-                       'Price', 'Type', 'Shop', 'Payment Method', 'Slip URL'];
+                       'Price', 'Type', 'Shop', 'Payment Method', 'Slip URL', 'Transaction ID'];
 
 function ss() { return SpreadsheetApp.openById(SPREADSHEET_ID); }
 
@@ -62,25 +62,31 @@ function submitEntry(data) {
     fileUrl = uploadSlipToDrive(data.fileName, data.fileData, data.mimeType);
   }
 
-  // Step 2: append the row to the spreadsheet (locked to avoid concurrent-write races)
+  // Step 2: append one row per currency sub-amount (locked to avoid concurrent-write races)
   const tab = data.sheetTabName;
-  const row = [
-    data.timestamp,
-    data.staffName,
-    data.itemName,
-    data.currency,
-    Number(data.price) || 0,
-    data.type,
-    data.shop,
-    data.paymentMethod,
-    fileUrl,
-  ];
+  const amounts = Array.isArray(data.amounts) && data.amounts.length
+    ? data.amounts
+    : [{ currency: data.currency, price: data.price }];
+  const transactionId = Utilities.getUuid();
 
   const lock = LockService.getScriptLock();
   lock.waitLock(30000);
   try {
     const sheet = ss().getSheetByName(tab) || createDailySheet(tab);
-    sheet.appendRow(row);
+    amounts.forEach(amount => {
+      sheet.appendRow([
+        data.timestamp,
+        data.staffName,
+        data.itemName,
+        amount.currency,
+        Number(amount.price) || 0,
+        data.type,
+        data.shop,
+        data.paymentMethod,
+        fileUrl,
+        transactionId,
+      ]);
+    });
   } finally {
     lock.releaseLock();
   }
@@ -89,13 +95,9 @@ function submitEntry(data) {
   let telegramOk = false;
   let telegramError = '';
   try {
-    const tgResp = sendTelegramNotification(data, fileUrl);
-    const tgCode = tgResp.getResponseCode();
-    if (tgCode === 200) {
-      telegramOk = true;
-    } else {
-      telegramError = `HTTP ${tgCode}: ${tgResp.getContentText()}`;
-    }
+    const tgResult = sendTelegramNotification(data, fileUrl, amounts);
+    telegramOk = tgResult.ok;
+    telegramError = tgResult.error;
   } catch (err) {
     telegramError = err.message;
   }
@@ -140,6 +142,7 @@ function getDateData(dateTab) {
       shop:          String(rows[i][6] || ''),
       paymentMethod: String(rows[i][7] || ''),
       slipUrl:       String(rows[i][8] || ''),
+      transactionId: String(rows[i][9] || ''),
     });
   }
   return { entries, tabName: dateTab };
@@ -169,29 +172,43 @@ function escapeHtml(value) {
 }
 
 // 📲 Telegram Bot Notification — fired server-side only, never from the client
-function sendTelegramNotification(data, fileUrl) {
+function sendTelegramNotification(data, fileUrl, amounts) {
+  const costLines = (amounts || [{ currency: data.currency, price: data.price }])
+    .map(a => `${escapeHtml(a.price)} ${escapeHtml(a.currency)}`)
+    .join('\n');
+
   const lines = [
-    '🔔 <b>New Transaction Recorded</b>',
-    `<b>Type:</b> ${escapeHtml(data.type)}`,
+    data.type === 'Income' ? '🟢 <b>New Income</b>' : '🔴 <b>New Expense</b>',
     `<b>Item Name:</b> ${escapeHtml(data.itemName)}`,
-    `<b>Cost:</b> ${escapeHtml(data.price)} ${escapeHtml(data.currency)}`,
+    `<b>Cost:</b>\n${costLines}`,
     `<b>Payment Method:</b> ${escapeHtml(data.paymentMethod)}`,
     `<b>Branch:</b> ${escapeHtml(data.shop)}`,
     `<b>Author:</b> ${escapeHtml(data.userEmail || data.staffName)}`,
   ];
   if (fileUrl) lines.push(`<b>Slip:</b> <a href="${escapeHtml(fileUrl)}">View Attachment</a>`);
 
-  const url = 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage';
-  const options = {
-    method:             'post',
-    contentType:        'application/json',
-    payload:            JSON.stringify({
-      chat_id:    TELEGRAM_CHAT_ID,
-      text:       lines.join('\n'),
-      parse_mode: 'HTML',
-    }),
-    muteHttpExceptions: true,
-  };
+  const url  = 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage';
+  const text = lines.join('\n');
 
-  return UrlFetchApp.fetch(url, options);
+  const errors = [];
+  let sentAny = false;
+  TELEGRAM_CHAT_IDS.forEach(chatId => {
+    if (!chatId || chatId === 'YOUR_TELEGRAM_CHAT_ID_HERE') return;
+    sentAny = true;
+    const options = {
+      method:             'post',
+      contentType:        'application/json',
+      payload:            JSON.stringify({
+        chat_id:    chatId,
+        text:       text,
+        parse_mode: 'HTML',
+      }),
+      muteHttpExceptions: true,
+    };
+    const resp = UrlFetchApp.fetch(url, options);
+    const code = resp.getResponseCode();
+    if (code !== 200) errors.push(`${chatId}: HTTP ${code}: ${resp.getContentText()}`);
+  });
+
+  return { ok: sentAny && errors.length === 0, error: errors.join('; ') };
 }

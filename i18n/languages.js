@@ -40,6 +40,8 @@ const I18N = {
   ariaSelectItem:        { lo:'ເລືອກລາຍການ', th:'เลือกรายการ', en:'Select item', vi:'Chọn mục', my:'ပစ္စည်းရွေးပါ' },
   labelAmount:           { lo:'ຈຳນວນເງິນ', th:'จำนวนเงิน', en:'Amount', vi:'Số tiền', my:'ပမာဏ' },
   ariaCurrency:          { lo:'ສະກຸນເງິນ', th:'สกุลเงิน', en:'Currency', vi:'Tiền tệ', my:'ငွေကြေး' },
+  btnAddCurrency:        { lo:'+ ເພີ່ມສະກຸນເງິນ', th:'+ เพิ่มสกุลเงิน', en:'+ Add Currency', vi:'+ Thêm tiền tệ', my:'+ ငွေကြေး ထပ်ထည့်ရန်' },
+  ariaRemoveCurrency:    { lo:'ລຶບສະກຸນເງິນນີ້', th:'ลบสกุลเงินนี้', en:'Remove this currency', vi:'Xóa loại tiền này', my:'ဤငွေကြေးကို ဖယ်ရှားမည်' },
   labelBranch:           { lo:'ສາຂາ', th:'สาขา', en:'Branch', vi:'Chi nhánh', my:'ဌာနခွဲ' },
   labelPaymentMethod:    { lo:'ຊ່ອງທາງຊຳລະເງິນ', th:'ช่องทางชำระเงิน', en:'Payment Method', vi:'Phương thức thanh toán', my:'ငွေချေနည်းလမ်း' },
   payCash:               { lo:'ເງິນສົດ', th:'เงินสด', en:'Cash', vi:'Tiền mặt', my:'ငွေသား' },

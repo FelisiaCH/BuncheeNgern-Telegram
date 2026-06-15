@@ -275,6 +275,18 @@ option{background:#0E1526}
 .prc-in::-webkit-inner-spin-button{-webkit-appearance:none}
 .prc-in[type=number]{-moz-appearance:textfield;appearance:textfield}
 
+/* ➕ Multi-Currency Repeater */
+.cur-line{display:flex;gap:8px;margin-top:8px;align-items:stretch}
+.cur-line .pg{flex:1}
+.cur-remove-btn{
+  flex:0 0 auto;width:42px;border:1px solid var(--brd);
+  background:var(--bg-input);border-radius:var(--r-sm);
+  color:var(--red);font-size:16px;cursor:pointer;
+  transition:background var(--ease),border-color var(--ease)
+}
+.cur-remove-btn:hover{background:var(--red-dim);border-color:var(--red-brd)}
+.cur-add-btn{width:100%;margin-top:10px;padding:11px}
+
 /* 📎 Slip Upload Zone */
 .upload-zone{
   border:2px dashed rgba(46,232,180,.2);border-radius:var(--r-sm);
@@ -712,6 +724,10 @@ option{background:#0E1526}
         </select>
         <input type="number" id="f-price" class="prc-in" placeholder="0" inputmode="decimal" min="0" step="any">
       </div>
+      <div id="cur-lines"></div>
+      <button type="button" class="btn-ghost cur-add-btn" onclick="addCurLine()">
+        <span data-i18n="btnAddCurrency">+ เพิ่มสกุลเงิน</span>
+      </button>
     </div>
 
     <div class="fg">
@@ -856,8 +872,8 @@ option{background:#0E1526}
 <script src="i18n/languages.js"></script>
 <script>
 // ⚙️ Configuration
-const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID_HERE";
-const SCRIPT_URL       = "YOUR_APPS_SCRIPT_URL_HERE";
+const GOOGLE_CLIENT_ID = "GOOGLE_CLIENT_ID";
+const SCRIPT_URL       = "SCRIPT_URL";
 
 // 🛠️ DOM Helper (must be defined before any early init calls below)
 const $ = id => document.getElementById(id);
@@ -889,7 +905,7 @@ const API_TIMEOUT      = 15000;
 const A = {
   me:        null,
   userEmail: '',
-  fd: { type:'income', shop: BRANCHES[0], pay:'Cash' },
+  fd: { type:'income', shop: BRANCHES[0], pay:'Cash', extraCur: [] },
   slip:      null,
 };
 let dashByBranchCur  = {};
@@ -1407,6 +1423,39 @@ function onDrop(e) {
   if (f?.type.startsWith('image/')) loadFile(f);
 }
 
+// 💱 Multi-Currency Repeater
+function renderCurLines() {
+  const wrap = $('cur-lines');
+  wrap.innerHTML = '';
+  A.fd.extraCur.forEach((line, i) => {
+    const row = document.createElement('div');
+    row.className = 'cur-line';
+    row.innerHTML = `
+      <div class="pg">
+        <select class="cur-sel" aria-label="${esc(t('ariaCurrency'))}">
+          ${CURRENCIES.map(c => `<option value="${c}"${c === line.currency ? ' selected' : ''}>${c}</option>`).join('')}
+        </select>
+        <input type="number" class="prc-in" placeholder="0" inputmode="decimal" min="0" step="any" value="${line.price ?? ''}">
+      </div>
+      <button type="button" class="cur-remove-btn" aria-label="${esc(t('ariaRemoveCurrency'))}">✕</button>
+    `;
+    const sel   = row.querySelector('select');
+    const input = row.querySelector('input');
+    sel.addEventListener('change', () => { A.fd.extraCur[i].currency = sel.value; });
+    input.addEventListener('input', () => { A.fd.extraCur[i].price = input.value; });
+    row.querySelector('.cur-remove-btn').addEventListener('click', () => removeCurLine(i));
+    wrap.appendChild(row);
+  });
+}
+function addCurLine() {
+  A.fd.extraCur.push({ currency: 'LAK', price: '' });
+  renderCurLines();
+}
+function removeCurLine(i) {
+  A.fd.extraCur.splice(i, 1);
+  renderCurLines();
+}
+
 // 📝 Entry Submission Flow
 async function doSubmit() {
   const item  = $('f-item').value.trim();
@@ -1417,6 +1466,10 @@ async function doSubmit() {
   if (!item)               { setMsg('f-msg', t('warnEnterItemName'),'warn'); return; }
   if (!price || price <= 0){ setMsg('f-msg', t('warnEnterValidAmount'),'warn'); return; }
   if (A.fd.pay === 'QR' && !A.slip) { setMsg('f-msg', t('warnAttachSlip'),'warn'); return; }
+
+  const extraAmounts = A.fd.extraCur.map(line => ({ currency: line.currency, price: parseFloat(line.price) }));
+  if (extraAmounts.some(a => !a.price || a.price <= 0)) { setMsg('f-msg', t('warnEnterValidAmount'),'warn'); return; }
+  const amounts = [{ currency: cur, price }, ...extraAmounts];
 
   $('sub-btn').disabled = true;
   $('sub-txt').textContent = t('submitBtnSaving');
@@ -1434,6 +1487,7 @@ async function doSubmit() {
       itemName:      item,
       currency:      cur,
       price:         Number(price) || 0,
+      amounts:       amounts,
       type:          A.fd.type === 'income' ? 'Income' : 'Expense',
       shop:          A.fd.shop,
       paymentMethod: A.fd.pay === 'QR' ? 'Lao QR / OnePay' : 'Cash',
@@ -1467,6 +1521,7 @@ async function doSubmit() {
 
 function resetForm() {
   $('f-item').value = ''; closeCombo(); $('f-price').value = ''; $('f-cur').value = 'LAK';
+  A.fd.extraCur = []; renderCurLines();
   clearSlip(); setMsg('f-msg');
   document.querySelectorAll('#sg-type .seg').forEach((s,i) => s.classList.toggle('on', i===0));
   A.fd.type = 'income';

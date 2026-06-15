@@ -2,28 +2,36 @@
 
 [อ่านคู่มือภาษาไทยที่นี่](README_th.md)
 
-A mobile-first PWA for logging income & expenses. Staff sign in with Google, record a transaction, and the entry is appended to a Google Sheet (slip images go to Drive) while a Telegram message is sent to your management chat. Frontend is a single `index.html`; backend is one Google Apps Script file (`Code.gs`).
+A mobile-first PWA for logging income & expenses across one or more branches. Staff sign in with Google, record a transaction (optionally split across multiple currencies in one go), and the entry is appended to a Google Sheet — slip images go to Drive, and a Telegram message is sent to your management chat(s). The frontend is a single `index.html`; the backend is one Google Apps Script file (`Code.gs`).
 
-> **Heads-up on security:** Sign-in here is a *soft gate*, not real access control. The Google credential is read in the browser but never verified server-side, and the backend is deployed as "Anyone", so anyone who has the Web App URL can write to the sheet. That's fine for a trusted internal team that just needs "who logged this" on each entry — but don't treat it as auth for sensitive data. See [Hardening](#hardening-optional) if you need more.
+## Features
+
+- Multi-branch tracking, with branches manageable from the in-app Settings tab
+- Multi-currency per transaction — add several currency/amount lines to a single entry (e.g. pay partly in LAK, partly in THB); all lines share one Transaction ID
+- Telegram notifications to a private chat, a group, or both at once
+- 5 languages: Lao, Thai, English, Vietnamese, Burmese
+- Installable PWA with offline app-shell support
+
+> **Heads-up on security:** Sign-in here is a *soft gate*, not real access control. The Google credential (JWT) is decoded in the browser but never verified server-side, and the Apps Script backend is deployed with "Who has access: Anyone" (required so the Web App doesn't redirect to a login page). The sign-in screen exists to record "who logged this" on each entry for a trusted internal team — anyone who has the Web App URL can call it directly. Don't use this as access control for sensitive data. See [Hardening](#hardening-optional) if you need more.
 
 ---
 
-## What you need before starting
+## Prerequisites
 
-- A Google account (for the Sheet, Drive folder, Apps Script, and OAuth client)
-- A Telegram bot token + the chat ID to notify
-- Somewhere to host `index.html` over **HTTPS** (GitHub Pages, Netlify, Cloudflare Pages). Google Sign-In does **not** work from `file://` or a plain `http://` origin.
+- A Google account (for the Sheet, Drive folder, Apps Script project, and OAuth client)
+- A Telegram bot token (from @BotFather) and at least one chat ID to notify
+- Somewhere to host the whole project folder over **HTTPS** (e.g. Cloudflare Pages, Netlify, GitHub Pages). Google Sign-In does **not** work from `file://` or a plain `http://` origin.
 
-There are **four** values you must fill in. Three of them are currently placeholders and the app will not work until all are set:
+There are **six** placeholder values to fill in before the app works:
 
-| Where | Constant | What it is |
+| File | Constant | What it is |
 | --- | --- | --- |
 | `Code.gs` | `SPREADSHEET_ID` | ID of your Google Sheet (from its URL) |
-| `Code.gs` | `DRIVE_FOLDER_ID` | ID of the Drive folder where slips are stored |
-| `Code.gs` | `TELEGRAM_BOT_TOKEN` | From @BotFather |
-| `Code.gs` | `TELEGRAM_CHAT_ID` | The chat that receives notifications |
-| `index.html` | `GOOGLE_CLIENT_ID` | OAuth Web client ID (for sign-in) |
-| `index.html` | `SCRIPT_URL` | The Apps Script Web App `/exec` URL |
+| `Code.gs` | `DRIVE_FOLDER_ID` | ID of the Drive folder where slip images are stored |
+| `Code.gs` | `TELEGRAM_BOT_TOKEN` | Bot token from @BotFather |
+| `Code.gs` | `TELEGRAM_CHAT_IDS` | **Array** of chat IDs to notify — one or more, private and/or group |
+| `index.html` | `GOOGLE_CLIENT_ID` | OAuth Web client ID (for Google Sign-In) |
+| `index.html` | `SCRIPT_URL` | Your deployed Apps Script Web App `/exec` URL |
 
 ---
 
@@ -31,27 +39,51 @@ There are **four** values you must fill in. Three of them are currently placehol
 
 1. Create (or open) a Google Sheet. Copy its ID from the URL: `docs.google.com/spreadsheets/d/`**`THIS_PART`**`/edit`.
 2. Create a Drive folder for slip images and copy its ID from the URL.
-3. In the Sheet, go to **Extensions ▸ Apps Script**. Delete the default code and paste in all of `Code.gs`. Also create `appsscript.json` in the same project (the editor's "Project Settings" must have "Show appsscript.json manifest file" enabled) and paste in the contents of this repo's `appsscript.json` — it declares the Sheets, Drive, and external-request scopes the script needs.
-4. Fill in the four constants at the top: `SPREADSHEET_ID`, `DRIVE_FOLDER_ID`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`.
-5. **Authorize the script (this is the step that makes Telegram and slip upload work).** In the editor, pick any function (e.g. `todayTab`) from the dropdown and click **Run** once. Google will prompt for permissions — approve them. This grants the *external request* permission (needed to call Telegram) and the *Drive* permission (needed to upload slips). **If you skip this, entries still save but no Telegram message is sent and uploads fail silently.**
-6. Click **Deploy ▸ New deployment ▸ Web app**:
+3. In the Sheet, go to **Extensions ▸ Apps Script**. Delete the default code and paste in all of `Code.gs`.
+4. Create `appsscript.json` in the same project (in **Project Settings**, enable "Show `appsscript.json` manifest file" first) and paste in the contents of this repo's `appsscript.json`. It declares the scopes the script needs:
+   - `https://www.googleapis.com/auth/spreadsheets`
+   - `https://www.googleapis.com/auth/drive`
+   - `https://www.googleapis.com/auth/script.external_request` (needed for the Telegram API call)
+5. Fill in the constants at the top of `Code.gs`:
+
+   ```js
+   const SPREADSHEET_ID  = 'YOUR_GOOGLE_SHEET_ID_HERE';
+   const DRIVE_FOLDER_ID = 'YOUR_DRIVE_FOLDER_ID_HERE';
+   const TELEGRAM_BOT_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN_HERE';
+   const TELEGRAM_CHAT_IDS  = ['YOUR_TELEGRAM_CHAT_ID_HERE'];
+   ```
+
+6. **Authorize the script.** In the editor toolbar, pick any function (e.g. `todayTab`) from the function dropdown and click **Run** once. Google will show a consent screen — approve it. This single consent covers *all* the scopes declared in `appsscript.json`, including the external-request permission needed to call Telegram and the Drive permission needed to upload slips. **If you skip this, entries still save to the sheet, but Telegram messages and slip uploads will silently fail.**
+7. Click **Deploy ▸ New deployment ▸ Web app**:
    - **Execute as:** Me
    - **Who has access:** Anyone
-7. Copy the **Web app URL** (ends in `/exec`). You'll paste it into `index.html` as `SCRIPT_URL`.
+8. Copy the **Web app URL** (ends in `/exec`). You'll paste it into `index.html` as `SCRIPT_URL`.
 
-> Every time you change `Code.gs`, you must create a **new deployment** (or "Manage deployments ▸ edit ▸ New version") for the change to go live.
+> **Every time you edit `Code.gs` (or `appsscript.json`), you must ship a new deployment version** — go to **Deploy ▸ Manage deployments ▸ edit (pencil) ▸ Version: New version ▸ Deploy**. Editing the script alone does *not* update the live `/exec` URL's behavior.
+
+### What the backend exposes
+
+- `doGet`: `?action=getTodayData` (today's entries) and `?action=getDateData&date=DD-MM-YYYY` (entries for a specific day's sheet tab)
+- `doPost`: `{ action: 'submitEntry', ... }` — uploads the slip (if any) to Drive, appends one row per currency amount to the day's sheet tab (all sharing one `Transaction ID`), and sends the Telegram notification
+- Each day's sheet tab is created on first use with header row: `Timestamp, Staff Name, Item Name, Currency, Price, Type, Shop, Payment Method, Slip URL, Transaction ID`
 
 ---
 
 ## 2. Telegram bot
 
 1. In Telegram, message **@BotFather**, send `/newbot`, follow the prompts, and copy the **bot token** — that's `TELEGRAM_BOT_TOKEN`.
-2. Get the **chat ID**:
-   - For a notification to **yourself**: message your new bot once (send it any text — a bot cannot start a conversation with you), then open `https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates` in a browser and read `chat.id`.
-   - For a **group**: add the bot to the group, send a message in the group, then check `getUpdates` for the group's `chat.id` (it's negative).
-3. Put that value in `TELEGRAM_CHAT_ID`.
+2. Get the chat ID(s) you want to notify:
+   - **Private chat (you or a staff member):** the bot can't message you first, so send it any message, then open `https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates` in a browser and read `message.chat.id` — it's a plain positive number.
+   - **Group chat:** add the bot to the group, send any message in the group, then check `getUpdates` for that update's `chat.id` — group IDs are negative and often start with `-100`.
+3. Put one or more IDs into the array, as strings or numbers:
 
-> The "chat not found" failure almost always means you never sent the bot a message first, or the chat ID is wrong.
+   ```js
+   const TELEGRAM_CHAT_IDS = ['123456789', '-1009876543210'];
+   ```
+
+   Every non-placeholder entry in the array gets a copy of the notification. Leave it as `['YOUR_TELEGRAM_CHAT_ID_HERE']` (or remove unused entries) if you only want one destination.
+
+> "Chat not found" almost always means you never sent the bot a message first (for a private chat), or the bot isn't a member of the group, or the ID is wrong/missing its leading `-`.
 
 ---
 
@@ -61,25 +93,51 @@ This is required for the sign-in button to appear at all.
 
 1. Go to **console.cloud.google.com ▸ APIs & Services ▸ Credentials**.
 2. **Create Credentials ▸ OAuth client ID ▸ Application type: Web application**.
-3. Under **Authorized JavaScript origins**, add the exact origin where you host the app — e.g. `https://yourname.github.io` (scheme + host, **no path, no trailing slash**). Add every origin you'll use, including a dev origin if you test locally over HTTPS.
+3. Under **Authorized JavaScript origins**, add the exact origin where you'll host the app — e.g. `https://yourproject.pages.dev` (scheme + host **only**, no path, no trailing slash, and it must be `https://`, never `file://`). Add every origin you'll actually open the app from, including any dev/preview URL.
 4. Copy the **Client ID** — that's `GOOGLE_CLIENT_ID`.
 
-> If the sign-in button shows but clicking it does nothing, open the browser console — `origin is not allowed for the given client ID` means the origin in step 3 doesn't exactly match where the page is served.
+> If the sign-in button shows but clicking it does nothing, open the browser console — `origin is not allowed for the given client ID` means the origin in step 3 doesn't exactly match the URL the page is served from (including the scheme).
 
-If `GOOGLE_CLIENT_ID` is still a placeholder, or the Google Identity Services script fails to load (e.g. blocked by an ad blocker or no network), the login screen now shows an inline hint explaining what's wrong instead of just leaving an empty space.
+If `GOOGLE_CLIENT_ID` is still left as the placeholder, or the Google Identity Services script fails to load, the login screen shows an inline hint explaining what's wrong instead of leaving an empty space.
 
 ---
 
-## 4. Frontend — `index.html`
+## 4. Frontend config + hosting
 
-1. Near the top of the `<script>` block, set:
+1. Near the top of the `<script>` block in `index.html`, set the two constants:
+
    ```js
-   const GOOGLE_CLIENT_ID = "…your client ID…";
-   const SCRIPT_URL       = "…your /exec URL…";
+   const GOOGLE_CLIENT_ID = "…your OAuth client ID…";
+   const SCRIPT_URL       = "…your Apps Script /exec URL…";
    ```
+
    These are plain constants in the file — there is no in-app settings field for them.
-2. Host the folder over HTTPS (GitHub Pages / Netlify / Cloudflare Pages). Open the page on that URL.
-3. The service worker now updates the cached app shell automatically: HTML pages are fetched network-first (falling back to cache only when offline), while static assets like icons and `i18n/languages.js` stay cache-first. You generally no longer need to manually bump the cache version after every change — but if you do change static asset filenames, bump `CACHE` in `service-worker.js` so old assets are evicted.
+2. Deploy the **whole project folder**, not just `index.html` — the app loads `i18n/languages.js`, `service-worker.js`, and icon/manifest files from relative paths, and will fail to load or run untranslated if those 404. From the repo root:
+
+   ```bash
+   npx wrangler pages deploy .
+   ```
+
+   (or the equivalent "deploy this folder" flow on Netlify/GitHub Pages). Deploying only `index.html` is a common mistake and breaks the app.
+3. Open the page on that HTTPS URL.
+4. **Bump the service worker cache on every change.** `service-worker.js` defines:
+
+   ```js
+   const CACHE = 'fintrack-v1.1.2';
+   ```
+
+   HTML pages are fetched network-first (so most changes to `index.html` reach users on their next reload automatically), but `i18n/languages.js`, icons, and other static assets are served cache-first. Whenever you change any static asset, bump the `CACHE` string (e.g. `v1.1.3`) so old cached files are evicted and the new ones are fetched.
+
+---
+
+## 5. Usage guide
+
+- **Logging an entry:** on the **Record** tab, choose Income or Expense, enter an item name (you can type a new one or pick from previously used items), enter the amount and currency, choose the branch and payment method.
+- **Multiple currencies in one transaction:** click **"+ Add Currency"** to add extra currency/amount lines (e.g. part paid in LAK, part in THB). Each line is saved as its own row in the sheet, but all rows from one submission share the same Transaction ID so they can be grouped later.
+- **Attaching a slip:** if you select **Lao QR / OnePay** as the payment method, an upload zone appears — tap it or drag-and-drop an image (max 5 MB). The image is automatically resized to a max of 1280px on its longest side and re-encoded as JPEG at ~82% quality in the browser before upload, to keep uploads small.
+- **Switching branch:** pick a branch chip in the Record tab; branches are managed from **Settings ▸ Management** (add/remove).
+- **Switching date / reading the dashboard:** on the **Summary** tab, use the arrows to move between days, filter by branch, and switch currency tabs (LAK/THB/USD) to see cash income, QR/OnePay income, and total expenses for that day, plus a list of recent entries.
+- **Language switch:** in **Settings**, pick from Lao, Thai, English, Vietnamese, or Burmese — the choice is remembered on the device.
 
 ---
 
@@ -87,21 +145,25 @@ If `GOOGLE_CLIENT_ID` is still a placeholder, or the Google Identity Services sc
 
 | Symptom | Likely cause | Fix |
 | --- | --- | --- |
-| No "Sign in with Google" button, or an inline "not configured" hint | `GOOGLE_CLIENT_ID` still a placeholder | Set it (§3–4) |
-| Inline "failed to load" hint, or button appears but clicking does nothing | Google Identity Services script blocked/failed, or origin not whitelisted, or page on `file://`/`http://` | Add exact origin in OAuth client; host over HTTPS; check for ad blockers |
-| Entry saves but no Telegram message | Script never authorized for external requests, or chat ID/token wrong, or the bot was never messaged first | Run a function once to authorize (§1.5); verify bot/chat (§2). The server response now includes `telegramOk`/`telegramError` so you can see the exact failure. |
-| Slip upload fails | Same authorization gap, or wrong `DRIVE_FOLDER_ID` | Authorize (§1.5); check folder ID |
-| Fixed the code but app unchanged on phone | Stale service-worker cache | The service worker is now network-first for HTML, so a normal reload should pick up changes; if not, bump `CACHE` in `service-worker.js` and reinstall |
+| No "Sign in with Google" button, or an inline "not configured" hint | `GOOGLE_CLIENT_ID` is still the placeholder | Set it (§3–4) |
+| Button appears but clicking does nothing, or console shows `origin is not allowed for the given client ID` | The page's origin isn't in the OAuth client's Authorized JavaScript origins, or the page is on `file://`/`http://` | Add the exact `https://` origin in the OAuth client (§3); host over HTTPS |
+| Entry saves but no Telegram message arrives | Script never authorized for external requests, bot token wrong, or chat ID(s) wrong/never messaged the bot | Run any function once in the Apps Script editor to authorize (§1.6); verify token and chat IDs (§2). The response includes `telegramOk`/`telegramError` so the app can show the exact failure as a toast |
+| Telegram error mentions "chat not found" | The bot was never messaged first (private chat), or isn't in the group, or the ID is missing its `-` prefix | Re-check §2 |
+| Slip upload fails | Script not authorized, or wrong `DRIVE_FOLDER_ID` | Authorize (§1.6); check the folder ID |
+| `i18n/languages.js` 404s, app stuck on splash, or UI shows untranslated keys | Only `index.html` was deployed, not the whole folder | Redeploy the entire project folder (§4.2) |
+| Code/UI changes don't show up on a phone that already installed the app | Stale service-worker cache for static assets | Bump `CACHE` in `service-worker.js` (§4.4) and reload; HTML itself is network-first so most changes should appear on a normal reload |
+| Apps Script changes don't take effect | Edited `Code.gs` but didn't ship a new deployment version | Deploy ▸ Manage deployments ▸ edit ▸ New version ▸ Deploy (§1) |
 
-> **Telegram + special characters:** notifications are sent with HTML formatting and every interpolated field is HTML-escaped, so item or branch names containing `_`, `*`, `` ` ``, or `[` are safe and won't break the message. (Earlier versions used Markdown, where these characters caused silent HTTP 400 rejections.)
+> **Telegram + special characters:** notifications are sent with HTML formatting and every interpolated field (item name, branch, author, etc.) is HTML-escaped, so names containing `_`, `*`, `` ` ``, or `[` are safe and won't break the message.
 
 ---
 
 ## Hardening (optional)
 
 If you need sign-in to be real access control rather than a soft gate:
-- Send the Google credential (JWT) to the backend on each write and verify it server-side (check signature, `aud` = your client ID, and that the email is on an allow-list) before appending the row.
-- Keep "Who has access: Anyone" (Apps Script needs this to avoid login redirects), but reject requests whose token is missing/invalid inside `doPost`.
+
+- Send the Google credential (JWT) to the backend on every write and verify it server-side — check the signature, that `aud` matches your `GOOGLE_CLIENT_ID`, and that the email is on an allow-list — before appending the row.
+- Keep "Who has access: Anyone" (Apps Script needs this to avoid login redirects), but have `doPost` reject any request whose token is missing or fails verification.
 
 ---
 
@@ -109,9 +171,9 @@ If you need sign-in to be real access control rather than a soft gate:
 
 | Layer | Technology |
 | --- | --- |
-| Frontend | Single-file HTML/CSS/JS PWA, 5-language i18n (`i18n/languages.js`) |
-| Backend | Google Apps Script (`doGet`/`doPost` web app), scopes declared in `appsscript.json` |
-| Storage | Google Sheets (one tab per day) + Google Drive (slips) |
-| Notifications | Telegram Bot API (sent server-side, HTML-escaped) |
+| Frontend | Single-file HTML/CSS/JS PWA, 5-language i18n (`i18n/languages.js`), installable via `service-worker.js` |
+| Backend | Google Apps Script (`doGet`/`doPost` Web App), scopes declared in `appsscript.json` |
+| Storage | Google Sheets (one tab per day) + Google Drive (slip images) |
+| Notifications | Telegram Bot API, sent server-side to one or more chats, HTML-escaped |
 
 © 2026 FelisiaCH — MIT License
