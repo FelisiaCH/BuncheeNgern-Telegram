@@ -1,7 +1,5 @@
 # FinTrack
 
-[อ่านคู่มือภาษาไทยที่นี่](README_th.md)
-
 A mobile-first PWA for logging income & expenses across one or more branches. Staff sign in with Google, record a transaction (optionally split across multiple currencies in one go), and the entry is appended to a Google Sheet — slip images go to Drive, and a Telegram message is sent to your management chat(s). The frontend is a single `index.html`; the backend is one Google Apps Script file (`Code.gs`).
 
 ## Features
@@ -123,21 +121,18 @@ If `GOOGLE_CLIENT_ID` is still left as the placeholder, or the Google Identity S
 4. **Bump the service worker cache on every change.** `service-worker.js` defines:
 
    ```js
-   const CACHE = 'fintrack-v1.1.2';
+   const CACHE = 'fintrack-v1.1.4';
    ```
 
-   HTML pages are fetched network-first (so most changes to `index.html` reach users on their next reload automatically), but `i18n/lang_*.js`, icons, and other static assets are served cache-first. Whenever you change any static asset, bump the `CACHE` string (e.g. `v1.1.4`) so old cached files are evicted and the new ones are fetched.
+   HTML pages are fetched network-first (so most changes to `index.html` reach users on their next reload automatically), but `i18n/lang_*.js`, icons, and other static assets are served cache-first. Whenever you change any static asset, bump the `CACHE` string (e.g. `v1.1.5`) so old cached files are evicted and the new ones are fetched.
 
 ---
 
-## 5. Usage guide
+## 5. First run — add currencies
 
-- **Logging an entry:** on the **Record** tab, choose Income or Expense, enter an item name (you can type a new one or pick from previously used items), enter the amount and currency, choose the branch and payment method.
-- **Multiple currencies in one transaction:** click **"+ Add Currency"** to add extra currency/amount lines (e.g. part paid in LAK, part in THB). Each line is saved as its own row in the sheet, but all rows from one submission share the same Transaction ID so they can be grouped later.
-- **Attaching a slip:** if you select **Lao QR / OnePay** as the payment method, an upload zone appears — tap it or drag-and-drop an image (max 5 MB). The image is automatically resized to a max of 1280px on its longest side and re-encoded as JPEG at ~82% quality in the browser before upload, to keep uploads small.
-- **Switching branch:** pick a branch chip in the Record tab; branches are managed from **Settings ▸ Management** (add/remove).
-- **Switching date / reading the dashboard:** on the **Summary** tab, use the arrows to move between days, filter by branch, and switch currency tabs (LAK/THB/USD) to see cash income, QR/OnePay income, and total expenses for that day, plus a list of recent entries.
-- **Language switch:** in **Settings**, pick from Lao, Thai, English, Vietnamese, or Burmese — the choice is remembered on the device.
+**Currencies are not preset.** The list starts empty. Before you can log any entry, go to **Settings ▸ Manage Currencies** and add at least one currency with a code and symbol (e.g. code `LAK`, symbol `₭`). The app will warn you and block submission if no currencies are configured.
+
+See [docs/USAGE.md](docs/USAGE.md) for the full day-to-day usage guide (logging entries, multi-currency transactions, dashboard, PWA install, etc.).
 
 ---
 
