@@ -1678,7 +1678,8 @@ function refreshDashUI() {
   });
 
   const vis = filteredEntries();
-  $('d-cnt').textContent = t('entriesCount', { n: vis.length });
+  const billCount = new Set(vis.map((e, i) => e.transactionId || ('_row'+i))).size;
+  $('d-cnt').textContent = t('entriesCount', { n: billCount });
   renderDashCur(activeCurTab);
   renderEntryList(vis);
 }
