@@ -82,7 +82,7 @@ function submitEntry(data) {
         Number(amount.price) || 0,
         data.type,
         data.shop,
-        data.paymentMethod,
+        amount.paymentMethod || data.paymentMethod,
         fileUrl,
         transactionId,
       ]);

@@ -237,6 +237,7 @@ option{background:#0E1526}
 .seg.exp.on{background:var(--red-dim);color:var(--red);font-weight:700}
 .seg.cash.on{background:var(--amber-dim);color:var(--amber);font-weight:700}
 .seg.qr.on{background:var(--teal-dim);color:var(--teal);font-weight:700}
+.seg.split.on{background:var(--indigo-dim);color:var(--indigo);font-weight:700}
 
 /* 🏪 Branch Chip Picker */
 .branch-grid{display:flex;flex-wrap:wrap;gap:6px}
@@ -731,6 +732,21 @@ option{background:#0E1526}
         <select id="f-cur" class="cur-sel" aria-label="สกุลเงิน" data-i18n-aria="ariaCurrency"></select>
         <input type="number" id="f-price" class="prc-in" placeholder="0" inputmode="decimal" min="0" step="any">
       </div>
+      <div class="seg-wrap" id="sg-pay-0" style="margin-top:8px">
+        <button class="seg cash on" onclick="setPrimaryPay('Cash',this)">💵 <span data-i18n="payCash">เงินสด</span></button>
+        <button class="seg qr" onclick="setPrimaryPay('Online',this)">📱 <span data-i18n="payQR">Online Payment</span></button>
+        <button class="seg split" onclick="setPrimaryPay('Split',this)">✂️ <span data-i18n="paySplit">แบ่งจ่าย</span></button>
+      </div>
+      <div id="split-grp-0" class="hidden" style="margin-top:8px">
+        <div class="pg" style="margin-bottom:6px">
+          <span class="cur-sel" style="pointer-events:none;color:var(--amber)">💵</span>
+          <input type="number" id="split-cash-0" class="prc-in" data-i18n-placeholder="labelSplitCash" placeholder="Cash amount" inputmode="decimal" min="0" step="any" oninput="A.fd.splitCash=this.value">
+        </div>
+        <div class="pg">
+          <span class="cur-sel" style="pointer-events:none;color:var(--teal)">📱</span>
+          <input type="number" id="split-online-0" class="prc-in" data-i18n-placeholder="labelSplitOnline" placeholder="Online amount" inputmode="decimal" min="0" step="any" oninput="A.fd.splitOnline=this.value">
+        </div>
+      </div>
       <div id="cur-lines"></div>
       <button type="button" class="btn-ghost cur-add-btn" onclick="addCurLine()">
         <span data-i18n="btnAddCurrency">+ เพิ่มสกุลเงิน</span>
@@ -740,14 +756,6 @@ option{background:#0E1526}
     <div class="fg">
       <label class="fl" data-i18n="labelBranch">สาขา</label>
       <div class="branch-grid" id="sg-branch"></div>
-    </div>
-
-    <div class="fg">
-      <label class="fl" data-i18n="labelPaymentMethod">ช่องทางชำระเงิน</label>
-      <div class="seg-wrap" id="sg-pay">
-        <button class="seg cash on" onclick="setPay('Cash',this)">💵 <span data-i18n="payCash">เงินสด</span></button>
-        <button class="seg qr" onclick="setPay('Online',this)">📱 <span data-i18n="payQR">Online Payment</span></button>
-      </div>
     </div>
 
     <div id="slip-grp" class="fg hidden">
@@ -957,7 +965,7 @@ const API_TIMEOUT      = 15000;
 const A = {
   me:        null,
   userEmail: '',
-  fd: { type:'income', shop: BRANCHES[0], pay:'Cash', extraCur: [] },
+  fd: { type:'income', shop: BRANCHES[0], pay:'Cash', splitCash:'', splitOnline:'', extraCur: [] },
   slip:      null,
 };
 let dashByBranchCur  = {};
@@ -1550,13 +1558,18 @@ function setSeg(key, val, btn) {
   }
 }
 
-function setPay(val, btn) {
+function setPrimaryPay(val, btn) {
   A.fd.pay = val;
   btn.closest('.seg-wrap').querySelectorAll('.seg').forEach(s => s.classList.remove('on'));
   btn.classList.add('on');
-  const isQR = val === 'Online';
-  $('slip-grp').classList.toggle('hidden', !isQR);
-  if (!isQR) clearSlip();
+  $('split-grp-0').classList.toggle('hidden', val !== 'Split');
+  updateSlipVisibility();
+}
+function updateSlipVisibility() {
+  const needs = A.fd.pay === 'Online' || A.fd.pay === 'Split' ||
+                A.fd.extraCur.some(l => l.pay === 'Online' || l.pay === 'Split');
+  $('slip-grp').classList.toggle('hidden', !needs);
+  if (!needs) clearSlip();
 }
 
 // 📎 Slip Upload, Compression & Drag-Drop
@@ -1637,19 +1650,50 @@ function renderCurLines() {
         </select>
         <input type="number" class="prc-in" placeholder="0" inputmode="decimal" min="0" step="any" value="${line.price ?? ''}">
       </div>
+      <div class="seg-wrap" style="margin-top:8px">
+        <button class="seg cash${line.pay==='Cash'?' on':''}" type="button">💵 <span>${esc(t('payCash'))}</span></button>
+        <button class="seg qr${line.pay==='Online'?' on':''}" type="button">📱 <span>${esc(t('payQR'))}</span></button>
+        <button class="seg split${line.pay==='Split'?' on':''}" type="button">✂️ <span>${esc(t('paySplit'))}</span></button>
+      </div>
+      <div class="split-grp${line.pay==='Split'?'':' hidden'}" style="margin-top:8px">
+        <div class="pg" style="margin-bottom:6px">
+          <span class="cur-sel" style="pointer-events:none;color:var(--amber)">💵</span>
+          <input type="number" class="prc-in split-cash-in" placeholder="${esc(t('labelSplitCash'))}" inputmode="decimal" min="0" step="any" value="${line.splitCash ?? ''}">
+        </div>
+        <div class="pg">
+          <span class="cur-sel" style="pointer-events:none;color:var(--teal)">📱</span>
+          <input type="number" class="prc-in split-online-in" placeholder="${esc(t('labelSplitOnline'))}" inputmode="decimal" min="0" step="any" value="${line.splitOnline ?? ''}">
+        </div>
+      </div>
       <button type="button" class="cur-remove-btn" aria-label="${esc(t('ariaRemoveCurrency'))}">✕</button>
     `;
-    const sel   = row.querySelector('select');
-    const input = row.querySelector('input');
+    const sel          = row.querySelector('select');
+    const input        = row.querySelector('.prc-in');
+    const splitCashIn  = row.querySelector('.split-cash-in');
+    const splitOnlineIn= row.querySelector('.split-online-in');
+    const segBtns      = row.querySelectorAll('.seg-wrap .seg');
+    const splitGrp     = row.querySelector('.split-grp');
+
     sel.addEventListener('change', () => { A.fd.extraCur[i].currency = sel.value; });
     input.addEventListener('input', () => { A.fd.extraCur[i].price = input.value; });
+    splitCashIn.addEventListener('input', () => { A.fd.extraCur[i].splitCash = splitCashIn.value; });
+    splitOnlineIn.addEventListener('input', () => { A.fd.extraCur[i].splitOnline = splitOnlineIn.value; });
+    segBtns.forEach(btn => btn.addEventListener('click', () => {
+      const val = btn.classList.contains('cash') ? 'Cash' : btn.classList.contains('qr') ? 'Online' : 'Split';
+      A.fd.extraCur[i].pay = val;
+      segBtns.forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      splitGrp.classList.toggle('hidden', val !== 'Split');
+      updateSlipVisibility();
+    }));
     row.querySelector('.cur-remove-btn').addEventListener('click', () => removeCurLine(i));
     wrap.appendChild(row);
   });
+  updateSlipVisibility();
 }
 function addCurLine() {
   if (!CURRENCIES.length) { showToast(t('warnNoCurrencies'), 'warn'); return; }
-  A.fd.extraCur.push({ currency: CURRENCIES[0].code, price: '' });
+  A.fd.extraCur.push({ currency: CURRENCIES[0].code, price: '', pay: 'Cash', splitCash: '', splitOnline: '' });
   renderCurLines();
 }
 function removeCurLine(i) {
@@ -1667,17 +1711,46 @@ async function doSubmit() {
   if (!CURRENCIES.length)  { setMsg('f-msg', t('warnNoCurrencies'),'warn'); return; }
   if (!item)               { setMsg('f-msg', t('warnEnterItemName'),'warn'); return; }
   if (!price || price <= 0){ setMsg('f-msg', t('warnEnterValidAmount'),'warn'); return; }
-  if (A.fd.pay === 'Online' && !A.slip) { setMsg('f-msg', t('warnAttachSlip'),'warn'); return; }
-
-  const extraAmounts = A.fd.extraCur.map(line => ({ currency: line.currency, price: parseFloat(line.price) }));
+  const extraAmounts = A.fd.extraCur.map(line => ({
+    currency: line.currency, price: parseFloat(line.price),
+    pay: line.pay, splitCash: parseFloat(line.splitCash), splitOnline: parseFloat(line.splitOnline),
+  }));
   if (extraAmounts.some(a => !a.price || a.price <= 0)) { setMsg('f-msg', t('warnEnterValidAmount'),'warn'); return; }
-  const amounts = [{ currency: cur, price }, ...extraAmounts];
+
+  if (A.fd.pay === 'Split') {
+    const sc = parseFloat(A.fd.splitCash), so = parseFloat(A.fd.splitOnline);
+    if (!(sc > 0) || !(so > 0)) { setMsg('f-msg', t('warnSplitRequired'),'warn'); return; }
+    if (Math.abs((sc + so) - price) > 0.001) { setMsg('f-msg', t('warnSplitMustEqualTotal'),'warn'); return; }
+  }
+  for (const a of extraAmounts) {
+    if (a.pay === 'Split') {
+      if (!(a.splitCash > 0) || !(a.splitOnline > 0)) { setMsg('f-msg', t('warnSplitRequired'),'warn'); return; }
+      if (Math.abs((a.splitCash + a.splitOnline) - a.price) > 0.001) { setMsg('f-msg', t('warnSplitMustEqualTotal'),'warn'); return; }
+    }
+  }
+
+  const needsSlip = A.fd.pay === 'Online' || A.fd.pay === 'Split' ||
+                    A.fd.extraCur.some(l => l.pay === 'Online' || l.pay === 'Split');
+  if (needsSlip && !A.slip) { setMsg('f-msg', t('warnAttachSlip'),'warn'); return; }
+
+  const toPayMethod = p => p === 'Online' ? 'Online Payment' : p === 'Split' ? 'Split' : 'Cash';
+  const primaryAmt = { currency: cur, price, paymentMethod: toPayMethod(A.fd.pay) };
+  if (A.fd.pay === 'Split') { primaryAmt.splitCash = parseFloat(A.fd.splitCash); primaryAmt.splitOnline = parseFloat(A.fd.splitOnline); }
+  const amounts = [primaryAmt, ...extraAmounts.map(a => {
+    const obj = { currency: a.currency, price: a.price, paymentMethod: toPayMethod(a.pay) };
+    if (a.pay === 'Split') { obj.splitCash = a.splitCash; obj.splitOnline = a.splitOnline; }
+    return obj;
+  })];
+  const allPays = [A.fd.pay, ...A.fd.extraCur.map(l => l.pay)];
+  const topPayMethod = allPays.every(p => p === 'Cash') ? 'Cash'
+                     : allPays.every(p => p === 'Online') ? 'Online Payment'
+                     : 'Mixed';
 
   $('sub-btn').disabled = true;
   $('sub-txt').textContent = t('submitBtnSaving');
 
   try {
-    showOv(A.fd.pay === 'Online' && A.slip ? t('ovUploadingSlip') : t('ovSavingEntry'));
+    showOv(needsSlip && A.slip ? t('ovUploadingSlip') : t('ovSavingEntry'));
     const ts  = nowStamp();
     const tab = fmtDateTab(new Date());
     const result = await apiPost({
@@ -1692,7 +1765,7 @@ async function doSubmit() {
       amounts:       amounts,
       type:          A.fd.type === 'income' ? 'Income' : 'Expense',
       shop:          A.fd.shop,
-      paymentMethod: A.fd.pay === 'Online' ? 'Online Payment' : 'Cash',
+      paymentMethod: topPayMethod,
       fileName:      A.slip?.name || '',
       fileData:      A.slip?.b64  || '',
       mimeType:      A.slip?.mime || '',
@@ -1723,6 +1796,7 @@ async function doSubmit() {
 
 function resetForm() {
   $('f-item').value = ''; closeCombo(); $('f-price').value = ''; $('f-cur').value = CURRENCIES.length ? CURRENCIES[0].code : '';
+  A.fd.pay = 'Cash'; A.fd.splitCash = ''; A.fd.splitOnline = '';
   A.fd.extraCur = []; renderCurLines();
   clearSlip(); setMsg('f-msg');
   document.querySelectorAll('#sg-type .seg').forEach((s,i) => s.classList.toggle('on', i===0));
@@ -1730,8 +1804,8 @@ function resetForm() {
   const sb = $('sub-btn');
   sb.className = 'btn btn-teal'; sb.style.cssText = 'margin-top:16px';
   selectBranchSegment(A.fd.shop);
-  document.querySelectorAll('#sg-pay .seg').forEach((s,i) => s.classList.toggle('on', i===0));
-  A.fd.pay = 'Cash'; $('slip-grp').classList.add('hidden');
+  document.querySelectorAll('#sg-pay-0 .seg').forEach((s,i) => s.classList.toggle('on', i===0));
+  $('split-grp-0').classList.add('hidden');
 }
 
 // 📅 Date Helpers & Dashboard Navigation
