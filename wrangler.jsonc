@@ -1,14 +1,5 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "fintrack",
-  "compatibility_date": "2026-06-15",
-  "observability": {
-    "enabled": true
-  },
-  "assets": {
-    "directory": "."
-  },
-  "compatibility_flags": [
-    "nodejs_compat"
-  ]
+  "name": "buncheengern",
+  "pages_build_output_dir": "."
 }

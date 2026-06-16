@@ -1,4 +1,4 @@
-# FinTrack
+# Buncheengern
 
 A mobile-first PWA for logging income & expenses across one or more branches. Staff sign in with Google, record a transaction (optionally split across multiple currencies in one go), and the entry is appended to a Google Sheet — slip images go to Drive, and a Telegram message is sent to your management chat(s). The frontend is a single `index.html`; the backend is one Google Apps Script file (`Code.gs`).
 
@@ -121,7 +121,7 @@ If `GOOGLE_CLIENT_ID` is still left as the placeholder, or the Google Identity S
 4. **Bump the service worker cache on every change.** `service-worker.js` defines:
 
    ```js
-   const CACHE = 'fintrack-v1.1.4';
+   const CACHE = 'buncheengern-v1.1.5';
    ```
 
    HTML pages are fetched network-first (so most changes to `index.html` reach users on their next reload automatically), but `i18n/lang_*.js`, icons, and other static assets are served cache-first. Whenever you change any static asset, bump the `CACHE` string (e.g. `v1.1.5`) so old cached files are evicted and the new ones are fetched.

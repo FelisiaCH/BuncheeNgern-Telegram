@@ -1,4 +1,4 @@
-# FinTrack — Usage Guide
+# Buncheengern — Usage Guide
 
 Day-to-day guide for staff using the app after a fork has been set up. For initial setup (Apps Script, OAuth, hosting), see the [README](../README.md).
 

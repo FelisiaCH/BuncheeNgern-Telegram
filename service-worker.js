@@ -1,4 +1,4 @@
-const CACHE = 'fintrack-v1.1.4';
+const CACHE = 'buncheengern-v1.1.5';
 const ASSETS = [
   './', './index.html',
   './i18n/lang_meta.js',

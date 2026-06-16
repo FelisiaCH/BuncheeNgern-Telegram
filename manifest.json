@@ -1,6 +1,6 @@
 {
-  "name": "FinTrack",
-  "short_name": "FinTrack",
+  "name": "Buncheengern",
+  "short_name": "Buncheen",
   "description": "Income & Expense Tracking System",
   "start_url": "./index.html",
   "display": "standalone",
