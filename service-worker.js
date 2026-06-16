@@ -1,5 +1,13 @@
-const CACHE = 'fintrack-v1.1.3';
-const ASSETS = ['./', './index.html', './i18n/languages.js'];
+const CACHE = 'fintrack-v1.1.4';
+const ASSETS = [
+  './', './index.html',
+  './i18n/lang_meta.js',
+  './i18n/lang_en.js',
+  './i18n/lang_th.js',
+  './i18n/lang_lo.js',
+  './i18n/lang_vi.js',
+  './i18n/lang_my.js',
+];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
@@ -29,7 +37,7 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // Cache-first for static assets (icons, languages.js, etc.)
+  // Cache-first for static assets (icons, lang_*.js, etc.)
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request))
   );

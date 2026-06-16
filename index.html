@@ -875,7 +875,30 @@ option{background:#0E1526}
   </nav>
 </div>
 
-<script src="i18n/languages.js"></script>
+<script src="i18n/lang_meta.js"></script>
+<script src="i18n/lang_en.js"></script>
+<script src="i18n/lang_th.js"></script>
+<script src="i18n/lang_lo.js"></script>
+<script src="i18n/lang_vi.js"></script>
+<script src="i18n/lang_my.js"></script>
+<script>
+// 🔤 Build I18N in key-first shape from per-language parts (t() expects I18N[key][lang])
+(function () {
+  var parts = window.I18N_PARTS || {};
+  var base  = parts.en || {};
+  var langs = ['en', 'th', 'lo', 'vi', 'my'];
+  var per   = {};
+  langs.forEach(function (l) { per[l] = Object.assign({}, base, parts[l] || {}); });
+  var built = {};
+  Object.keys(base).forEach(function (key) {
+    built[key] = {};
+    langs.forEach(function (l) { built[key][l] = per[l][key] || ''; });
+  });
+  window.I18N = built;
+  // Fallback: if lang_meta.js failed to load, degrade to English-only selector
+  window.LANGS = window.LANGS || { en: { flag: '🇺🇸', label: 'English' } };
+})();
+</script>
 <script>
 // ⚙️ Configuration
 const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID_HERE";

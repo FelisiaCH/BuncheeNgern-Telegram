@@ -112,7 +112,7 @@ If `GOOGLE_CLIENT_ID` is still left as the placeholder, or the Google Identity S
    ```
 
    These are plain constants in the file — there is no in-app settings field for them.
-2. Deploy the **whole project folder**, not just `index.html` — the app loads `i18n/languages.js`, `service-worker.js`, and icon/manifest files from relative paths, and will fail to load or run untranslated if those 404. From the repo root:
+2. Deploy the **whole project folder**, not just `index.html` — the app loads `i18n/lang_*.js`, `service-worker.js`, and icon/manifest files from relative paths, and will fail to load or run untranslated if those 404. From the repo root:
 
    ```bash
    npx wrangler pages deploy .
@@ -126,7 +126,7 @@ If `GOOGLE_CLIENT_ID` is still left as the placeholder, or the Google Identity S
    const CACHE = 'fintrack-v1.1.2';
    ```
 
-   HTML pages are fetched network-first (so most changes to `index.html` reach users on their next reload automatically), but `i18n/languages.js`, icons, and other static assets are served cache-first. Whenever you change any static asset, bump the `CACHE` string (e.g. `v1.1.3`) so old cached files are evicted and the new ones are fetched.
+   HTML pages are fetched network-first (so most changes to `index.html` reach users on their next reload automatically), but `i18n/lang_*.js`, icons, and other static assets are served cache-first. Whenever you change any static asset, bump the `CACHE` string (e.g. `v1.1.4`) so old cached files are evicted and the new ones are fetched.
 
 ---
 
@@ -150,7 +150,7 @@ If `GOOGLE_CLIENT_ID` is still left as the placeholder, or the Google Identity S
 | Entry saves but no Telegram message arrives | Script never authorized for external requests, bot token wrong, or chat ID(s) wrong/never messaged the bot | Run any function once in the Apps Script editor to authorize (§1.6); verify token and chat IDs (§2). The response includes `telegramOk`/`telegramError` so the app can show the exact failure as a toast |
 | Telegram error mentions "chat not found" | The bot was never messaged first (private chat), or isn't in the group, or the ID is missing its `-` prefix | Re-check §2 |
 | Slip upload fails | Script not authorized, or wrong `DRIVE_FOLDER_ID` | Authorize (§1.6); check the folder ID |
-| `i18n/languages.js` 404s, app stuck on splash, or UI shows untranslated keys | Only `index.html` was deployed, not the whole folder | Redeploy the entire project folder (§4.2) |
+| `i18n/lang_*.js` 404s, app stuck on splash, or UI shows untranslated keys | Only `index.html` was deployed, not the whole folder | Redeploy the entire project folder (§4.2) |
 | Code/UI changes don't show up on a phone that already installed the app | Stale service-worker cache for static assets | Bump `CACHE` in `service-worker.js` (§4.4) and reload; HTML itself is network-first so most changes should appear on a normal reload |
 | Apps Script changes don't take effect | Edited `Code.gs` but didn't ship a new deployment version | Deploy ▸ Manage deployments ▸ edit ▸ New version ▸ Deploy (§1) |
 
@@ -171,7 +171,7 @@ If you need sign-in to be real access control rather than a soft gate:
 
 | Layer | Technology |
 | --- | --- |
-| Frontend | Single-file HTML/CSS/JS PWA, 5-language i18n (`i18n/languages.js`), installable via `service-worker.js` |
+| Frontend | Single-file HTML/CSS/JS PWA, 5-language i18n (`i18n/lang_*.js`), installable via `service-worker.js` |
 | Backend | Google Apps Script (`doGet`/`doPost` Web App), scopes declared in `appsscript.json` |
 | Storage | Google Sheets (one tab per day) + Google Drive (slip images) |
 | Notifications | Telegram Bot API, sent server-side to one or more chats, HTML-escaped |
