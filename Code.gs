@@ -74,18 +74,23 @@ function submitEntry(data) {
   try {
     const sheet = ss().getSheetByName(tab) || createDailySheet(tab);
     amounts.forEach(amount => {
-      sheet.appendRow([
-        data.timestamp,
-        data.staffName,
-        data.itemName,
-        amount.currency,
-        Number(amount.price) || 0,
-        data.type,
-        data.shop,
-        amount.paymentMethod || data.paymentMethod,
-        fileUrl,
-        transactionId,
-      ]);
+      if (amount.paymentMethod === 'Split') {
+        // Split → two rows so dashboard cash/online totals stay accurate
+        sheet.appendRow([data.timestamp, data.staffName, data.itemName,
+          amount.currency, Number(amount.splitCash) || 0,
+          data.type, data.shop, 'Cash', fileUrl, transactionId]);
+        sheet.appendRow([data.timestamp, data.staffName, data.itemName,
+          amount.currency, Number(amount.splitOnline) || 0,
+          data.type, data.shop, 'Online Payment', fileUrl, transactionId]);
+      } else {
+        sheet.appendRow([
+          data.timestamp, data.staffName, data.itemName,
+          amount.currency, Number(amount.price) || 0,
+          data.type, data.shop,
+          amount.paymentMethod || data.paymentMethod,
+          fileUrl, transactionId,
+        ]);
+      }
     });
   } finally {
     lock.releaseLock();
