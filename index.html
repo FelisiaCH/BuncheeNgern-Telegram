@@ -1744,7 +1744,7 @@ async function doSubmit() {
   const allPays = [A.fd.pay, ...A.fd.extraCur.map(l => l.pay)];
   const topPayMethod = allPays.every(p => p === 'Cash') ? 'Cash'
                      : allPays.every(p => p === 'Online') ? 'Online Payment'
-                     : 'Mixed';
+                     : 'Cash + Online Payment';
 
   $('sub-btn').disabled = true;
   $('sub-txt').textContent = t('submitBtnSaving');

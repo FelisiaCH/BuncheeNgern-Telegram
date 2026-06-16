@@ -97,10 +97,20 @@ function submitEntry(data) {
   }
 
   // Step 3: fire the Telegram notification from the server side
+  // Expand Split amounts into two rows to match what was written to the sheet
+  const telegramAmounts = [];
+  amounts.forEach(a => {
+    if (a.paymentMethod === 'Split') {
+      telegramAmounts.push({ currency: a.currency, price: Number(a.splitCash)  || 0, paymentMethod: 'Cash' });
+      telegramAmounts.push({ currency: a.currency, price: Number(a.splitOnline) || 0, paymentMethod: 'Online Payment' });
+    } else {
+      telegramAmounts.push(a);
+    }
+  });
   let telegramOk = false;
   let telegramError = '';
   try {
-    const tgResult = sendTelegramNotification(data, fileUrl, amounts);
+    const tgResult = sendTelegramNotification(data, fileUrl, telegramAmounts);
     telegramOk = tgResult.ok;
     telegramError = tgResult.error;
   } catch (err) {
@@ -179,14 +189,16 @@ function escapeHtml(value) {
 // 📲 Telegram Bot Notification — fired server-side only, never from the client
 function sendTelegramNotification(data, fileUrl, amounts) {
   const costLines = (amounts || [{ currency: data.currency, price: data.price }])
-    .map(a => `${escapeHtml(a.price)} ${escapeHtml(a.currency)}`)
+    .map(a => a.paymentMethod === 'Split'
+      ? `(Cash: ${escapeHtml(a.splitCash)} / Online: ${escapeHtml(a.splitOnline)}) ${escapeHtml(a.currency)}`
+      : `${escapeHtml(a.price)} ${escapeHtml(a.currency)}`)
     .join('\n');
 
   const lines = [
     data.type === 'Income' ? '🟢 <b>New Income</b>' : '🔴 <b>New Expense</b>',
     `<b>Item Name:</b> ${escapeHtml(data.itemName)}`,
     `<b>Cost:</b>\n${costLines}`,
-    `<b>Payment Method:</b> ${escapeHtml(data.paymentMethod)}`,
+    `<b>Payment Method:</b> ${escapeHtml(data.paymentMethod === 'Mixed' ? 'Cash + Online Payment' : data.paymentMethod)}`,
     `<b>Branch:</b> ${escapeHtml(data.shop)}`,
     `<b>Author:</b> ${escapeHtml(data.userEmail || data.staffName)}`,
   ];
