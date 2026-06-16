@@ -625,6 +625,29 @@ option{background:#0E1526}
 [data-theme="light"] .hdr-badge{background:linear-gradient(135deg,var(--bg-input),var(--bg-hover))}
 [data-theme="light"] .bot-nav{background:rgba(244,246,251,.95)}
 [data-theme="light"] .nb{color:var(--txt-sub)}
+
+/* ✨ Entrance Animations — transform+opacity only (GPU-accelerated, no reflow) */
+@keyframes tab-in    {from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none}}
+@keyframes ei-in     {from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none}}
+@keyframes popup-in  {from{opacity:0;transform:scale(.96)} to{opacity:1;transform:none}}
+@keyframes ov-fade   {from{opacity:0} to{opacity:1}}
+@keyframes check-draw{from{stroke-dashoffset:24} to{stroke-dashoffset:0}}
+
+.tab-body.tab-enter{animation:tab-in 250ms cubic-bezier(.4,0,.2,1) both}
+.ei{animation:ei-in 250ms cubic-bezier(.4,0,.2,1) both}
+.combo-drop:not(.hidden){animation:popup-in 200ms cubic-bezier(.4,0,.2,1) both}
+.ov:not(.hidden){animation:ov-fade 200ms cubic-bezier(.4,0,.2,1) both}
+.ov-card{animation:popup-in 200ms cubic-bezier(.4,0,.2,1) both}
+.toast-check{stroke-dasharray:24;stroke-dashoffset:0}
+.toast.show:not(.err):not(.warn) .toast-check{
+  animation:check-draw 350ms cubic-bezier(.4,0,.2,1) both;
+  animation-delay:50ms
+}
+
+@media(prefers-reduced-motion:reduce){
+  .tab-body.tab-enter,.ei,.combo-drop:not(.hidden),
+  .ov:not(.hidden),.ov-card,.toast-check{animation:none!important}
+}
 </style>
 </head>
 <body>
@@ -637,7 +660,7 @@ option{background:#0E1526}
 </div>
 
 <div id="toast" class="toast">
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><path d="M20 6L9 17l-5-5"/></svg>
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><path class="toast-check" d="M20 6L9 17l-5-5"/></svg>
   <span id="toast-txt"></span>
 </div>
 
@@ -1964,7 +1987,8 @@ function renderEntryList(entries) {
     }</div>`;
     return;
   }
-  $('d-list').innerHTML = [...entries].reverse().map(e => {
+  $('d-list').innerHTML = [...entries].reverse().map((e, idx) => {
+    const delay  = Math.min(idx, 10) * 30;
     const isInc  = e.type === 'Income';
     const isCash = (e.paymentMethod||'').toLowerCase().includes('cash');
     const sym    = currSym(e.currency || 'LAK');
@@ -1978,7 +2002,7 @@ function renderEntryList(entries) {
     const slipEl = e.slipUrl
       ? `&nbsp;·&nbsp;<a class="slip-a" href="${esc(e.slipUrl)}" target="_blank" rel="noopener">${t('slipLink')}</a>`
       : '';
-    return `<div class="ei">
+    return `<div class="ei" style="animation-delay:${delay}ms">
       <div class="ei-ic ${isInc?'inc':'exp'}">${isInc?'↑':'↓'}</div>
       <div class="ei-info">
         <div class="ei-name">${esc(e.itemName)}</div>
@@ -2018,8 +2042,15 @@ function renderDashCur(cur) {
 // 🧭 Tab Navigation
 function switchTab(tab) {
   ['rec','dash','settings'].forEach(t => {
-    $(`tab-${t}`).classList.toggle('hidden', t !== tab);
-    $(`nb-${t}`).classList.toggle('on', t === tab);
+    const el = $(`tab-${t}`);
+    const isActive = t === tab;
+    el.classList.toggle('hidden', !isActive);
+    if (isActive) {
+      el.classList.remove('tab-enter');
+      void el.offsetWidth;
+      el.classList.add('tab-enter');
+    }
+    $(`nb-${t}`).classList.toggle('on', isActive);
   });
   if (tab === 'dash') loadDash();
 }
