@@ -746,7 +746,7 @@ option{background:#0E1526}
       <label class="fl" data-i18n="labelPaymentMethod">ช่องทางชำระเงิน</label>
       <div class="seg-wrap" id="sg-pay">
         <button class="seg cash on" onclick="setPay('Cash',this)">💵 <span data-i18n="payCash">เงินสด</span></button>
-        <button class="seg qr" onclick="setPay('QR',this)">📱 Lao QR / OnePay</button>
+        <button class="seg qr" onclick="setPay('Online',this)">📱 <span data-i18n="payQR">Online Payment</span></button>
       </div>
     </div>
 
@@ -857,14 +857,17 @@ option{background:#0E1526}
 
     <div class="settings-sec">
       <div class="settings-lbl" data-i18n="menuManageCurrencies">💱 Manage Currencies</div>
+      <p style="font-size:11.5px;color:var(--txt-sub);margin:4px 0 8px;line-height:1.6" data-i18n="hintCurSection">Enter a currency code (e.g. USD, THB, JPY, EUR, LAK). The symbol is looked up automatically — you can edit it if needed. For unknown codes, enter the symbol manually.</p>
       <div id="manage-currency-list" class="branch-manage-list"></div>
       <div class="branch-add-row">
         <input type="text" id="m-cur-code" class="fi" maxlength="10" autocomplete="off"
                data-i18n-placeholder="placeholderCurCode"
+               onblur="onCurCodeBlur()"
                onkeydown="if(event.key==='Enter'){event.preventDefault();addCurrency();}">
         <input type="text" id="m-cur-symbol" class="fi" maxlength="5" autocomplete="off"
                data-i18n-placeholder="placeholderCurSymbol"
                onkeydown="if(event.key==='Enter'){event.preventDefault();addCurrency();}">
+        <div id="cur-sym-hint" class="msg warn hidden" data-i18n="hintCurSymbolNotFound">Symbol not found — enter manually</div>
         <button type="button" class="menu-action-btn" onclick="addCurrency()" data-i18n="btnAddNewCurrency">➕ Add Currency</button>
       </div>
     </div>
@@ -1249,12 +1252,39 @@ function commitCurrencies(list) {
   }
 }
 
+function guessSymbol(code) {
+  try {
+    const s = (0).toLocaleString('en', {
+      style:'currency', currency: code.toUpperCase(),
+      minimumFractionDigits:0, maximumFractionDigits:0
+    }).replace(/[\d\s,\.]/g,'').trim();
+    return s || code;
+  } catch { return code; }
+}
+function onCurCodeBlur() {
+  const codeIn = $('m-cur-code');
+  const symIn  = $('m-cur-symbol');
+  const hint   = $('cur-sym-hint');
+  const code   = (codeIn?.value || '').trim().toUpperCase();
+  if (!code) return;
+  const sym = guessSymbol(code);
+  if (sym && sym !== code) {
+    if (symIn && !symIn.value.trim()) symIn.value = sym;
+    if (hint) hint.classList.add('hidden');
+  } else {
+    if (hint) hint.classList.remove('hidden');
+  }
+}
 function addCurrency() {
   const codeIn   = $('m-cur-code');
   const symbolIn = $('m-cur-symbol');
   const code   = (codeIn?.value   || '').trim().toUpperCase();
-  const symbol = (symbolIn?.value || '').trim();
-  if (!code)   { showToast(t('warnEnterCurCode'),   'warn'); return; }
+  let   symbol = (symbolIn?.value || '').trim();
+  if (!code) { showToast(t('warnEnterCurCode'), 'warn'); return; }
+  if (!symbol) {
+    const auto = guessSymbol(code);
+    if (auto !== code) symbol = auto;
+  }
   if (!symbol) { showToast(t('warnEnterCurSymbol'), 'warn'); return; }
   if (CURRENCIES.some(c => c.code.toUpperCase() === code)) { showToast(t('warnCurExists'), 'warn'); return; }
   commitCurrencies([...CURRENCIES, { code, symbol }]);
@@ -1524,7 +1554,7 @@ function setPay(val, btn) {
   A.fd.pay = val;
   btn.closest('.seg-wrap').querySelectorAll('.seg').forEach(s => s.classList.remove('on'));
   btn.classList.add('on');
-  const isQR = val === 'QR';
+  const isQR = val === 'Online';
   $('slip-grp').classList.toggle('hidden', !isQR);
   if (!isQR) clearSlip();
 }
@@ -1637,7 +1667,7 @@ async function doSubmit() {
   if (!CURRENCIES.length)  { setMsg('f-msg', t('warnNoCurrencies'),'warn'); return; }
   if (!item)               { setMsg('f-msg', t('warnEnterItemName'),'warn'); return; }
   if (!price || price <= 0){ setMsg('f-msg', t('warnEnterValidAmount'),'warn'); return; }
-  if (A.fd.pay === 'QR' && !A.slip) { setMsg('f-msg', t('warnAttachSlip'),'warn'); return; }
+  if (A.fd.pay === 'Online' && !A.slip) { setMsg('f-msg', t('warnAttachSlip'),'warn'); return; }
 
   const extraAmounts = A.fd.extraCur.map(line => ({ currency: line.currency, price: parseFloat(line.price) }));
   if (extraAmounts.some(a => !a.price || a.price <= 0)) { setMsg('f-msg', t('warnEnterValidAmount'),'warn'); return; }
@@ -1647,7 +1677,7 @@ async function doSubmit() {
   $('sub-txt').textContent = t('submitBtnSaving');
 
   try {
-    showOv(A.fd.pay === 'QR' && A.slip ? t('ovUploadingSlip') : t('ovSavingEntry'));
+    showOv(A.fd.pay === 'Online' && A.slip ? t('ovUploadingSlip') : t('ovSavingEntry'));
     const ts  = nowStamp();
     const tab = fmtDateTab(new Date());
     const result = await apiPost({
@@ -1662,7 +1692,7 @@ async function doSubmit() {
       amounts:       amounts,
       type:          A.fd.type === 'income' ? 'Income' : 'Expense',
       shop:          A.fd.shop,
-      paymentMethod: A.fd.pay === 'QR' ? 'Lao QR / OnePay' : 'Cash',
+      paymentMethod: A.fd.pay === 'Online' ? 'Online Payment' : 'Cash',
       fileName:      A.slip?.name || '',
       fileData:      A.slip?.b64  || '',
       mimeType:      A.slip?.mime || '',
@@ -1882,7 +1912,7 @@ function renderEntryList(entries) {
       </div>
       <div class="ei-right">
         <div class="ei-amt ${isInc?'inc':'exp'}">${isInc?'+':'-'}${amt}&nbsp;${sym}</div>
-        <div class="pm-b ${isCash?'pm-cash':'pm-qr'}">${isCash?'Cash':'QR'}</div>
+        <div class="pm-b ${isCash?'pm-cash':'pm-qr'}">${isCash?'Cash':'Online'}</div>
       </div>
     </div>`;
   }).join('');
