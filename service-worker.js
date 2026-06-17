@@ -1,6 +1,12 @@
-const CACHE = 'buncheengern-v1.1.15';
+const CACHE = 'buncheengern-v1.1.16';
 const ASSETS = [
   './', './index.html',
+  './favicon.svg',
+  './favicon.ico',
+  './favicon-96x96.png',
+  './apple-touch-icon.png',
+  './icon-192x192.png',
+  './icon-512x512.png',
   './i18n/currencies.js',
   './i18n/lang_meta.js',
   './i18n/lang_en.js',
