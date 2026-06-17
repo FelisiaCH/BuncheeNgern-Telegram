@@ -1832,10 +1832,10 @@ function renderCurLines() {
     row.className = 'cur-line';
     row.innerHTML = `
       <div class="pg">
-        <select class="cur-sel" aria-label="${esc(t('ariaCurrency'))}">
+        <select class="cur-sel" id="x-cur-sel-${i}" name="x-cur-sel-${i}" aria-label="${esc(t('ariaCurrency'))}">
           ${CURRENCIES.map(c => `<option value="${c.code}"${c.code === line.currency ? ' selected' : ''}>${c.code} ${c.symbol}</option>`).join('')}
         </select>
-        <input type="number" class="prc-in" placeholder="0" inputmode="decimal" min="0" step="any" value="${line.price ?? ''}">
+        <input type="number" class="prc-in" id="x-cur-price-${i}" name="x-cur-price-${i}" placeholder="0" inputmode="decimal" min="0" step="any" value="${line.price ?? ''}">
       </div>
       <div class="seg-wrap" style="margin-top:8px">
         <button class="seg cash${line.pay==='Cash'?' on':''}" type="button">💵 <span>${esc(t('payCash'))}</span></button>
@@ -1845,11 +1845,11 @@ function renderCurLines() {
       <div class="split-grp${line.pay==='Split'?'':' hidden'}" style="margin-top:8px">
         <div class="pg" style="margin-bottom:6px">
           <span class="cur-sel" style="pointer-events:none;color:var(--amber)">💵</span>
-          <input type="number" class="prc-in split-cash-in" placeholder="${esc(t('labelSplitCash'))}" inputmode="decimal" min="0" step="any" value="${line.splitCash ?? ''}">
+          <input type="number" class="prc-in split-cash-in" id="x-split-cash-${i}" name="x-split-cash-${i}" placeholder="${esc(t('labelSplitCash'))}" inputmode="decimal" min="0" step="any" value="${line.splitCash ?? ''}">
         </div>
         <div class="pg">
           <span class="cur-sel" style="pointer-events:none;color:var(--teal)">📱</span>
-          <input type="number" class="prc-in split-online-in" placeholder="${esc(t('labelSplitOnline'))}" inputmode="decimal" min="0" step="any" value="${line.splitOnline ?? ''}">
+          <input type="number" class="prc-in split-online-in" id="x-split-online-${i}" name="x-split-online-${i}" placeholder="${esc(t('labelSplitOnline'))}" inputmode="decimal" min="0" step="any" value="${line.splitOnline ?? ''}">
         </div>
       </div>
       <button type="button" class="cur-remove-btn" aria-label="${esc(t('ariaRemoveCurrency'))}">✕</button>
