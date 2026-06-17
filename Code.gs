@@ -198,7 +198,7 @@ function sendTelegramNotification(data, fileUrl, amounts) {
     data.type === 'Income' ? '🟢 <b>New Income</b>' : '🔴 <b>New Expense</b>',
     `<b>Item Name:</b> ${escapeHtml(data.itemName)}`,
     `<b>Cost:</b>\n${costLines}`,
-    `<b>Payment Method:</b> ${escapeHtml(data.paymentMethod === 'Mixed' ? 'Cash + Online Payment' : data.paymentMethod)}`,
+    `<b>Payment Method:</b> ${escapeHtml(data.paymentMethod)}`,
     `<b>Branch:</b> ${escapeHtml(data.shop)}`,
     `<b>Author:</b> ${escapeHtml(data.userEmail || data.staffName)}`,
   ];
