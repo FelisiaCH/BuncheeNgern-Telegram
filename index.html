@@ -1122,6 +1122,12 @@ function setLang(lang) {
   currentLang = lang;
   localStorage.setItem(LANG_KEY, lang);
   applyTranslations();
+
+  const btnEl = $('g-signin-btn');
+  if (window.google?.accounts?.id && btnEl) {
+    btnEl.innerHTML = '';
+    google.accounts.id.renderButton(btnEl, { theme: 'outline', size: 'medium', shape: 'pill', locale: gsiLocale(currentLang) });
+  }
 }
 
 function renderLangSwitchers() {
@@ -1666,6 +1672,12 @@ function showSignInWarn(key) {
   el.classList.remove('hidden');
 }
 
+function gsiLocale(lang) {
+  if (lang === 'zh') return 'zh-CN';
+  if (lang === 'tl') return 'fil';
+  return lang;
+}
+
 function initGoogleSignIn(retries = 20) {
   if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID_HERE') {
     showSignInWarn('googleSignInNotConfigured');
@@ -1679,7 +1691,7 @@ function initGoogleSignIn(retries = 20) {
 
   try {
     google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleGoogleCredential, auto_select: true });
-    google.accounts.id.renderButton($('g-signin-btn'), { theme: 'outline', size: 'medium', shape: 'pill' });
+    google.accounts.id.renderButton($('g-signin-btn'), { theme: 'outline', size: 'medium', shape: 'pill', locale: gsiLocale(currentLang) });
   } catch (err) {
     showSignInWarn('googleSignInError');
   }
