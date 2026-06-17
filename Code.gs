@@ -21,9 +21,9 @@ function ss() { return SpreadsheetApp.openById(SPREADSHEET_ID); }
 // 🌐 GET Router
 function doGet(e) {
   try {
-    const email = verifyGoogleToken(e.parameter.idToken);
-    if (!email) return respond({ error: 'AUTH_EXPIRED' });
-    if (checkWhitelist(email) !== 'allow') return respond({ error: 'AUTH_DENIED' });
+    const auth = verifyGoogleToken(e.parameter.idToken);
+    if (!auth) return respond({ error: 'AUTH_EXPIRED' });
+    if (checkWhitelist(auth.email) !== 'allow') return respond({ error: 'AUTH_DENIED' });
 
     const action = e.parameter.action;
     switch (action) {
@@ -41,10 +41,11 @@ function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
 
-    const email = verifyGoogleToken(data.idToken);
-    if (!email) return respond({ error: 'AUTH_EXPIRED' });
-    if (checkWhitelist(email) !== 'allow') return respond({ error: 'AUTH_DENIED' });
-    data.userEmail = email; // verified identity — discard any client-supplied value
+    const auth = verifyGoogleToken(data.idToken);
+    if (!auth) return respond({ error: 'AUTH_EXPIRED' });
+    if (checkWhitelist(auth.email) !== 'allow') return respond({ error: 'AUTH_DENIED' });
+    data.userEmail = auth.email; // verified identity — discard any client-supplied value
+    data.staffName = auth.name;  // verified identity — discard any client-supplied value
 
     switch (data.action) {
       case 'submitEntry': return respond(submitEntry(data));
@@ -88,7 +89,7 @@ function verifyGoogleToken(idToken) {
   if (payload.email_verified !== 'true' && payload.email_verified !== true) return null;
   if (!payload.email) return null;
 
-  return payload.email;
+  return { email: payload.email, name: payload.name || payload.email };
 }
 
 // ✅ Email Whitelist — sheet tab 'AllowedUsers': Email | Status | Note | Last Login
