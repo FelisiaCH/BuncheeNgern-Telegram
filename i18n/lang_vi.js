@@ -12,6 +12,7 @@ window.I18N_PARTS.vi = {
   logoutTitle:           'Đăng xuất',
   ariaMoreMenu:          'Thêm tùy chọn',
   menuLanguage:          '🌐 Ngôn ngữ / Language',
+  placeholderSearchLanguage: 'Tìm ngôn ngữ',
   menuManagement:        '⚙️ Quản lý / Management',
 
   placeholderNewBranch:  'Nhập tên chi nhánh mới',

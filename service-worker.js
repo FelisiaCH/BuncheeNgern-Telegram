@@ -1,4 +1,4 @@
-const CACHE = 'buncheengern-v1.1.10';
+const CACHE = 'buncheengern-v1.1.11';
 const ASSETS = [
   './', './index.html',
   './i18n/currencies.js',
@@ -8,6 +8,19 @@ const ASSETS = [
   './i18n/lang_lo.js',
   './i18n/lang_vi.js',
   './i18n/lang_my.js',
+  './i18n/lang_zh.js',
+  './i18n/lang_ja.js',
+  './i18n/lang_ko.js',
+  './i18n/lang_id.js',
+  './i18n/lang_ms.js',
+  './i18n/lang_tl.js',
+  './i18n/lang_km.js',
+  './i18n/lang_hi.js',
+  './i18n/lang_bn.js',
+  './i18n/lang_es.js',
+  './i18n/lang_fr.js',
+  './i18n/lang_pt.js',
+  './i18n/lang_de.js',
 ];
 
 self.addEventListener('install', e => {

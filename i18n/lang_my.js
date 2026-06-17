@@ -12,6 +12,7 @@ window.I18N_PARTS.my = {
   logoutTitle:           'ထွက်မည်',
   ariaMoreMenu:          'နောက်ထပ်ရွေးချယ်စရာများ',
   menuLanguage:          '🌐 ဘာသာစကား / Language',
+  placeholderSearchLanguage: 'ဘာသာစကား ရှာပါ',
   menuManagement:        '⚙️ စီမံခန့်ခွဲမှု / Management',
 
   placeholderNewBranch:  'ဌာနခွဲအသစ်အမည် ထည့်ပါ',

@@ -12,6 +12,7 @@ window.I18N_PARTS.en = {
   logoutTitle:           'Log Out',
   ariaMoreMenu:          'More options',
   menuLanguage:          '🌐 Language Options',
+  placeholderSearchLanguage: 'Search language',
   menuManagement:        '⚙️ Management',
 
   placeholderNewBranch:  'Enter new branch name',

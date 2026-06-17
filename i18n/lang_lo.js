@@ -12,6 +12,7 @@ window.I18N_PARTS.lo = {
   logoutTitle:           'ອອກຈາກລະບົບ',
   ariaMoreMenu:          'ເມນູເພີ່ມເຕີມ',
   menuLanguage:          '🌐 ພາສາ / Language',
+  placeholderSearchLanguage: 'ຄົ້ນຫາພາສາ',
   menuManagement:        '⚙️ ການຈັດການ / Management',
 
   placeholderNewBranch:  'ປ້ອນຊື່ສາຂາໃໝ່',

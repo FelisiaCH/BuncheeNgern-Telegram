@@ -12,6 +12,7 @@ window.I18N_PARTS.th = {
   logoutTitle:           'ออกจากระบบ',
   ariaMoreMenu:          'เมนูเพิ่มเติม',
   menuLanguage:          '🌐 ภาษา / Language',
+  placeholderSearchLanguage: 'ค้นหาภาษา',
   menuManagement:        '⚙️ การจัดการ / Management',
 
   placeholderNewBranch:  'กรอกชื่อสาขาใหม่',
