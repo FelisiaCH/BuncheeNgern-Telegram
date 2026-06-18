@@ -9,7 +9,6 @@ window.I18N_PARTS.hi = {
 
   footerCopy:            '© 2026 FelisiaCH — MIT लाइसेंस के अंतर्गत जारी',
 
-  logoutTitle:           'लॉग आउट',
   ariaMoreMenu:          'अधिक विकल्प',
   menuLanguage:          '🌐 भाषा विकल्प',
   placeholderSearchLanguage: 'भाषा खोजें',
@@ -87,6 +86,10 @@ window.I18N_PARTS.hi = {
 
   errGeneric:            '❌ एक त्रुटि हुई: {msg}',
   confirmLogout:         'क्या आप लॉग आउट करना चाहते हैं?',
+  lockTitle:             'लॉक करें',
+  confirmLock:           'ऐप लॉक करें? अनलॉक करने के लिए Google से साइन इन करें।',
+  menuAccount:           '👤 खाता',
+  menuLogoutFull:        '🚪 साइन आउट करें और इस डिवाइस को भूल जाएं',
   errAuthExpired:        '❌ आपका सेशन समाप्त हो गया है — कृपया फिर से साइन इन करें',
   errAuthDenied:         '❌ इस खाते को इस ऐप का उपयोग करने की अनुमति नहीं है',
   errFileTooLarge:       '❌ फ़ाइल 5 MB से अधिक है',

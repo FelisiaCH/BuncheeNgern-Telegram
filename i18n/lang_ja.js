@@ -9,7 +9,6 @@ window.I18N_PARTS.ja = {
 
   footerCopy:            '© 2026 FelisiaCH — MITライセンスのもとで公開',
 
-  logoutTitle:           'ログアウト',
   ariaMoreMenu:          'その他のオプション',
   menuLanguage:          '🌐 言語設定',
   placeholderSearchLanguage: '言語を検索',
@@ -87,6 +86,10 @@ window.I18N_PARTS.ja = {
 
   errGeneric:            '❌ エラーが発生しました：{msg}',
   confirmLogout:         'ログアウトしてもよろしいですか？',
+  lockTitle:             'ロック',
+  confirmLock:           'アプリをロックしますか？解除するには Google でサインインしてください。',
+  menuAccount:           '👤 アカウント',
+  menuLogoutFull:        '🚪 サインアウトしてこの端末を削除',
   errAuthExpired:        '❌ セッションの有効期限が切れました — 再度ログインしてください',
   errAuthDenied:         '❌ このアカウントはこのアプリの使用を許可されていません',
   errFileTooLarge:       '❌ ファイルが5MBを超えています',

@@ -9,7 +9,6 @@ window.I18N_PARTS.km = {
 
   footerCopy:            '© 2026 FelisiaCH — ចេញផ្សាយក្រោមអាជ្ញាប័ណ្ណ MIT',
 
-  logoutTitle:           'ចាកចេញ',
   ariaMoreMenu:          'ជម្រើសបន្ថែម',
   menuLanguage:          '🌐 ជម្រើសភាសា',
   placeholderSearchLanguage: 'ស្វែងរកភាសា',
@@ -87,6 +86,10 @@ window.I18N_PARTS.km = {
 
   errGeneric:            '❌ មានកំហុសកើតឡើង៖ {msg}',
   confirmLogout:         'តើអ្នកប្រាកដជាចង់ចាកចេញមែនទេ?',
+  lockTitle:             'ចាក់សោ',
+  confirmLock:           'ចាក់សោកម្មវិធី? ចូលដោយ Google ដើម្បីដោះសោ។',
+  menuAccount:           '👤 គណនី',
+  menuLogoutFull:        '🚪 ចេញ និងបំភ្លេចឧបករណ៍នេះ',
   errAuthExpired:        '❌ សម័យចូលប្រើរបស់អ្នកបានផុតកំណត់ — សូមចូលប្រើម្តងទៀត',
   errAuthDenied:         '❌ គណនីនេះមិនត្រូវបានអនុញ្ញាតឱ្យប្រើកម្មវិធីនេះទេ',
   errFileTooLarge:       '❌ ឯកសារលើសពី 5 MB',

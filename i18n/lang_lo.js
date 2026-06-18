@@ -9,7 +9,6 @@ window.I18N_PARTS.lo = {
 
   footerCopy:            '© 2026 FelisiaCH — ເຜີຍແຜ່ພາຍໃຕ້ໃບອະນຸຍາດ MIT',
 
-  logoutTitle:           'ອອກຈາກລະບົບ',
   ariaMoreMenu:          'ເມນູເພີ່ມເຕີມ',
   menuLanguage:          '🌐 ພາສາ / Language',
   placeholderSearchLanguage: 'ຄົ້ນຫາພາສາ',
@@ -87,6 +86,10 @@ window.I18N_PARTS.lo = {
 
   errGeneric:            '❌ ເກີດຂໍ້ຜິດພາດ: {msg}',
   confirmLogout:         'ທ່ານຕ້ອງການອອກຈາກລະບົບແທ້ບໍ?',
+  lockTitle:             'ລັອກ',
+  confirmLock:           'ລັອກແອັບບໍ? ເຂົ້າສູ່ລະບົບດ້ວຍ Google ເພື່ອປົດລັອກ',
+  menuAccount:           '👤 ບັນຊີ',
+  menuLogoutFull:        '🚪 ອອກຈາກລະບົບ ແລະ ລືມອຸປະກອນນີ້',
   errAuthExpired:        '❌ ເຊສຊັນຂອງທ່ານໝົດອາຍຸແລ້ວ — ກະລຸນາເຂົ້າສູ່ລະບົບໃໝ່',
   errAuthDenied:         '❌ ບັນຊີນີ້ບໍ່ໄດ້ຮັບອະນຸຍາດໃຫ້ໃຊ້ແອັບນີ້',
   errFileTooLarge:       '❌ ໄຟລ໌ໃຫຍ່ເກີນ 5 MB',

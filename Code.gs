@@ -60,7 +60,8 @@ function doPost(e) {
       const auth = verifyGoogleToken(data.idToken);
       if (!auth) return respond({ error: 'AUTH_EXPIRED' });
       if (checkWhitelist(auth.email) !== 'allow') return respond({ error: 'AUTH_DENIED' });
-      const sessionToken = createSession(auth.email, auth.name);
+      const sessionToken = getOrCreateSessionForDevice(
+        auth.email, auth.name, data.deviceId, data.deviceLabel, data.userAgent, data.existingToken);
       return respond({ ok: true, sessionToken, name: auth.name, email: auth.email });
     }
 
@@ -148,27 +149,85 @@ function checkWhitelist(email) {
   }
 }
 
-// 🪪 App-managed sessions — sheet tab 'Sessions': Token | Email | Name | Created | Expires
+// 🪪 App-managed, device-bound sessions — sheet tab 'Sessions':
+//   Token | Email | Name | DeviceId | DeviceLabel | UserAgent | Created | Expires
+//   (0-based array indices: Token 0, Email 1, Name 2, DeviceId 3, DeviceLabel 4,
+//    UserAgent 5, Created 6, Expires 7 → Expires is getRange column 8)
 // After a one-time Google sign-in the backend mints its own token with a 30-day
-// rolling expiry; the frontend then uses that token instead of the short-lived id_token.
+// rolling expiry, bound to the signing-in device; the frontend then uses that token
+// instead of the short-lived id_token. Re-login on the same device reuses the row.
 const SESSION_TTL_MS  = 30 * 24 * 60 * 60 * 1000; // 30 days
 const SESSIONS_TAB     = 'Sessions';
-const SESSION_HEADERS  = ['Token', 'Email', 'Name', 'Created', 'Expires'];
+const SESSION_HEADERS  = ['Token', 'Email', 'Name', 'DeviceId', 'DeviceLabel', 'UserAgent', 'Created', 'Expires'];
+
+// 0-based column indices into a Sessions row (keep in sync with SESSION_HEADERS)
+const SES_TOKEN = 0, SES_EMAIL = 1, SES_NAME = 2, SES_DEVICE_ID = 3,
+      SES_DEVICE_LABEL = 4, SES_UA = 5, SES_CREATED = 6, SES_EXPIRES = 7;
 
 function getSessionsSheet() {
   return getOrCreateSheet(SESSIONS_TAB, SESSION_HEADERS);
 }
 
-function createSession(email, name) {
+function rowExpiry(row) {
+  const v = row[SES_EXPIRES];
+  return v instanceof Date ? v : new Date(v);
+}
+
+// Resolve the session token for a verified identity on a given device:
+//   1) reuse the supplied existingToken IF its row belongs to this email (unlock path)
+//   2) else reuse an existing non-expired row for this email + device
+//   3) else mint a new row (new device)
+// Reused rows have their device info refreshed and expiry rolled forward.
+function getOrCreateSessionForDevice(email, name, deviceId, deviceLabel, userAgent, existingToken) {
+  const normEmail = normalizeEmail(email);
+  deviceId    = clampStr(deviceId, 100);
+  deviceLabel = clampStr(deviceLabel, 200);
+  userAgent   = clampStr(userAgent, 500);
+
   const lock = LockService.getScriptLock();
   lock.waitLock(30000);
   try {
     const sheet = getSessionsSheet();
     purgeExpiredSessions(sheet);
-    const token   = Utilities.getUuid() + Utilities.getUuid().replace(/-/g, '');
-    const now     = new Date();
-    const expires = new Date(now.getTime() + SESSION_TTL_MS);
-    sheet.appendRow([token, normalizeEmail(email), name, now, expires]);
+    const rows      = sheet.getDataRange().getValues();
+    const now       = new Date();
+    const newExpiry = new Date(now.getTime() + SESSION_TTL_MS);
+
+    // 1) Unlock path — reuse the presented token only if it OWNS this email.
+    if (existingToken) {
+      for (let i = 1; i < rows.length; i++) {
+        if (String(rows[i][SES_TOKEN]) !== String(existingToken)) continue;
+        const expires = rowExpiry(rows[i]);
+        // Ownership check: never reuse a token whose stored email differs from
+        // the Google-verified identity (guards against a stolen token).
+        if (normalizeEmail(rows[i][SES_EMAIL]) === normEmail &&
+            !isNaN(expires.getTime()) && expires.getTime() > now.getTime()) {
+          sheet.getRange(i + 1, SES_DEVICE_ID + 1, 1, 3)
+               .setValues([[deviceId, deviceLabel, userAgent]]); // adopt current device
+          sheet.getRange(i + 1, SES_EXPIRES + 1).setValue(newExpiry);
+          return String(rows[i][SES_TOKEN]);
+        }
+        break; // token matched a row but failed ownership/expiry → don't reuse
+      }
+    }
+
+    // 2) Same email + same device → reuse that row's token.
+    if (deviceId) {
+      for (let i = 1; i < rows.length; i++) {
+        if (normalizeEmail(rows[i][SES_EMAIL]) !== normEmail) continue;
+        if (String(rows[i][SES_DEVICE_ID]) !== String(deviceId)) continue;
+        const expires = rowExpiry(rows[i]);
+        if (isNaN(expires.getTime()) || expires.getTime() <= now.getTime()) continue;
+        sheet.getRange(i + 1, SES_DEVICE_LABEL + 1, 1, 2)
+             .setValues([[deviceLabel, userAgent]]); // refresh label/UA
+        sheet.getRange(i + 1, SES_EXPIRES + 1).setValue(newExpiry);
+        return String(rows[i][SES_TOKEN]);
+      }
+    }
+
+    // 3) New device → new row (token order matches SESSION_HEADERS).
+    const token = Utilities.getUuid() + Utilities.getUuid().replace(/-/g, '');
+    sheet.appendRow([token, normEmail, name, deviceId, deviceLabel, userAgent, now, newExpiry]);
     return token;
   } finally {
     lock.releaseLock();
@@ -184,12 +243,12 @@ function validateSession(token) {
     const rows  = sheet.getDataRange().getValues();
     const now   = new Date();
     for (let i = 1; i < rows.length; i++) {
-      if (String(rows[i][0]) !== String(token)) continue;
-      const expires = rows[i][4] instanceof Date ? rows[i][4] : new Date(rows[i][4]);
+      if (String(rows[i][SES_TOKEN]) !== String(token)) continue;
+      const expires = rowExpiry(rows[i]);
       if (isNaN(expires.getTime()) || expires.getTime() <= now.getTime()) return null;
       // Roll the expiry forward so active users stay signed in
-      sheet.getRange(i + 1, 5).setValue(new Date(now.getTime() + SESSION_TTL_MS));
-      return { email: String(rows[i][1] || ''), name: String(rows[i][2] || '') };
+      sheet.getRange(i + 1, SES_EXPIRES + 1).setValue(new Date(now.getTime() + SESSION_TTL_MS));
+      return { email: String(rows[i][SES_EMAIL] || ''), name: String(rows[i][SES_NAME] || '') };
     }
     return null;
   } finally {
@@ -198,12 +257,12 @@ function validateSession(token) {
 }
 
 // Delete expired/invalid session rows (bottom-up so indices stay valid).
-// Called from createSession only, to keep validateSession fast.
+// Called from getOrCreateSessionForDevice only, to keep validateSession fast.
 function purgeExpiredSessions(sheet) {
   const rows = sheet.getDataRange().getValues();
   const now  = new Date().getTime();
   for (let i = rows.length - 1; i >= 1; i--) {
-    const expires = rows[i][4] instanceof Date ? rows[i][4] : new Date(rows[i][4]);
+    const expires = rowExpiry(rows[i]);
     if (isNaN(expires.getTime()) || expires.getTime() <= now) {
       sheet.deleteRow(i + 1);
     }

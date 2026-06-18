@@ -9,7 +9,6 @@ window.I18N_PARTS.ms = {
 
   footerCopy:            '© 2026 FelisiaCH — Dikeluarkan di bawah Lesen MIT',
 
-  logoutTitle:           'Log Keluar',
   ariaMoreMenu:          'Pilihan lain',
   menuLanguage:          '🌐 Pilihan Bahasa',
   placeholderSearchLanguage: 'Cari bahasa',
@@ -87,6 +86,10 @@ window.I18N_PARTS.ms = {
 
   errGeneric:            '❌ Ralat berlaku: {msg}',
   confirmLogout:         'Adakah anda pasti mahu log keluar?',
+  lockTitle:             'Kunci',
+  confirmLock:           'Kunci apl? Log masuk dengan Google untuk buka kunci.',
+  menuAccount:           '👤 Akaun',
+  menuLogoutFull:        '🚪 Log keluar & lupakan peranti ini',
   errAuthExpired:        '❌ Sesi anda telah tamat tempoh — sila log masuk semula',
   errAuthDenied:         '❌ Akaun ini tidak dibenarkan menggunakan aplikasi ini',
   errFileTooLarge:       '❌ Fail melebihi 5 MB',

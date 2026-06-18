@@ -9,7 +9,6 @@ window.I18N_PARTS.my = {
 
   footerCopy:            '© 2026 FelisiaCH — MIT လိုင်စင်အောက်တွင် ထုတ်ပြန်ထားသည်',
 
-  logoutTitle:           'ထွက်မည်',
   ariaMoreMenu:          'နောက်ထပ်ရွေးချယ်စရာများ',
   menuLanguage:          '🌐 ဘာသာစကား / Language',
   placeholderSearchLanguage: 'ဘာသာစကား ရှာပါ',
@@ -87,6 +86,10 @@ window.I18N_PARTS.my = {
 
   errGeneric:            '❌ အမှားအယွင်း ဖြစ်ပွားသည်- {msg}',
   confirmLogout:         'ထွက်မှာ သေချာပါသလား?',
+  lockTitle:             'လော့ခ်ချ',
+  confirmLock:           'အက်ပ်ကို လော့ခ်ချမလား။ ပြန်ဖွင့်ရန် Google ဖြင့် ဝင်ပါ။',
+  menuAccount:           '👤 အကောင့်',
+  menuLogoutFull:        '🚪 ထွက်ပြီး ဤစက်ကို မေ့ပါ',
   errAuthExpired:        '❌ သင့်စက်ရှင် သက်တမ်းကုန်သွားပါပြီ — ပြန်လည်ဝင်ရောက်ပါ',
   errAuthDenied:         '❌ ဤအကောင့်သည် ဤအက်ပ်ကို အသုံးပြုရန် ခွင့်ပြုထားခြင်း မရှိပါ',
   errFileTooLarge:       '❌ ဖိုင်သည် 5 MB ထက် ကြီးသည်',

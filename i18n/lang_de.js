@@ -9,7 +9,6 @@ window.I18N_PARTS.de = {
 
   footerCopy:            '© 2026 FelisiaCH — Veröffentlicht unter der MIT-Lizenz',
 
-  logoutTitle:           'Abmelden',
   ariaMoreMenu:          'Weitere Optionen',
   menuLanguage:          '🌐 Sprachoptionen',
   placeholderSearchLanguage: 'Sprache suchen',
@@ -87,6 +86,10 @@ window.I18N_PARTS.de = {
 
   errGeneric:            '❌ Ein Fehler ist aufgetreten: {msg}',
   confirmLogout:         'Möchten Sie sich wirklich abmelden?',
+  lockTitle:             'Sperren',
+  confirmLock:           'App sperren? Mit Google anmelden zum Entsperren.',
+  menuAccount:           '👤 Konto',
+  menuLogoutFull:        '🚪 Abmelden & dieses Gerät vergessen',
   errAuthExpired:        '❌ Ihre Sitzung ist abgelaufen — bitte melden Sie sich erneut an',
   errAuthDenied:         '❌ Dieses Konto ist nicht berechtigt, diese App zu verwenden',
   errFileTooLarge:       '❌ Datei überschreitet 5 MB',

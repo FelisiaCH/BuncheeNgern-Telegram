@@ -9,7 +9,6 @@ window.I18N_PARTS.zh = {
 
   footerCopy:            '© 2026 FelisiaCH — 依据 MIT 许可证发布',
 
-  logoutTitle:           '退出登录',
   ariaMoreMenu:          '更多选项',
   menuLanguage:          '🌐 语言选项',
   placeholderSearchLanguage: '搜索语言',
@@ -87,6 +86,10 @@ window.I18N_PARTS.zh = {
 
   errGeneric:            '❌ 发生错误：{msg}',
   confirmLogout:         '确定要退出登录吗？',
+  lockTitle:             '锁定',
+  confirmLock:           '锁定应用？使用 Google 登录即可解锁。',
+  menuAccount:           '👤 账户',
+  menuLogoutFull:        '🚪 退出并忘记此设备',
   errAuthExpired:        '❌ 您的登录会话已过期 — 请重新登录',
   errAuthDenied:         '❌ 此账户未获授权使用本应用',
   errFileTooLarge:       '❌ 文件超过 5 MB',

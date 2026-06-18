@@ -9,7 +9,6 @@ window.I18N_PARTS.id = {
 
   footerCopy:            '© 2026 FelisiaCH — Dirilis di bawah Lisensi MIT',
 
-  logoutTitle:           'Keluar',
   ariaMoreMenu:          'Opsi lainnya',
   menuLanguage:          '🌐 Pilihan Bahasa',
   placeholderSearchLanguage: 'Cari bahasa',
@@ -87,6 +86,10 @@ window.I18N_PARTS.id = {
 
   errGeneric:            '❌ Terjadi kesalahan: {msg}',
   confirmLogout:         'Apakah Anda yakin ingin keluar?',
+  lockTitle:             'Kunci',
+  confirmLock:           'Kunci aplikasi? Masuk dengan Google untuk membuka.',
+  menuAccount:           '👤 Akun',
+  menuLogoutFull:        '🚪 Keluar & lupakan perangkat ini',
   errAuthExpired:        '❌ Sesi Anda telah berakhir — silakan masuk kembali',
   errAuthDenied:         '❌ Akun ini tidak diizinkan menggunakan aplikasi ini',
   errFileTooLarge:       '❌ Ukuran file melebihi 5 MB',

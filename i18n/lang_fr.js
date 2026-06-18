@@ -9,7 +9,6 @@ window.I18N_PARTS.fr = {
 
   footerCopy:            '© 2026 FelisiaCH — Publié sous licence MIT',
 
-  logoutTitle:           'Se déconnecter',
   ariaMoreMenu:          'Plus d\'options',
   menuLanguage:          '🌐 Options de langue',
   placeholderSearchLanguage: 'Rechercher une langue',
@@ -87,6 +86,10 @@ window.I18N_PARTS.fr = {
 
   errGeneric:            '❌ Une erreur est survenue : {msg}',
   confirmLogout:         'Voulez-vous vraiment vous déconnecter ?',
+  lockTitle:             'Verrouiller',
+  confirmLock:           'Verrouiller l\'app ? Connectez-vous avec Google pour déverrouiller.',
+  menuAccount:           '👤 Compte',
+  menuLogoutFull:        '🚪 Se déconnecter et oublier cet appareil',
   errAuthExpired:        '❌ Votre session a expiré — veuillez vous reconnecter',
   errAuthDenied:         '❌ Ce compte n\'est pas autorisé à utiliser cette application',
   errFileTooLarge:       '❌ Le fichier dépasse 5 Mo',

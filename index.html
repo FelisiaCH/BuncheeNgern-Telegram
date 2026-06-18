@@ -756,7 +756,7 @@ option{background:#0E1526}
         <div class="chip-dot"></div>
         <span id="hdr-user">—</span>
       </div>
-      <button class="lo-btn" onclick="doLogout()" title="ออกจากระบบ" data-i18n-title="logoutTitle">
+      <button class="lo-btn" onclick="lockApp()" title="Lock" data-i18n-title="lockTitle">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
       </button>
     </div>
@@ -937,6 +937,11 @@ option{background:#0E1526}
              data-i18n-placeholder="placeholderSearchCurrency"
              placeholder="Search currency, code, or country">
       <div id="cur-picker-list" class="cur-picker-list"></div>
+    </div>
+
+    <div class="settings-sec">
+      <div class="settings-lbl" data-i18n="menuAccount">👤 Account</div>
+      <button type="button" class="menu-action-btn" onclick="doLogout()" data-i18n="menuLogoutFull">🚪 Sign out &amp; forget this device</button>
     </div>
   </div>
 
@@ -1576,13 +1581,24 @@ function _apiFetch(input, init) {
 }
 // Exchange a one-time Google id_token for an app session token. This IS the
 // authentication step, so it carries no session token and bypasses the normal flow.
+// Sends device info + any stored token so the backend can reuse this device's
+// session (re-login / unlock) instead of minting a new row.
 function apiAuthenticate(idToken) {
   if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return Promise.reject(new Error('SCRIPT_URL is not set — see README for setup instructions'));
+  const stored = loadSession();
+  const info   = getDeviceInfo();
   return _apiFetch(SCRIPT_URL, {
     method:  'POST',
     redirect: 'follow',
     headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-    body:    JSON.stringify({ action: 'authenticate', idToken }),
+    body:    JSON.stringify({
+      action:        'authenticate',
+      idToken,
+      deviceId:      getDeviceId(),
+      deviceLabel:   info.label,
+      userAgent:     info.ua,
+      existingToken: A.sessionToken || (stored && stored.sessionToken) || '',
+    }),
   });
 }
 function apiGet(params) {
@@ -1602,13 +1618,64 @@ function apiPost(bodyObj) {
   });
 }
 
-// 💾 Session Storage
+// 📱 Device identity — a stable random id per device (how the backend recognizes
+// "the same device") plus a best-effort human-readable label for the Sessions sheet.
+const DEVICE_KEY = 'deviceId';
+function getDeviceId() {
+  let id = localStorage.getItem(DEVICE_KEY);
+  if (!id) {
+    id = (window.crypto && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : 'dev-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 12);
+    localStorage.setItem(DEVICE_KEY, id);
+  }
+  return id;
+}
+function getDeviceInfo() {
+  const ua = navigator.userAgent || '';
+  let browser = 'Browser';
+  if (/Edg\//.test(ua))                 browser = 'Edge';
+  else if (/SamsungBrowser\//.test(ua)) browser = 'Samsung Internet';
+  else if (/OPR\/|Opera/.test(ua))      browser = 'Opera';
+  else if (/Firefox\//.test(ua))        browser = 'Firefox';
+  else if (/Chrome\//.test(ua))         browser = 'Chrome';
+  else if (/Safari\//.test(ua))         browser = 'Safari';
+  let os = '';
+  if (/Android/.test(ua))               os = 'Android';
+  else if (/iPhone|iPad|iPod/.test(ua)) os = 'iOS';
+  else if (/Windows/.test(ua))          os = 'Windows';
+  else if (/Mac OS X|Macintosh/.test(ua)) os = 'macOS';
+  else if (/Linux/.test(ua))            os = 'Linux';
+  let model = '';
+  if (/iPhone/.test(ua))      model = 'iPhone';
+  else if (/iPad/.test(ua))   model = 'iPad';
+  else {
+    const m = ua.match(/Android[^;]*;\s*([^;)]+?)(?:\s+Build\/|[);])/); // "...; RMX3301)" → RMX3301
+    if (m && m[1]) {
+      const cand = m[1].trim();
+      if (cand.length >= 2 && cand.toLowerCase() !== 'wv' && cand !== 'K') model = cand;
+    }
+  }
+  let label = browser;
+  if (os)    label += ' on ' + os;
+  if (model) label += ' (' + model + ')';
+  return { label, ua };
+}
+
+// 💾 Session Storage — token is kept on LOCK (only memory is cleared); a hard
+// LOGOUT clears it entirely. The 'locked' flag gates the optimistic restore.
 const SESSION_KEY = 'userSession';
 function saveSession(name, email, shop, sessionToken) {
-  localStorage.setItem(SESSION_KEY, JSON.stringify({ name, email, shop, sessionToken }));
+  localStorage.setItem(SESSION_KEY, JSON.stringify({
+    name, email, shop, sessionToken, deviceId: getDeviceId(), locked: false,
+  }));
 }
 function loadSession() {
   try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch { return null; }
+}
+function lockSession() {
+  const s = loadSession();
+  if (s) { s.locked = true; localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
 }
 function clearSession() { localStorage.removeItem(SESSION_KEY); }
 
@@ -1668,10 +1735,10 @@ async function init() {
   initGoogleSignIn();
 
   const session = loadSession();
-  if (session?.name && session?.email && session?.sessionToken) {
-    // Returning user within the 30-day window — restore optimistically.
-    // The first data fetch validates the token; if it's expired the
-    // normal AUTH_EXPIRED handler drops back to the login screen.
+  if (session?.name && session?.email && session?.sessionToken && !session.locked) {
+    // Returning user within the 30-day window, not locked — restore optimistically.
+    // The first data fetch validates the token; if it's expired the normal
+    // AUTH_EXPIRED handler drops back to the login screen.
     A.me = session.name;
     A.userEmail = session.email;
     A.sessionToken = session.sessionToken;
@@ -1679,6 +1746,7 @@ async function init() {
     enterApp(session.name);
     return;
   }
+  // No session, or locked → login screen (a Google sign-in unlocks/restores it).
   showScr('scr-login');
 }
 
@@ -1692,6 +1760,19 @@ function enterApp(name) {
   showScr('scr-app');
 }
 
+// LOCK — keep the stored token for reuse; just clear in-memory state and show
+// the login screen. Signing in with Google re-verifies identity and unlocks.
+function lockApp() {
+  if (!confirm(t('confirmLock'))) return;
+  lockSession();
+  A.me = null;
+  A.userEmail = '';
+  A.sessionToken = null;
+  showScr('scr-login');
+}
+
+// HARD LOGOUT — fully forget this device: wipe the stored token so nothing can
+// be reused. For shared devices.
 function doLogout() {
   if (!confirm(t('confirmLogout'))) return;
   clearSession();

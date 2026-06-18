@@ -9,7 +9,6 @@ window.I18N_PARTS.es = {
 
   footerCopy:            '© 2026 FelisiaCH — Publicado bajo la Licencia MIT',
 
-  logoutTitle:           'Cerrar sesión',
   ariaMoreMenu:          'Más opciones',
   menuLanguage:          '🌐 Opciones de idioma',
   placeholderSearchLanguage: 'Buscar idioma',
@@ -87,6 +86,10 @@ window.I18N_PARTS.es = {
 
   errGeneric:            '❌ Ocurrió un error: {msg}',
   confirmLogout:         '¿Seguro que deseas cerrar sesión?',
+  lockTitle:             'Bloquear',
+  confirmLock:           '¿Bloquear la app? Inicia sesión con Google para desbloquear.',
+  menuAccount:           '👤 Cuenta',
+  menuLogoutFull:        '🚪 Cerrar sesión y olvidar este dispositivo',
   errAuthExpired:        '❌ Tu sesión ha caducado — vuelve a iniciar sesión',
   errAuthDenied:         '❌ Esta cuenta no está autorizada para usar esta aplicación',
   errFileTooLarge:       '❌ El archivo supera los 5 MB',

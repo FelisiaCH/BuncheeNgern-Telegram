@@ -9,7 +9,6 @@ window.I18N_PARTS.tl = {
 
   footerCopy:            '© 2026 FelisiaCH — Inilabas sa ilalim ng MIT License',
 
-  logoutTitle:           'Mag-log Out',
   ariaMoreMenu:          'Karagdagang opsyon',
   menuLanguage:          '🌐 Mga Pagpipilian sa Wika',
   placeholderSearchLanguage: 'Maghanap ng wika',
@@ -87,6 +86,10 @@ window.I18N_PARTS.tl = {
 
   errGeneric:            '❌ Nagkaroon ng error: {msg}',
   confirmLogout:         'Sigurado ka bang gusto mong mag-log out?',
+  lockTitle:             'I-lock',
+  confirmLock:           'I-lock ang app? Mag-sign in gamit ang Google para i-unlock.',
+  menuAccount:           '👤 Account',
+  menuLogoutFull:        '🚪 Mag-sign out at kalimutan ang device na ito',
   errAuthExpired:        '❌ Nag-expire na ang iyong session — paki-log in muli',
   errAuthDenied:         '❌ Hindi pinapahintulutan ang account na ito na gumamit ng app na ito',
   errFileTooLarge:       '❌ Lumampas sa 5 MB ang file',

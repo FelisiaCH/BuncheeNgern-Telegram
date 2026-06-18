@@ -9,7 +9,6 @@ window.I18N_PARTS.ko = {
 
   footerCopy:            '© 2026 FelisiaCH — MIT 라이선스에 따라 배포됨',
 
-  logoutTitle:           '로그아웃',
   ariaMoreMenu:          '추가 옵션',
   menuLanguage:          '🌐 언어 옵션',
   placeholderSearchLanguage: '언어 검색',
@@ -87,6 +86,10 @@ window.I18N_PARTS.ko = {
 
   errGeneric:            '❌ 오류가 발생했습니다: {msg}',
   confirmLogout:         '로그아웃하시겠습니까?',
+  lockTitle:             '잠금',
+  confirmLock:           '앱을 잠그시겠습니까? 잠금 해제하려면 Google로 로그인하세요.',
+  menuAccount:           '👤 계정',
+  menuLogoutFull:        '🚪 로그아웃 및 이 기기 삭제',
   errAuthExpired:        '❌ 세션이 만료되었습니다 — 다시 로그인해 주세요',
   errAuthDenied:         '❌ 이 계정은 이 앱을 사용할 권한이 없습니다',
   errFileTooLarge:       '❌ 파일이 5MB를 초과합니다',

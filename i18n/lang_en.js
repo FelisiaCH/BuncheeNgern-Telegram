@@ -9,7 +9,6 @@ window.I18N_PARTS.en = {
 
   footerCopy:            '© 2026 FelisiaCH — Released under the MIT License',
 
-  logoutTitle:           'Log Out',
   ariaMoreMenu:          'More options',
   menuLanguage:          '🌐 Language Options',
   placeholderSearchLanguage: 'Search language',
@@ -87,6 +86,10 @@ window.I18N_PARTS.en = {
 
   errGeneric:            '❌ An error occurred: {msg}',
   confirmLogout:         'Are you sure you want to log out?',
+  lockTitle:             'Lock',
+  confirmLock:           'Lock the app? Sign in with Google to unlock.',
+  menuAccount:           '👤 Account',
+  menuLogoutFull:        '🚪 Sign out & forget this device',
   errAuthExpired:        '❌ Your session has expired — please sign in again',
   errAuthDenied:         '❌ This account is not authorized to use this app',
   errFileTooLarge:       '❌ File exceeds 5 MB',

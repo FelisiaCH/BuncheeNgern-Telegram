@@ -9,7 +9,6 @@ window.I18N_PARTS.vi = {
 
   footerCopy:            '© 2026 FelisiaCH — Phát hành theo Giấy phép MIT',
 
-  logoutTitle:           'Đăng xuất',
   ariaMoreMenu:          'Thêm tùy chọn',
   menuLanguage:          '🌐 Ngôn ngữ / Language',
   placeholderSearchLanguage: 'Tìm ngôn ngữ',
@@ -87,6 +86,10 @@ window.I18N_PARTS.vi = {
 
   errGeneric:            '❌ Đã xảy ra lỗi: {msg}',
   confirmLogout:         'Bạn có chắc muốn đăng xuất?',
+  lockTitle:             'Khóa',
+  confirmLock:           'Khóa ứng dụng? Đăng nhập bằng Google để mở khóa.',
+  menuAccount:           '👤 Tài khoản',
+  menuLogoutFull:        '🚪 Đăng xuất & quên thiết bị này',
   errAuthExpired:        '❌ Phiên đăng nhập của bạn đã hết hạn — vui lòng đăng nhập lại',
   errAuthDenied:         '❌ Tài khoản này không được phép sử dụng ứng dụng này',
   errFileTooLarge:       '❌ Tệp vượt quá 5 MB',

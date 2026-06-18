@@ -9,7 +9,6 @@ window.I18N_PARTS.th = {
 
   footerCopy:            '© 2026 FelisiaCH — เผยแพร่ภายใต้สัญญาอนุญาต MIT',
 
-  logoutTitle:           'ออกจากระบบ',
   ariaMoreMenu:          'เมนูเพิ่มเติม',
   menuLanguage:          '🌐 ภาษา / Language',
   placeholderSearchLanguage: 'ค้นหาภาษา',
@@ -87,6 +86,10 @@ window.I18N_PARTS.th = {
 
   errGeneric:            '❌ เกิดข้อผิดพลาด: {msg}',
   confirmLogout:         'ต้องการออกจากระบบหรือไม่?',
+  lockTitle:             'ล็อก',
+  confirmLock:           'ล็อกแอปหรือไม่? เข้าสู่ระบบด้วย Google เพื่อปลดล็อก',
+  menuAccount:           '👤 บัญชี',
+  menuLogoutFull:        '🚪 ออกจากระบบและลืมอุปกรณ์นี้',
   errAuthExpired:        '❌ เซสชันของคุณหมดอายุ — กรุณาเข้าสู่ระบบอีกครั้ง',
   errAuthDenied:         '❌ บัญชีนี้ไม่ได้รับอนุญาตให้ใช้แอปนี้',
   errFileTooLarge:       '❌ ไฟล์ใหญ่เกิน 5 MB',
