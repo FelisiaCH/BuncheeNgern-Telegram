@@ -348,7 +348,9 @@ option{background:#0E1526}
 
 /* 📑 Tab Layout & Headers */
 .tab-body{
-  padding:74px 16px 100px;max-width:480px;
+  /* bottom padding clears the fixed .bot-nav; add the safe-area inset so the
+     last rows (e.g. Manage Currencies) stay tappable above the nav on notch phones */
+  padding:74px 16px calc(100px + env(safe-area-inset-bottom));max-width:480px;
   margin:0 auto;width:100%
 }
 .tab-top{
@@ -631,7 +633,8 @@ option{background:#0E1526}
 
 /* 💱 Currency Picker */
 .cur-picker-list{
-  max-height:320px;overflow-y:auto;margin-top:8px;
+  /* viewport-relative cap so the list stays scrollable within view on short phones */
+  max-height:min(320px, 45vh);overflow-y:auto;margin-top:8px;
   border:1px solid var(--brd);border-radius:var(--r-sm)
 }
 .cur-region-hdr{
