@@ -1369,6 +1369,14 @@ function commitCurrencies(list) {
   localStorage.setItem(CURRENCIES_KEY, JSON.stringify(CURRENCIES));
   if (!CURRENCIES.length) activeCurTab = '';
   else if (!CURRENCIES.find(c => c.code === activeCurTab)) activeCurTab = CURRENCIES[0].code;
+  // Reconcile extra form lines pointing at a now-deleted currency: reset them to
+  // the first available code so the stored state matches the rebuilt dropdowns.
+  // Without this, the <select> silently falls back to the first option while
+  // A.fd.extraCur[i].currency keeps the deleted code, and submit sends the stale one.
+  const curFallback = CURRENCIES.length ? CURRENCIES[0].code : '';
+  A.fd.extraCur.forEach(line => {
+    if (!CURRENCIES.find(c => c.code === line.currency)) line.currency = curFallback;
+  });
   renderCurSelect();
   renderCurLines();
   renderManageCurrenciesList();
