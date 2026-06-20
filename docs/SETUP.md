@@ -57,10 +57,12 @@ There are **seven** placeholder values to fill in before the app works:
 
 ### What the backend exposes
 
-- `doGet`: `?action=getTodayData` (today's entries) and `?action=getDateData&date=DD-MM-YYYY` (entries for a specific day's sheet tab)
-- `doPost`: `{ action: 'submitEntry', ... }` — uploads the slip (if any) to Drive, appends rows to the day's sheet tab (Cash and Online Payment lines write one row each; a Split line writes **two rows** — one `Cash` and one `Online Payment` — all sharing one `Transaction ID`), and sends the Telegram notification
+- `doGet`: `?action=getTodayData` (today's entries) and `?action=getDateData&date=DD-MM-YYYY` (entries for a specific day's sheet tab). Each call carries the app **session token** (`?sessionToken=…`).
+- `doPost` accepts two actions:
+  - `{ action: 'authenticate', idToken, deviceId, deviceLabel, userAgent, ... }` — the **one-time sign-in step**: verifies the Google `id_token`, checks the allow-list, then mints (or, for a known device, reuses) a **session token** for that device and returns it (see [The `Sessions` tab](#the-sessions-tab)).
+  - `{ action: 'submitEntry', sessionToken, ... }` — uploads the slip (if any) to Drive, appends rows to the day's sheet tab (Cash and Online Payment lines write one row each; a Split line writes **two rows** — one `Cash` and one `Online Payment` — all sharing one `Transaction ID`), and sends the Telegram notification
 - Each day's sheet tab is created on first use with header row: `Timestamp, Staff Name, Item Name, Currency, Price, Type, Shop, Payment Method, Slip URL, Transaction ID`
-- **Both** of the above require a valid, allow-listed Google sign-in — see [Security](#security)
+- **The `doGet` reads and `submitEntry` both require a valid, non-expired session token** whose email is still allow-listed — see [Security](#security). Only `authenticate` accepts the Google `id_token`; every other request uses the session token instead.
 
 ### The `AllowedUsers` allow-list tab
 
@@ -75,6 +77,21 @@ Every request — reads and writes alike — is checked against a sheet tab name
 - **Email not in the sheet at all** — a new row is auto-appended with `Status = deny` and `Note = "Auto-logged on first access attempt"`, and the request is rejected.
 
 This means **the very first sign-in for every email — including your own, as the project owner — is automatically logged as `deny`.** After your first attempt, open the `AllowedUsers` tab and change your row's `Status` to `allow`. Repeat for every staff member's email the first time they try to sign in, or pre-populate the tab with known emails set to `allow` before rollout so nobody hits the denied screen.
+
+### The `Sessions` tab
+
+After a successful Google sign-in the backend mints its own **session token** and stores it in a sheet tab named **`Sessions`** — also **auto-created** on first use, never created or edited by hand. From then on the app sends this session token (not the Google token) with every request.
+
+| Token | Email | Name | DeviceId | DeviceLabel | UserAgent | Created | Expires |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `a1b2…` | `someone@example.com` | Jane | `f3c2-…` | Chrome on Android (RMX3301) | Mozilla/5.0 … | 17-06-2026 14:32:01 | 17-07-2026 14:32:01 |
+
+- **30-day rolling expiry:** every valid request pushes `Expires` 30 days into the future, so an active user effectively stays signed in; only ~30 days of true inactivity ends a session.
+- **Device-bound:** each device stores a random `DeviceId`. Signing in again on the **same device reuses that device's row** (no duplicate rows); a **different device** for the same email gets **its own row**. `DeviceLabel` is a best-effort parse (browser + OS + model when detectable, e.g. "Chrome on Android (RMX3301)") and `UserAgent` is the full string — both are for your visibility only.
+- **You never edit this tab by hand**, but you **can delete rows to force a sign-out:** delete one device's row to sign that device out, or delete all of a user's rows to sign them out everywhere. The next request from a deleted session is rejected and the user signs in with Google again.
+- Expired rows are pruned automatically whenever a new session is created.
+
+> **Upgrading an existing instance?** The `Sessions` tab schema grew from 5 columns to the 8 above. If you deployed an earlier version that created a 5-column `Sessions` tab, **delete that tab** so it's recreated with the new 8-column header (old session rows are discarded; everyone simply signs in once more). Also remember to **ship a new Apps Script deployment version** after any `Code.gs` change (see the note in §1), and note that on first run with the new backend every user signs in with Google once to mint their first session token.
 
 ---
 
@@ -108,6 +125,8 @@ This is required for the sign-in button to appear at all.
 > If the sign-in button shows but clicking it does nothing, open the browser console — `origin is not allowed for the given client ID` means the origin in step 3 doesn't exactly match the URL the page is served from (including the scheme).
 
 If `GOOGLE_CLIENT_ID` is still left as the placeholder, or the Google Identity Services script fails to load, the login screen shows an inline hint explaining what's wrong instead of leaving an empty space. Signing in successfully is only half the story now — the backend still has to verify the token and find the email allow-listed in `AllowedUsers` (§1) before any data loads or saves.
+
+Note that Google sign-in now happens **once**: it mints an app session token that keeps the user signed in on that device for ~30 days of rolling activity (see [The `Sessions` tab](#the-sessions-tab)). After that, the Google button appears again only to **unlock** a locked session or after ~30 days of inactivity — the Google `id_token` itself is no longer sent on every request.
 
 ---
 
@@ -168,9 +187,11 @@ See [docs/USAGE.md](USAGE.md) for the full day-to-day usage guide (logging entri
 
 Every API call — both reading the dashboard and saving an entry — is gated server-side before any other code runs:
 
-- **Token verification:** the frontend sends the user's Google `id_token` with every request (as a query param on `doGet`, in the JSON body on `doPost`). The backend calls Google's `tokeninfo` endpoint directly, rejects the request if the call doesn't return 200, rejects if the token's `aud` doesn't match the backend's own `GOOGLE_CLIENT_ID`, and rejects if the email isn't marked verified by Google.
-- **Allow-list:** the verified email is then checked against the `AllowedUsers` sheet tab (see §1) — only `Status = allow` proceeds; `deny` or an unknown email is rejected (unknown emails are auto-logged as `deny` for the owner to review).
-- **Verified identity, not client-supplied:** once a request passes both checks, the backend overwrites the submitted entry's author fields (`staffName`, `userEmail`) with the name and email from the verified token — a client can't spoof who an entry is attributed to.
+- **One-time Google verification:** the Google `id_token` is sent **only** to the `authenticate` action. The backend calls Google's `tokeninfo` endpoint directly, and rejects the sign-in unless the call returns 200, the token's `aud` matches the backend's own `GOOGLE_CLIENT_ID`, and the email is marked verified by Google.
+- **App-minted session tokens:** on a successful `authenticate`, the backend generates its own random session token, stores it in the `Sessions` tab (see §1) with a 30-day rolling expiry, and returns it. **Every other request** — all `doGet` reads and `submitEntry` — carries this **session token** (query param on `doGet`, JSON body on `doPost`), which the backend validates against the `Sessions` tab (the row must exist and not be expired). The short-lived Google token is never sent again.
+- **Allow-list re-checked every call:** the email — from the verified Google token at `authenticate`, and from the session row on every request afterward — is checked against the `AllowedUsers` sheet tab (see §1) on **every** request. Only `Status = allow` proceeds; `deny` or an unknown email is rejected (unknown emails are auto-logged as `deny` for the owner to review). Flipping a user to `deny` therefore revokes access immediately, even mid-session.
+- **Device-bound, with an ownership check on reuse:** each session is tied to the device that created it (`DeviceId`). When a stored session is **unlocked** (the user signs in with Google again while the token is still saved on the device), the backend reuses that stored token **only if the Google-verified email matches the email on the token's row** — so a session token stolen from one account can't be unlocked or reused under a different Google identity.
+- **Verified identity, not client-supplied:** the recorded author fields (`staffName`, `userEmail`) come from the verified session row (or the Google token at sign-in), never from client input — a client can't spoof who an entry is attributed to.
 - **Slip uploads:** the server independently re-validates every uploaded slip — rejects any MIME type outside `image/jpeg`, `image/png`, `image/webp`, `image/gif`, and rejects anything over 5 MB — regardless of what the browser already enforced.
 - **Slip links:** the dashboard only renders a slip link if its URL starts with `https://`; anything else (e.g. a `javascript:` URL from a manually edited sheet cell) is silently dropped.
 - **Input clamping:** free-text fields (`itemName`, `staffName`, `shop`) are truncated to 200 characters and the entry `type`/currency code are coerced to expected shapes before being written, so a direct API call can't write arbitrarily large or malformed rows.

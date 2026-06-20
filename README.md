@@ -8,14 +8,14 @@ Buncheengern is a zero-dependency, single-file PWA for tracking income and expen
 - Multi-currency per transaction — add several currency/amount lines to a single entry (e.g. pay partly in LAK, partly in THB); all lines share one Transaction ID
 - User-configurable currencies — a searchable, region-grouped picker (~85 world currencies plus popular crypto): search by code, name, or country and tap to add; only the code and symbol are stored, the list starts empty
 - Split payment per line — each currency line can be Cash, Online Payment, or Split (partly Cash + partly Online); a Split line writes two sheet rows sharing the same Transaction ID so the dashboard counts Cash Income and Online Payment Income correctly
-- Real Google sign-in authentication — every request is verified server-side against a Google Sheet allow-list (allow/deny per email); unknown emails are auto-logged for review
+- Real server-verified sign-in — a one-time Google sign-in mints a device-bound, 30-day rolling session; every request is re-checked against a Google Sheet allow-list (allow/deny per email), and unknown emails are auto-logged for review
 - Telegram notifications to a private chat, a group, or both at once
 - 18 languages with a searchable language picker and automatic device-language detection on first launch (falls back to English)
 - Installable PWA with offline app-shell support
 
 ## Security
 
-Sign-in is enforced server-side, not just in the browser: every API call carries the user's Google `id_token`, which the backend verifies directly with Google and checks against a Google Sheet allow-list before any data is read or written. The verified email and name — not whatever the client claims — become the recorded author, so entries can't be misattributed. Slip uploads and free-text input are also re-validated server-side, independent of what the browser already enforced.
+Sign-in is enforced server-side, not just in the browser. Google verifies your identity **once**; the backend then mints its own **device-bound session token** (stored in a `Sessions` sheet tab) with a **30-day rolling expiry**, and every later request carries that session token instead of the Google token. Each request re-checks the token's email against a Google Sheet allow-list — so revoking someone takes effect immediately, even mid-session — and the recorded author's email and name come from the verified session, not whatever the client claims, so entries can't be misattributed. Slip uploads and free-text input are also re-validated server-side, independent of what the browser already enforced.
 
 See [docs/SETUP.md#security](docs/SETUP.md#security) for the full breakdown.
 
@@ -25,7 +25,7 @@ See [docs/SETUP.md#security](docs/SETUP.md#security) for the full breakdown.
 | --- | --- |
 | Frontend | Single-file HTML/CSS/JS PWA, 18-language i18n (`i18n/lang_*.js`), installable via `service-worker.js` |
 | Backend | Google Apps Script (`doGet`/`doPost` Web App), scopes declared in `appsscript.json` |
-| Auth | Google `id_token` verified server-side via Google's `tokeninfo` endpoint + a Google Sheet allow-list (`AllowedUsers` tab) — see [Security](docs/SETUP.md#security) |
+| Auth | One-time Google `id_token` verification (`tokeninfo`, `aud`, `email_verified`) → app-minted device-bound session token (30-day rolling, `Sessions` tab); allow-list (`AllowedUsers` tab) re-checked every request — see [Security](docs/SETUP.md#security) |
 | Storage | Google Sheets (one tab per day) + Google Drive (slip images) |
 | Notifications | Telegram Bot API, sent server-side to one or more chats, HTML-escaped |
 

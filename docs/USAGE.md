@@ -10,7 +10,14 @@ You sign in with your Google account. That's only the first step — every sign-
 
 If you sign in and see a message saying your account isn't authorized, that's expected the first time: your admin needs to add your email to the allow-list (or flip it from "deny" to "allow") before you can use the app. Let them know which Google account you signed in with, and try again once they've confirmed it's been added.
 
-If you're ever signed out unexpectedly with a "session expired" message, just sign in again — Google sessions expire periodically and this is normal.
+After you sign in once, you stay signed in **on that device** — you won't be asked to sign in every time. A session lasts about a month, and every time you use the app the clock resets, so in practice you rarely have to sign in again. The same Google account can be signed in on several devices at once, each staying signed in independently.
+
+There are two ways to sign out, both in the app:
+
+- **Lock** — the lock button in the top-right corner quickly locks the app without forgetting you. To get back in, sign in with Google again; because your device still remembers the session, it unlocks right away (the app just re-confirms it's really you).
+- **Sign out & forget this device** — under **Settings ▸ Account**. This fully signs you out and clears the saved session from this device. Use it on a shared or borrowed device so the next person can't get back into your account.
+
+If you ever do see a "session expired" message — for example after about a month of not using the app, or if your admin removed your session — just sign in with Google again.
 
 ---
 
