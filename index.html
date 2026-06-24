@@ -822,7 +822,7 @@ option{background:#0E1526}
       <label class="fl" data-i18n="labelItemName">ชื่อรายการ</label>
       <div class="combo-wrap">
         <input type="text" id="f-item" class="fi combo-input" placeholder="ระบุหรือเลือกชื่อรายการ" autocomplete="off"
-               data-i18n-placeholder="placeholderItemName">
+               oninput="onItemInput()" data-i18n-placeholder="placeholderItemName">
         <button type="button" class="combo-toggle" id="combo-btn" onclick="toggleCombo()" tabindex="-1" aria-label="เลือกรายการ" data-i18n-aria="ariaSelectItem">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg>
         </button>
@@ -1236,6 +1236,7 @@ function applyTranslations() {
   renderManageBranchesList();
   renderManageCurrenciesList();
   renderCurrencyPicker($('cur-picker-search')?.value || '');
+  renderComboOptions($('f-item')?.value || '');
 
   if (!$('scr-app').classList.contains('hidden')) {
     $('f-date-lbl').textContent = fmtDateTab(new Date());
@@ -1243,12 +1244,21 @@ function applyTranslations() {
   }
 }
 
-// 🧾 Item Picker & Combo Dropdown
-const ITEM_OPTIONS = ['Service','Charger Port','Charger Kit','Charging Cable','Screen Protector','Battery','Headphones','Power Adapter'];
-
-function initCombo() {
+// 🧾 Item Picker & Combo Dropdown — localized general suggestions + live filter.
+// Free-text helper only: any typed value (even one not in the list) is submittable.
+function itemSuggestionList() {
+  const v = t('itemSuggestions');
+  return Array.isArray(v) ? v : [];
+}
+// Build the dropdown showing only suggestions matching `query` (empty → all).
+// Returns the match count so callers can decide whether to show/hide the list.
+function renderComboOptions(query) {
   const drop = $('combo-drop');
-  ITEM_OPTIONS.forEach(opt => {
+  if (!drop) return 0;
+  const q = String(query || '').trim().toLowerCase();
+  const opts = itemSuggestionList().filter(o => !q || String(o).toLowerCase().includes(q));
+  drop.innerHTML = '';
+  opts.forEach(opt => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'combo-opt';
@@ -1256,14 +1266,29 @@ function initCombo() {
     btn.addEventListener('mousedown', e => { e.preventDefault(); pickCombo(opt); });
     drop.appendChild(btn);
   });
+  return opts.length;
+}
+function initCombo() {
+  renderComboOptions('');
   document.addEventListener('click', e => {
     if (!e.target?.closest('.combo-wrap')) closeCombo();
   });
+}
+// Typing filters the suggestions live: keep the dropdown open while there are
+// matches, hide it when nothing matches (the custom text stays submittable).
+function onItemInput() {
+  if (renderComboOptions($('f-item').value) > 0) {
+    $('combo-drop').classList.remove('hidden');
+    $('combo-btn').classList.add('open');
+  } else {
+    closeCombo();
+  }
 }
 function toggleCombo() {
   const drop = $('combo-drop');
   const isOpen = !drop.classList.contains('hidden');
   if (isOpen) { closeCombo(); } else {
+    renderComboOptions('');           // chevron opens the full list
     drop.classList.remove('hidden');
     $('combo-btn').classList.add('open');
     $('f-item').focus();

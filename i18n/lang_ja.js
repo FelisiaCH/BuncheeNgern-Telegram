@@ -112,4 +112,5 @@ window.I18N_PARTS.ja = {
   actionQRIncome:        '↑ オンライン',
   actionExpense:         '↓ 支出',
   slipLink:              '🔗 証明書',
+  itemSuggestions:      ['商品', 'サービス', '飲食', '備品', '設備', '家賃', '光熱費', '給与', '交通費', 'メンテナンス', '手数料', 'その他'],
 };

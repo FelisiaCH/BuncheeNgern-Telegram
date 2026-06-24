@@ -112,4 +112,5 @@ window.I18N_PARTS.id = {
   actionQRIncome:        '↑ Online',
   actionExpense:         '↓ Pengeluaran',
   slipLink:              '🔗 Bukti Transfer',
+  itemSuggestions:      ['Produk', 'Jasa', 'Makanan & Minuman', 'Perlengkapan', 'Peralatan', 'Sewa', 'Utilitas', 'Gaji', 'Transportasi', 'Perawatan', 'Biaya', 'Lainnya'],
 };

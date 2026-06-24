@@ -112,4 +112,5 @@ window.I18N_PARTS.pt = {
   actionQRIncome:        '↑ Online',
   actionExpense:         '↓ Despesa',
   slipLink:              '🔗 Comprovante',
+  itemSuggestions:      ['Produto', 'Serviço', 'Comida e bebida', 'Suprimentos', 'Equipamento', 'Aluguer', 'Utilidades', 'Salário', 'Transporte', 'Manutenção', 'Taxas', 'Outro'],
 };

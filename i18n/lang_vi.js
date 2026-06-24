@@ -112,4 +112,5 @@ window.I18N_PARTS.vi = {
   actionQRIncome:        '↑ Thu trực tuyến',
   actionExpense:         '↓ Chi',
   slipLink:              '🔗 Phiếu',
+  itemSuggestions:      ['Sản phẩm', 'Dịch vụ', 'Đồ ăn & thức uống', 'Vật tư', 'Thiết bị', 'Tiền thuê', 'Điện nước', 'Lương', 'Vận chuyển', 'Bảo trì', 'Phí', 'Khác'],
 };

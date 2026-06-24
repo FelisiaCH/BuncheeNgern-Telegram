@@ -112,4 +112,5 @@ window.I18N_PARTS.es = {
   actionQRIncome:        '↑ En línea',
   actionExpense:         '↓ Gasto',
   slipLink:              '🔗 Comprobante',
+  itemSuggestions:      ['Producto', 'Servicio', 'Comida y bebida', 'Suministros', 'Equipo', 'Alquiler', 'Servicios públicos', 'Salario', 'Transporte', 'Mantenimiento', 'Comisiones', 'Otro'],
 };

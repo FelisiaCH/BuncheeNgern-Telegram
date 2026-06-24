@@ -112,4 +112,5 @@ window.I18N_PARTS.fr = {
   actionQRIncome:        '↑ En ligne',
   actionExpense:         '↓ Dépense',
   slipLink:              '🔗 Reçu',
+  itemSuggestions:      ['Produit', 'Service', 'Nourriture et boissons', 'Fournitures', 'Équipement', 'Loyer', 'Charges', 'Salaire', 'Transport', 'Entretien', 'Frais', 'Autre'],
 };

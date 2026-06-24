@@ -112,4 +112,5 @@ window.I18N_PARTS.ko = {
   actionQRIncome:        '↑ 온라인',
   actionExpense:         '↓ 지출',
   slipLink:              '🔗 영수증',
+  itemSuggestions:      ['상품', '서비스', '식음료', '소모품', '장비', '임대료', '공과금', '급여', '교통', '유지보수', '수수료', '기타'],
 };

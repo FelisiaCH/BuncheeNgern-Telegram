@@ -112,4 +112,5 @@ window.I18N_PARTS.en = {
   actionQRIncome:        '↑ Online',
   actionExpense:         '↓ Expense',
   slipLink:              '🔗 Slip',
+  itemSuggestions:      ['Product', 'Service', 'Food & Drink', 'Supplies', 'Equipment', 'Rent', 'Utilities', 'Salary', 'Transport', 'Maintenance', 'Fees', 'Other'],
 };

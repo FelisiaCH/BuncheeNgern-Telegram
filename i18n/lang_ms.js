@@ -112,4 +112,5 @@ window.I18N_PARTS.ms = {
   actionQRIncome:        '↑ Dalam Talian',
   actionExpense:         '↓ Perbelanjaan',
   slipLink:              '🔗 Resit',
+  itemSuggestions:      ['Produk', 'Perkhidmatan', 'Makanan & Minuman', 'Bekalan', 'Peralatan', 'Sewa', 'Utiliti', 'Gaji', 'Pengangkutan', 'Penyelenggaraan', 'Yuran', 'Lain-lain'],
 };

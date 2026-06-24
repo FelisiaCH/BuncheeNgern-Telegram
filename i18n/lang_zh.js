@@ -112,4 +112,5 @@ window.I18N_PARTS.zh = {
   actionQRIncome:        '↑ 线上支付',
   actionExpense:         '↓ 支出',
   slipLink:              '🔗 凭证',
+  itemSuggestions:      ['商品', '服务', '餐饮', '用品', '设备', '租金', '水电费', '工资', '交通', '维护', '费用', '其他'],
 };

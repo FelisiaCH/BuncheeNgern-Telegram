@@ -112,4 +112,5 @@ window.I18N_PARTS.de = {
   actionQRIncome:        '↑ Online',
   actionExpense:         '↓ Ausgabe',
   slipLink:              '🔗 Beleg',
+  itemSuggestions:      ['Produkt', 'Dienstleistung', 'Essen & Trinken', 'Material', 'Ausrüstung', 'Miete', 'Nebenkosten', 'Gehalt', 'Transport', 'Wartung', 'Gebühren', 'Sonstiges'],
 };
