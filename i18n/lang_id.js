@@ -113,4 +113,7 @@ window.I18N_PARTS.id = {
   actionExpense:         '↓ Pengeluaran',
   slipLink:              '🔗 Bukti Transfer',
   itemSuggestions:      ['Produk', 'Jasa', 'Makanan & Minuman', 'Perlengkapan', 'Peralatan', 'Sewa', 'Utilitas', 'Gaji', 'Transportasi', 'Perawatan', 'Biaya', 'Lainnya'],
+  pickerItemTitle:               'Pilih item',
+  placeholderSearchItem:               'Cari item',
+  ariaClose:               'Tutup',
 };

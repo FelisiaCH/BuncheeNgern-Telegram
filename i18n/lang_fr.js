@@ -113,4 +113,7 @@ window.I18N_PARTS.fr = {
   actionExpense:         '↓ Dépense',
   slipLink:              '🔗 Reçu',
   itemSuggestions:      ['Produit', 'Service', 'Nourriture et boissons', 'Fournitures', 'Équipement', 'Loyer', 'Charges', 'Salaire', 'Transport', 'Entretien', 'Frais', 'Autre'],
+  pickerItemTitle:               'Choisir un article',
+  placeholderSearchItem:               'Rechercher un article',
+  ariaClose:               'Fermer',
 };

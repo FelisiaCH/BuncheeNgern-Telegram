@@ -113,4 +113,7 @@ window.I18N_PARTS.de = {
   actionExpense:         '↓ Ausgabe',
   slipLink:              '🔗 Beleg',
   itemSuggestions:      ['Produkt', 'Dienstleistung', 'Essen & Trinken', 'Material', 'Ausrüstung', 'Miete', 'Nebenkosten', 'Gehalt', 'Transport', 'Wartung', 'Gebühren', 'Sonstiges'],
+  pickerItemTitle:               'Artikel auswählen',
+  placeholderSearchItem:               'Artikel suchen',
+  ariaClose:               'Schließen',
 };

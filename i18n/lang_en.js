@@ -113,4 +113,7 @@ window.I18N_PARTS.en = {
   actionExpense:         '↓ Expense',
   slipLink:              '🔗 Slip',
   itemSuggestions:      ['Product', 'Service', 'Food & Drink', 'Supplies', 'Equipment', 'Rent', 'Utilities', 'Salary', 'Transport', 'Maintenance', 'Fees', 'Other'],
+  pickerItemTitle:               'Select item',
+  placeholderSearchItem:               'Search item',
+  ariaClose:               'Close',
 };

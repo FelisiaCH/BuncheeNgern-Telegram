@@ -113,4 +113,7 @@ window.I18N_PARTS.hi = {
   actionExpense:         '↓ व्यय',
   slipLink:              '🔗 पर्ची',
   itemSuggestions:      ['उत्पाद', 'सेवा', 'खाना और पेय', 'सामग्री', 'उपकरण', 'किराया', 'बिजली-पानी', 'वेतन', 'परिवहन', 'रखरखाव', 'शुल्क', 'अन्य'],
+  pickerItemTitle:               'आइटम चुनें',
+  placeholderSearchItem:               'आइटम खोजें',
+  ariaClose:               'बंद करें',
 };

@@ -113,4 +113,7 @@ window.I18N_PARTS.zh = {
   actionExpense:         '↓ 支出',
   slipLink:              '🔗 凭证',
   itemSuggestions:      ['商品', '服务', '餐饮', '用品', '设备', '租金', '水电费', '工资', '交通', '维护', '费用', '其他'],
+  pickerItemTitle:               '选择项目',
+  placeholderSearchItem:               '搜索项目',
+  ariaClose:               '关闭',
 };

@@ -113,4 +113,7 @@ window.I18N_PARTS.bn = {
   actionExpense:         '↓ ব্যয়',
   slipLink:              '🔗 রসিদ',
   itemSuggestions:      ['পণ্য', 'সেবা', 'খাবার ও পানীয়', 'সরবরাহ', 'সরঞ্জাম', 'ভাড়া', 'বিদ্যুৎ-পানি', 'বেতন', 'পরিবহন', 'রক্ষণাবেক্ষণ', 'ফি', 'অন্যান্য'],
+  pickerItemTitle:               'আইটেম নির্বাচন করুন',
+  placeholderSearchItem:               'আইটেম খুঁজুন',
+  ariaClose:               'বন্ধ করুন',
 };

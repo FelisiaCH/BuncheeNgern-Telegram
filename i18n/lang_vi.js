@@ -113,4 +113,7 @@ window.I18N_PARTS.vi = {
   actionExpense:         '↓ Chi',
   slipLink:              '🔗 Phiếu',
   itemSuggestions:      ['Sản phẩm', 'Dịch vụ', 'Đồ ăn & thức uống', 'Vật tư', 'Thiết bị', 'Tiền thuê', 'Điện nước', 'Lương', 'Vận chuyển', 'Bảo trì', 'Phí', 'Khác'],
+  pickerItemTitle:               'Chọn mục',
+  placeholderSearchItem:               'Tìm mục',
+  ariaClose:               'Đóng',
 };

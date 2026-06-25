@@ -113,4 +113,7 @@ window.I18N_PARTS.tl = {
   actionExpense:         '↓ Gastos',
   slipLink:              '🔗 Resibo',
   itemSuggestions:      ['Produkto', 'Serbisyo', 'Pagkain at Inumin', 'Gamit', 'Kagamitan', 'Upa', 'Kuryente at Tubig', 'Sahod', 'Transportasyon', 'Pagpapanatili', 'Mga Bayarin', 'Iba pa'],
+  pickerItemTitle:               'Pumili ng item',
+  placeholderSearchItem:               'Maghanap ng item',
+  ariaClose:               'Isara',
 };

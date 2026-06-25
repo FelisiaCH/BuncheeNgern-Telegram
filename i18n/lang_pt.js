@@ -113,4 +113,7 @@ window.I18N_PARTS.pt = {
   actionExpense:         '↓ Despesa',
   slipLink:              '🔗 Comprovante',
   itemSuggestions:      ['Produto', 'Serviço', 'Comida e bebida', 'Suprimentos', 'Equipamento', 'Aluguer', 'Utilidades', 'Salário', 'Transporte', 'Manutenção', 'Taxas', 'Outro'],
+  pickerItemTitle:               'Selecionar item',
+  placeholderSearchItem:               'Buscar item',
+  ariaClose:               'Fechar',
 };

@@ -113,4 +113,7 @@ window.I18N_PARTS.ms = {
   actionExpense:         '↓ Perbelanjaan',
   slipLink:              '🔗 Resit',
   itemSuggestions:      ['Produk', 'Perkhidmatan', 'Makanan & Minuman', 'Bekalan', 'Peralatan', 'Sewa', 'Utiliti', 'Gaji', 'Pengangkutan', 'Penyelenggaraan', 'Yuran', 'Lain-lain'],
+  pickerItemTitle:               'Pilih item',
+  placeholderSearchItem:               'Cari item',
+  ariaClose:               'Tutup',
 };
