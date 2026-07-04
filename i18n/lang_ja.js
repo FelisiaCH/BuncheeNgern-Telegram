@@ -117,4 +117,5 @@ window.I18N_PARTS.ja = {
   placeholderSearchItem:               '項目を検索',
   ariaClose:               '閉じる',
   cameraBtn:             'Take Photo',
+  ariaPriceSuggest:      'Price suggestions',
 };

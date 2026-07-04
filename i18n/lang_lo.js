@@ -117,4 +117,5 @@ window.I18N_PARTS.lo = {
   placeholderSearchItem:               'ຊອກຫາລາຍການ',
   ariaClose:               'ປິດ',
   cameraBtn:             'ຖ່າຍຮູບ',
+  ariaPriceSuggest:      'ລາຄາແນະນຳ',
 };

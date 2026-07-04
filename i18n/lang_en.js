@@ -117,4 +117,5 @@ window.I18N_PARTS.en = {
   placeholderSearchItem:               'Search item',
   ariaClose:               'Close',
   cameraBtn:             'Take Photo',
+  ariaPriceSuggest:      'Price suggestions',
 };

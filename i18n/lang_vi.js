@@ -117,4 +117,5 @@ window.I18N_PARTS.vi = {
   placeholderSearchItem:               'Tìm mục',
   ariaClose:               'Đóng',
   cameraBtn:             'Take Photo',
+  ariaPriceSuggest:      'Price suggestions',
 };

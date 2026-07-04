@@ -117,4 +117,5 @@ window.I18N_PARTS.th = {
   placeholderSearchItem:               'ค้นหารายการ',
   ariaClose:               'ปิด',
   cameraBtn:             'ถ่ายรูป',
+  ariaPriceSuggest:      'ราคาแนะนำ',
 };

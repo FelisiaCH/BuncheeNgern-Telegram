@@ -117,4 +117,5 @@ window.I18N_PARTS.tl = {
   placeholderSearchItem:               'Maghanap ng item',
   ariaClose:               'Isara',
   cameraBtn:             'Take Photo',
+  ariaPriceSuggest:      'Price suggestions',
 };

@@ -117,4 +117,5 @@ window.I18N_PARTS.my = {
   placeholderSearchItem:               'ပစ္စည်းရှာရန်',
   ariaClose:               'ပိတ်ပါ',
   cameraBtn:             'Take Photo',
+  ariaPriceSuggest:      'Price suggestions',
 };

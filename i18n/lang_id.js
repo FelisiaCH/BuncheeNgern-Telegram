@@ -117,4 +117,5 @@ window.I18N_PARTS.id = {
   placeholderSearchItem:               'Cari item',
   ariaClose:               'Tutup',
   cameraBtn:             'Take Photo',
+  ariaPriceSuggest:      'Price suggestions',
 };

@@ -117,4 +117,5 @@ window.I18N_PARTS.bn = {
   placeholderSearchItem:               'আইটেম খুঁজুন',
   ariaClose:               'বন্ধ করুন',
   cameraBtn:             'Take Photo',
+  ariaPriceSuggest:      'Price suggestions',
 };
