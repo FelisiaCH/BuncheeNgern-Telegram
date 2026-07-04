@@ -55,7 +55,6 @@ window.I18N_PARTS.fr = {
   labelSplitCash:        'Montant en espèces',
   labelSplitOnline:      'Montant en ligne',
   warnSplitRequired:     '⚠️ Entrez les montants en espèces et en ligne pour le paiement partagé',
-  warnSplitMustEqualTotal: '⚠️ Espèces + En ligne doit être égal au total de la ligne',
   labelAttachSlip:       'Joindre le reçu',
   uploadZoneText:        'Touchez pour sélectionner l\'image du reçu',
   uploadZoneHint:        'PNG / JPG — jusqu\'à 5 Mo',
@@ -118,4 +117,6 @@ window.I18N_PARTS.fr = {
   ariaClose:               'Fermer',
   cameraBtn:             'Take Photo',
   ariaPriceSuggest:      'Price suggestions',
+  splitAddCurrency:      '＋ Add currency',
+  warnSplitNeedOne:      '⚠️ Turn on at least one split amount',
 };

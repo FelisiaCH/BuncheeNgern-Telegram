@@ -55,7 +55,6 @@ window.I18N_PARTS.de = {
   labelSplitCash:        'Bargeldbetrag',
   labelSplitOnline:      'Online-Betrag',
   warnSplitRequired:     '⚠️ Geben Sie sowohl den Bargeld- als auch den Online-Betrag für die geteilte Zahlung ein',
-  warnSplitMustEqualTotal: '⚠️ Bargeld + Online muss dem Gesamtbetrag der Zeile entsprechen',
   labelAttachSlip:       'Beleg anhängen',
   uploadZoneText:        'Tippen, um Belegbild auszuwählen',
   uploadZoneHint:        'PNG / JPG — bis zu 5 MB',
@@ -118,4 +117,6 @@ window.I18N_PARTS.de = {
   ariaClose:               'Schließen',
   cameraBtn:             'Take Photo',
   ariaPriceSuggest:      'Price suggestions',
+  splitAddCurrency:      '＋ Add currency',
+  warnSplitNeedOne:      '⚠️ Turn on at least one split amount',
 };

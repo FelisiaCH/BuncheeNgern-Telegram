@@ -55,7 +55,6 @@ window.I18N_PARTS.tl = {
   labelSplitCash:        'Halaga ng Cash',
   labelSplitOnline:      'Halaga ng Online',
   warnSplitRequired:     '⚠️ Ilagay ang halaga ng Cash at Online para sa hating bayad',
-  warnSplitMustEqualTotal: '⚠️ Ang Cash + Online ay dapat kapareho ng kabuuang halaga ng linya',
   labelAttachSlip:       'Maglagay ng Resibo',
   uploadZoneText:        'I-tap para pumili ng larawan ng resibo',
   uploadZoneHint:        'PNG / JPG — hanggang 5 MB',
@@ -118,4 +117,6 @@ window.I18N_PARTS.tl = {
   ariaClose:               'Isara',
   cameraBtn:             'Take Photo',
   ariaPriceSuggest:      'Price suggestions',
+  splitAddCurrency:      '＋ Add currency',
+  warnSplitNeedOne:      '⚠️ Turn on at least one split amount',
 };

@@ -310,6 +310,24 @@ option{background:#0E1526}
 .price-chip:hover{background:rgba(129,140,248,.16)}
 .price-chip:active{transform:scale(.96)}
 
+/* ✂️ Split builder — per-currency groups of Cash/Online toggle chips */
+.pg.split-on .prc-in{display:none}
+.pg.split-on .cur-sel{flex:1;border-right:none}
+.split-cur-grp{
+  background:var(--bg-card);border:1px solid var(--brd);
+  border-radius:var(--r-sm);padding:10px;margin-bottom:8px
+}
+.split-cur-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.split-cur-code{font-size:13px;font-weight:800;color:var(--teal);letter-spacing:.3px;white-space:nowrap}
+.split-cur-sub{
+  flex:1;min-width:0;text-align:right;font-size:12.5px;font-weight:700;
+  color:var(--txt-sub);font-variant-numeric:tabular-nums;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.split-part-row{margin-top:6px}
+.split-add-btn{width:100%;padding:11px}
+.split-add-sel{margin-top:2px}
+
 /* 📎 Slip Upload Zone */
 .upload-zone{
   border:2px dashed rgba(46,232,180,.2);border-radius:var(--r-sm);
@@ -887,7 +905,7 @@ option{background:#0E1526}
 
     <div class="fg">
       <label class="fl" data-i18n="labelAmount">จำนวนเงิน</label>
-      <div class="pg">
+      <div class="pg" id="f-price-row">
         <select id="f-cur" class="cur-sel" aria-label="สกุลเงิน" data-i18n-aria="ariaCurrency"></select>
         <input type="text" id="f-price" class="prc-in amt-fmt" placeholder="0" inputmode="decimal" oninput="renderPriceSuggest()">
       </div>
@@ -897,16 +915,7 @@ option{background:#0E1526}
         <button class="seg qr" onclick="setPrimaryPay('Online',this)">📱 <span data-i18n="payQR">Online Payment</span></button>
         <button class="seg split" onclick="setPrimaryPay('Split',this)">✂️ <span data-i18n="paySplit">แบ่งจ่าย</span></button>
       </div>
-      <div id="split-grp-0" class="hidden" style="margin-top:8px">
-        <div class="pg" style="margin-bottom:6px">
-          <span class="cur-sel" style="pointer-events:none;color:var(--amber)">💵</span>
-          <input type="text" id="split-cash-0" class="prc-in amt-fmt" data-i18n-placeholder="labelSplitCash" placeholder="Cash amount" inputmode="decimal" oninput="A.fd.splitCash=this.value">
-        </div>
-        <div class="pg">
-          <span class="cur-sel" style="pointer-events:none;color:var(--teal)">📱</span>
-          <input type="text" id="split-online-0" class="prc-in amt-fmt" data-i18n-placeholder="labelSplitOnline" placeholder="Online amount" inputmode="decimal" oninput="A.fd.splitOnline=this.value">
-        </div>
-      </div>
+      <div id="split-grp-0" class="hidden" style="margin-top:8px"></div>
       <div id="cur-lines"></div>
       <button type="button" class="btn-ghost cur-add-btn" onclick="addCurLine()">
         <span data-i18n="btnAddCurrency">+ เพิ่มสกุลเงิน</span>
@@ -1191,7 +1200,7 @@ const A = {
   me:          null,
   userEmail:   '',
   sessionToken: null,
-  fd: { type:'income', shop: BRANCHES[0], pay:'Cash', splitCash:'', splitOnline:'', extraCur: [] },
+  fd: { type:'income', shop: BRANCHES[0], pay:'Cash', splitBuckets: [], extraCur: [] },
   slip:      null,
 };
 let dashByBranchCur  = {};
@@ -1342,6 +1351,8 @@ function applyTranslations() {
   renderManageCurrenciesList();
   renderCurrencyPicker($('cur-picker-search')?.value || '');
   renderComboOptions($('f-item')?.value || '');
+  renderCurLines();   // extra lines (incl. their split builders) carry baked labels
+  if (A.fd.pay === 'Split') renderSplitBuilder($('split-grp-0'), A.fd);
 
   if (!$('scr-app').classList.contains('hidden')) {
     $('f-date-lbl').textContent = fmtDateTab(new Date());
@@ -2014,11 +2025,136 @@ function setSeg(key, val, btn) {
   }
 }
 
+// ✂️ Split builder — a Split line is a set of toggle buckets, each with its own
+// source (Cash/Online) AND currency. The line total derives from the ON parts,
+// so no separate full total is entered. Buckets are a frontend authoring model;
+// doSubmit flattens them to the parts payload the backend expects.
+function seedSplitBuckets(line, cur) {
+  if (Array.isArray(line.splitBuckets) && line.splitBuckets.length) return;
+  line.splitBuckets = [
+    { currency: cur, source: 'Cash',   on: true,  amount: '' },
+    { currency: cur, source: 'Online', on: false, amount: '' },
+  ];
+}
+function renderSplitBuilder(wrap, line) {
+  if (!wrap) return;
+  const buckets = line.splitBuckets || (line.splitBuckets = []);
+  wrap.innerHTML = '';
+  const order = [];
+  buckets.forEach(b => { if (!order.includes(b.currency)) order.push(b.currency); });
+
+  order.forEach(cur => {
+    const grpBuckets = buckets.filter(b => b.currency === cur);
+    const grp = document.createElement('div');
+    grp.className = 'split-cur-grp';
+
+    // header: currency code + live subtotal + remove-group (while ≥1 group remains)
+    const head = document.createElement('div');
+    head.className = 'split-cur-head';
+    const code = document.createElement('span');
+    code.className = 'split-cur-code';
+    code.textContent = `${cur} ${currSym(cur)}`;
+    const sub = document.createElement('span');
+    sub.className = 'split-cur-sub';
+    const updateSub = () => {
+      const s = grpBuckets.reduce((t2, b) => { const n = amt(b.amount); return b.on && n > 0 ? t2 + n : t2; }, 0);
+      sub.textContent = s > 0 ? formatAmount(String(Math.round(s * 100) / 100)) : '';
+    };
+    updateSub();
+    head.append(code, sub);
+    if (order.length > 1) {
+      const rm = document.createElement('button');
+      rm.type = 'button';
+      rm.className = 'branch-del-btn';
+      rm.textContent = '❌';
+      rm.setAttribute('aria-label', t('ariaRemoveCurrency'));
+      rm.addEventListener('click', () => {
+        line.splitBuckets = line.splitBuckets.filter(b => b.currency !== cur);
+        renderSplitBuilder(wrap, line);
+      });
+      head.appendChild(rm);
+    }
+    grp.appendChild(head);
+
+    // Cash / Online toggle chips — independent on/off, ON reveals the amount input
+    const segWrap = document.createElement('div');
+    segWrap.className = 'seg-wrap';
+    grpBuckets.forEach(b => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = `seg ${b.source === 'Cash' ? 'cash' : 'qr'}${b.on ? ' on' : ''}`;
+      chip.setAttribute('aria-pressed', String(b.on));
+      chip.innerHTML = `${b.source === 'Cash' ? '💵' : '📱'} <span>${esc(t(b.source === 'Cash' ? 'payCash' : 'payQR'))}</span>`;
+      chip.addEventListener('click', () => {
+        b.on = !b.on;
+        if (!b.on) b.amount = '';   // toggling OFF hides and clears its amount
+        renderSplitBuilder(wrap, line);
+      });
+      segWrap.appendChild(chip);
+    });
+    grp.appendChild(segWrap);
+
+    grpBuckets.forEach(b => {
+      if (!b.on) return;
+      const rowEl = document.createElement('div');
+      rowEl.className = 'pg split-part-row';
+      const ico = document.createElement('span');
+      ico.className = 'cur-sel';
+      ico.style.cssText = `pointer-events:none;color:var(--${b.source === 'Cash' ? 'amber' : 'teal'})`;
+      ico.textContent = b.source === 'Cash' ? '💵' : '📱';
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      inp.className = 'prc-in amt-fmt';
+      inp.inputMode = 'decimal';
+      inp.placeholder = t(b.source === 'Cash' ? 'labelSplitCash' : 'labelSplitOnline');
+      inp.value = formatAmount(b.amount ?? '');
+      inp.addEventListener('input', () => { b.amount = inp.value; updateSub(); });
+      rowEl.append(ico, inp);
+      grp.appendChild(rowEl);
+    });
+
+    wrap.appendChild(grp);
+  });
+
+  // ＋ Add currency — reveals a select of the not-yet-added currencies
+  const avail = CURRENCIES.map(c => c.code).filter(c => !order.includes(c));
+  if (avail.length) {
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'btn-ghost split-add-btn';
+    addBtn.textContent = t('splitAddCurrency');
+    const sel = document.createElement('select');
+    sel.className = 'fs split-add-sel hidden';
+    sel.setAttribute('aria-label', t('splitAddCurrency'));
+    sel.innerHTML = `<option value="" selected disabled>${esc(t('splitAddCurrency'))}</option>` +
+      avail.map(c => `<option value="${esc(c)}">${esc(c)} ${esc(currSym(c))}</option>`).join('');
+    addBtn.addEventListener('click', () => { addBtn.classList.add('hidden'); sel.classList.remove('hidden'); sel.focus(); });
+    sel.addEventListener('change', () => {
+      const codeVal = sel.value;
+      if (!codeVal || line.splitBuckets.some(b => b.currency === codeVal)) return;
+      line.splitBuckets.push(
+        { currency: codeVal, source: 'Cash',   on: true,  amount: '' },
+        { currency: codeVal, source: 'Online', on: false, amount: '' },
+      );
+      renderSplitBuilder(wrap, line);
+    });
+    wrap.append(addBtn, sel);
+  }
+}
+
 function setPrimaryPay(val, btn) {
   A.fd.pay = val;
   btn.closest('.seg-wrap').querySelectorAll('.seg').forEach(s => s.classList.remove('on'));
   btn.classList.add('on');
-  $('split-grp-0').classList.toggle('hidden', val !== 'Split');
+  const isSplit = val === 'Split';
+  if (isSplit) {
+    seedSplitBuckets(A.fd, $('f-cur').value || (CURRENCIES[0] && CURRENCIES[0].code) || '');
+    renderSplitBuilder($('split-grp-0'), A.fd);
+  }
+  // Split derives its total from the parts — hide the single amount input + chips
+  $('f-price-row').classList.toggle('split-on', isSplit);
+  $('price-suggest').classList.toggle('hidden', isSplit);
+  $('split-grp-0').classList.toggle('hidden', !isSplit);
   updateSlipVisibility();
 }
 function updateSlipVisibility() {
@@ -2101,7 +2237,7 @@ function renderCurLines() {
     row.className = 'cur-line';
     row.innerHTML = `
       <div class="cur-line-top">
-        <div class="pg">
+        <div class="pg${line.pay==='Split'?' split-on':''}">
           <select class="cur-sel" id="x-cur-sel-${i}" name="x-cur-sel-${i}" aria-label="${esc(t('ariaCurrency'))}">
             ${CURRENCIES.map(c => `<option value="${c.code}"${c.code === line.currency ? ' selected' : ''}>${c.code} ${c.symbol}</option>`).join('')}
           </select>
@@ -2114,44 +2250,39 @@ function renderCurLines() {
         <button class="seg qr${line.pay==='Online'?' on':''}" type="button">📱 <span>${esc(t('payQR'))}</span></button>
         <button class="seg split${line.pay==='Split'?' on':''}" type="button">✂️ <span>${esc(t('paySplit'))}</span></button>
       </div>
-      <div class="split-grp${line.pay==='Split'?'':' hidden'}">
-        <div class="pg" style="margin-bottom:6px">
-          <span class="cur-sel" style="pointer-events:none;color:var(--amber)">💵</span>
-          <input type="text" class="prc-in split-cash-in amt-fmt" id="x-split-cash-${i}" name="x-split-cash-${i}" placeholder="${esc(t('labelSplitCash'))}" inputmode="decimal" value="${formatAmount(line.splitCash ?? '')}">
-        </div>
-        <div class="pg">
-          <span class="cur-sel" style="pointer-events:none;color:var(--teal)">📱</span>
-          <input type="text" class="prc-in split-online-in amt-fmt" id="x-split-online-${i}" name="x-split-online-${i}" placeholder="${esc(t('labelSplitOnline'))}" inputmode="decimal" value="${formatAmount(line.splitOnline ?? '')}">
-        </div>
-      </div>
+      <div class="split-grp${line.pay==='Split'?'':' hidden'}"></div>
     `;
     const sel          = row.querySelector('select');
+    const pgEl         = row.querySelector('.pg');
     const input        = row.querySelector('.prc-in');
-    const splitCashIn  = row.querySelector('.split-cash-in');
-    const splitOnlineIn= row.querySelector('.split-online-in');
     const segBtns      = row.querySelectorAll('.seg-wrap .seg');
     const splitGrp     = row.querySelector('.split-grp');
 
     sel.addEventListener('change', () => { A.fd.extraCur[i].currency = sel.value; });
     input.addEventListener('input', () => { A.fd.extraCur[i].price = input.value; });
-    splitCashIn.addEventListener('input', () => { A.fd.extraCur[i].splitCash = splitCashIn.value; });
-    splitOnlineIn.addEventListener('input', () => { A.fd.extraCur[i].splitOnline = splitOnlineIn.value; });
     segBtns.forEach(btn => btn.addEventListener('click', () => {
       const val = btn.classList.contains('cash') ? 'Cash' : btn.classList.contains('qr') ? 'Online' : 'Split';
       A.fd.extraCur[i].pay = val;
       segBtns.forEach(b => b.classList.remove('on'));
       btn.classList.add('on');
-      splitGrp.classList.toggle('hidden', val !== 'Split');
+      const isSplit = val === 'Split';
+      if (isSplit) {
+        seedSplitBuckets(A.fd.extraCur[i], A.fd.extraCur[i].currency);
+        renderSplitBuilder(splitGrp, A.fd.extraCur[i]);
+      }
+      pgEl.classList.toggle('split-on', isSplit);   // Split hides the line's single total input
+      splitGrp.classList.toggle('hidden', !isSplit);
       updateSlipVisibility();
     }));
     row.querySelector('.cur-remove-btn').addEventListener('click', () => removeCurLine(i));
+    if (line.pay === 'Split') renderSplitBuilder(splitGrp, line);
     wrap.appendChild(row);
   });
   updateSlipVisibility();
 }
 function addCurLine() {
   if (!CURRENCIES.length) { showToast(t('warnNoCurrencies'), 'warn'); return; }
-  A.fd.extraCur.push({ currency: CURRENCIES[0].code, price: '', pay: 'Cash', splitCash: '', splitOnline: '' });
+  A.fd.extraCur.push({ currency: CURRENCIES[0].code, price: '', pay: 'Cash', splitBuckets: [] });
   renderCurLines();
 }
 function removeCurLine(i) {
@@ -2160,31 +2291,44 @@ function removeCurLine(i) {
 }
 
 // 📝 Entry Submission Flow
+// A Split line's valid parts: ON buckets with a positive amount (raw numbers).
+function splitParts(line) {
+  return (line.splitBuckets || [])
+    .filter(b => b.on)
+    .map(b => ({ source: b.source, currency: b.currency, amount: amt(b.amount) }))
+    .filter(p => p.amount > 0);
+}
+function partsTotal(parts) {
+  return Math.round(parts.reduce((s, p) => s + p.amount, 0) * 100) / 100;
+}
+
 async function doSubmit() {
   const item  = $('f-item').value.trim();
-  const price = amt($('f-price').value);
   const cur   = $('f-cur').value;
   setMsg('f-msg');
 
+  // Split lines derive their total from the enabled parts — no separate full total.
+  const isPrimarySplit = A.fd.pay === 'Split';
+  const primaryParts   = isPrimarySplit ? splitParts(A.fd) : [];
+  const price          = isPrimarySplit ? partsTotal(primaryParts) : amt($('f-price').value);
+
   if (!CURRENCIES.length)  { setMsg('f-msg', t('warnNoCurrencies'),'warn'); return; }
   if (!item)               { setMsg('f-msg', t('warnEnterItemName'),'warn'); return; }
-  if (!price || price <= 0){ setMsg('f-msg', t('warnEnterValidAmount'),'warn'); return; }
-  const extraAmounts = A.fd.extraCur.map(line => ({
-    currency: line.currency, price: amt(line.price),
-    pay: line.pay, splitCash: amt(line.splitCash), splitOnline: amt(line.splitOnline),
-  }));
-  if (extraAmounts.some(a => !a.price || a.price <= 0)) { setMsg('f-msg', t('warnEnterValidAmount'),'warn'); return; }
+  if (isPrimarySplit) {
+    if (!primaryParts.length) { setMsg('f-msg', t('warnSplitNeedOne'),'warn'); return; }
+  } else if (!price || price <= 0) { setMsg('f-msg', t('warnEnterValidAmount'),'warn'); return; }
 
-  if (A.fd.pay === 'Split') {
-    const sc = amt(A.fd.splitCash), so = amt(A.fd.splitOnline);
-    if (!(sc > 0) || !(so > 0)) { setMsg('f-msg', t('warnSplitRequired'),'warn'); return; }
-    if (Math.abs((sc + so) - price) > 0.001) { setMsg('f-msg', t('warnSplitMustEqualTotal'),'warn'); return; }
-  }
+  const extraAmounts = A.fd.extraCur.map(line => {
+    const parts = line.pay === 'Split' ? splitParts(line) : [];
+    return {
+      currency: line.currency, pay: line.pay, parts,
+      price: line.pay === 'Split' ? partsTotal(parts) : amt(line.price),
+    };
+  });
   for (const a of extraAmounts) {
     if (a.pay === 'Split') {
-      if (!(a.splitCash > 0) || !(a.splitOnline > 0)) { setMsg('f-msg', t('warnSplitRequired'),'warn'); return; }
-      if (Math.abs((a.splitCash + a.splitOnline) - a.price) > 0.001) { setMsg('f-msg', t('warnSplitMustEqualTotal'),'warn'); return; }
-    }
+      if (!a.parts.length) { setMsg('f-msg', t('warnSplitNeedOne'),'warn'); return; }
+    } else if (!a.price || a.price <= 0) { setMsg('f-msg', t('warnEnterValidAmount'),'warn'); return; }
   }
 
   const needsSlip = A.fd.pay === 'Online' || A.fd.pay === 'Split' ||
@@ -2193,10 +2337,10 @@ async function doSubmit() {
 
   const toPayMethod = p => p === 'Online' ? 'Online Payment' : p === 'Split' ? 'Split' : 'Cash';
   const primaryAmt = { currency: cur, price, paymentMethod: toPayMethod(A.fd.pay) };
-  if (A.fd.pay === 'Split') { primaryAmt.splitCash = amt(A.fd.splitCash); primaryAmt.splitOnline = amt(A.fd.splitOnline); }
+  if (isPrimarySplit) primaryAmt.parts = primaryParts;
   const amounts = [primaryAmt, ...extraAmounts.map(a => {
     const obj = { currency: a.currency, price: a.price, paymentMethod: toPayMethod(a.pay) };
-    if (a.pay === 'Split') { obj.splitCash = a.splitCash; obj.splitOnline = a.splitOnline; }
+    if (a.pay === 'Split') obj.parts = a.parts;
     return obj;
   })];
   const allPays = [A.fd.pay, ...A.fd.extraCur.map(l => l.pay)];
@@ -2254,7 +2398,7 @@ async function doSubmit() {
 
 function resetForm() {
   $('f-item').value = ''; closeCombo(); $('f-price').value = ''; renderPriceSuggest(); $('f-cur').value = CURRENCIES.length ? CURRENCIES[0].code : '';
-  A.fd.pay = 'Cash'; A.fd.splitCash = ''; A.fd.splitOnline = '';
+  A.fd.pay = 'Cash'; A.fd.splitBuckets = [];
   A.fd.extraCur = []; renderCurLines();
   clearSlip(); setMsg('f-msg');
   document.querySelectorAll('#sg-type .seg').forEach((s,i) => s.classList.toggle('on', i===0));
@@ -2263,8 +2407,9 @@ function resetForm() {
   sb.className = 'btn btn-teal'; sb.style.cssText = 'margin-top:16px';
   selectBranchSegment(A.fd.shop);
   document.querySelectorAll('#sg-pay-0 .seg').forEach((s,i) => s.classList.toggle('on', i===0));
-  $('split-cash-0').value = ''; $('split-online-0').value = '';
-  $('split-grp-0').classList.add('hidden');
+  $('split-grp-0').innerHTML = ''; $('split-grp-0').classList.add('hidden');
+  $('f-price-row').classList.remove('split-on');
+  $('price-suggest').classList.remove('hidden');
 }
 
 // 📅 Date Helpers & Dashboard Navigation

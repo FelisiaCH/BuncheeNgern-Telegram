@@ -55,7 +55,6 @@ window.I18N_PARTS.vi = {
   labelSplitCash:        'Số tiền mặt',
   labelSplitOnline:      'Số tiền trực tuyến',
   warnSplitRequired:     '⚠️ Vui lòng nhập cả số tiền mặt và trực tuyến khi chia thanh toán',
-  warnSplitMustEqualTotal: '⚠️ Tiền mặt + Trực tuyến phải bằng tổng số tiền',
   labelAttachSlip:       'Đính kèm phiếu',
   uploadZoneText:        'Nhấn để chọn ảnh phiếu',
   uploadZoneHint:        'PNG / JPG — tối đa 5 MB',
@@ -118,4 +117,6 @@ window.I18N_PARTS.vi = {
   ariaClose:               'Đóng',
   cameraBtn:             'Take Photo',
   ariaPriceSuggest:      'Price suggestions',
+  splitAddCurrency:      '＋ Add currency',
+  warnSplitNeedOne:      '⚠️ Turn on at least one split amount',
 };

@@ -55,7 +55,6 @@ window.I18N_PARTS.ms = {
   labelSplitCash:        'Jumlah Tunai',
   labelSplitOnline:      'Jumlah Dalam Talian',
   warnSplitRequired:     '⚠️ Masukkan jumlah Tunai dan Dalam Talian untuk pembayaran berpisah',
-  warnSplitMustEqualTotal: '⚠️ Tunai + Dalam Talian mesti sama dengan jumlah baris',
   labelAttachSlip:       'Lampirkan Resit',
   uploadZoneText:        'Ketik untuk pilih imej resit',
   uploadZoneHint:        'PNG / JPG — maksimum 5 MB',
@@ -118,4 +117,6 @@ window.I18N_PARTS.ms = {
   ariaClose:               'Tutup',
   cameraBtn:             'Take Photo',
   ariaPriceSuggest:      'Price suggestions',
+  splitAddCurrency:      '＋ Add currency',
+  warnSplitNeedOne:      '⚠️ Turn on at least one split amount',
 };

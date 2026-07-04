@@ -55,7 +55,6 @@ window.I18N_PARTS.id = {
   labelSplitCash:        'Jumlah Tunai',
   labelSplitOnline:      'Jumlah Online',
   warnSplitRequired:     '⚠️ Masukkan jumlah Tunai dan Online untuk pembayaran terbagi',
-  warnSplitMustEqualTotal: '⚠️ Tunai + Online harus sama dengan total baris',
   labelAttachSlip:       'Lampirkan Bukti Transfer',
   uploadZoneText:        'Ketuk untuk memilih gambar bukti transfer',
   uploadZoneHint:        'PNG / JPG — maks 5 MB',
@@ -118,4 +117,6 @@ window.I18N_PARTS.id = {
   ariaClose:               'Tutup',
   cameraBtn:             'Take Photo',
   ariaPriceSuggest:      'Price suggestions',
+  splitAddCurrency:      '＋ Add currency',
+  warnSplitNeedOne:      '⚠️ Turn on at least one split amount',
 };

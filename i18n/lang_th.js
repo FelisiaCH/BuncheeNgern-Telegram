@@ -55,7 +55,6 @@ window.I18N_PARTS.th = {
   labelSplitCash:        'ยอดเงินสด',
   labelSplitOnline:      'ยอดออนไลน์',
   warnSplitRequired:     '⚠️ กรุณากรอกทั้งยอดเงินสดและออนไลน์สำหรับการแบ่งจ่าย',
-  warnSplitMustEqualTotal: '⚠️ เงินสด + ออนไลน์ต้องเท่ากับยอดรวม',
   labelAttachSlip:       'แนบสลิป',
   uploadZoneText:        'แตะเพื่อเลือกรูปสลิป',
   uploadZoneHint:        'PNG / JPG — ขนาดไม่เกิน 5 MB',
@@ -118,4 +117,6 @@ window.I18N_PARTS.th = {
   ariaClose:               'ปิด',
   cameraBtn:             'ถ่ายรูป',
   ariaPriceSuggest:      'ราคาแนะนำ',
+  splitAddCurrency:      '＋ เพิ่มสกุลเงิน',
+  warnSplitNeedOne:      '⚠️ เปิดใช้ยอดแบ่งจ่ายอย่างน้อย 1 รายการ',
 };

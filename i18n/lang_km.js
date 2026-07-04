@@ -55,7 +55,6 @@ window.I18N_PARTS.km = {
   labelSplitCash:        'ចំនួនសាច់ប្រាក់',
   labelSplitOnline:      'ចំនួនអនឡាញ',
   warnSplitRequired:     '⚠️ សូមបញ្ចូលទាំងចំនួនសាច់ប្រាក់ និងអនឡាញសម្រាប់ការបែងចែកការបង់ប្រាក់',
-  warnSplitMustEqualTotal: '⚠️ សាច់ប្រាក់ + អនឡាញ ត្រូវតែស្មើនឹងចំនួនសរុបនៃជួរ',
   labelAttachSlip:       'ភ្ជាប់ភស្តុតាងផ្ទេរប្រាក់',
   uploadZoneText:        'ចុចដើម្បីជ្រើសរើសរូបភាពភស្តុតាង',
   uploadZoneHint:        'PNG / JPG — អតិបរមា 5 MB',
@@ -118,4 +117,6 @@ window.I18N_PARTS.km = {
   ariaClose:               'បិទ',
   cameraBtn:             'Take Photo',
   ariaPriceSuggest:      'Price suggestions',
+  splitAddCurrency:      '＋ Add currency',
+  warnSplitNeedOne:      '⚠️ Turn on at least one split amount',
 };

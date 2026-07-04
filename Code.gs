@@ -303,13 +303,24 @@ function submitEntry(data) {
     const sheet = ss().getSheetByName(tab) || createDailySheet(tab);
     amounts.forEach(amount => {
       if (amount.paymentMethod === 'Split') {
-        // One Split line → two rows so dashboard cash/online totals stay accurate
-        sheet.appendRow([data.timestamp, data.staffName, data.itemName,
-          amount.currency, Number(amount.splitCash) || 0,
-          data.type, data.shop, 'Cash', fileUrl, transactionId]);
-        sheet.appendRow([data.timestamp, data.staffName, data.itemName,
-          amount.currency, Number(amount.splitOnline) || 0,
-          data.type, data.shop, 'Online Payment', fileUrl, transactionId]);
+        // One Split line → one ordinary row PER PART (each part carries its own
+        // source and currency), so dashboard per-currency cash/online totals
+        // stay accurate. Back-compat: accept legacy {splitCash, splitOnline}
+        // payloads (old cached clients) when parts is absent.
+        const parts = Array.isArray(amount.parts) && amount.parts.length
+          ? amount.parts
+          : [
+              { source: 'Cash',   currency: amount.currency, amount: amount.splitCash },
+              { source: 'Online', currency: amount.currency, amount: amount.splitOnline },
+            ];
+        parts.forEach(pt => {
+          const method = pt.source === 'Online' ? 'Online Payment' : 'Cash';
+          sheet.appendRow([
+            data.timestamp, data.staffName, data.itemName,
+            clampStr(pt.currency, 10), Number(pt.amount) || 0,
+            data.type, data.shop, method, fileUrl, transactionId,
+          ]);
+        });
       } else {
         sheet.appendRow([
           data.timestamp, data.staffName, data.itemName,
@@ -325,12 +336,22 @@ function submitEntry(data) {
   }
 
   // Step 3: fire the Telegram notification from the server side
-  // Expand Split amounts into two rows to match what was written to the sheet
+  // Expand Split amounts into one line per part to match what was written to
+  // the sheet (legacy {splitCash, splitOnline} fallback kept, as above)
   const telegramAmounts = [];
   amounts.forEach(a => {
     if (a.paymentMethod === 'Split') {
-      telegramAmounts.push({ currency: a.currency, price: Number(a.splitCash)  || 0, paymentMethod: 'Cash' });
-      telegramAmounts.push({ currency: a.currency, price: Number(a.splitOnline) || 0, paymentMethod: 'Online Payment' });
+      const parts = Array.isArray(a.parts) && a.parts.length
+        ? a.parts
+        : [
+            { source: 'Cash',   currency: a.currency, amount: a.splitCash },
+            { source: 'Online', currency: a.currency, amount: a.splitOnline },
+          ];
+      parts.forEach(pt => telegramAmounts.push({
+        currency:      clampStr(pt.currency, 10),
+        price:         Number(pt.amount) || 0,
+        paymentMethod: pt.source === 'Online' ? 'Online Payment' : 'Cash',
+      }));
     } else {
       telegramAmounts.push(a);
     }

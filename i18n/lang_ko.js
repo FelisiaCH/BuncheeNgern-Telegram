@@ -55,7 +55,6 @@ window.I18N_PARTS.ko = {
   labelSplitCash:        '현금 금액',
   labelSplitOnline:      '온라인 금액',
   warnSplitRequired:     '⚠️ 분할 결제 시 현금과 온라인 금액을 모두 입력하세요',
-  warnSplitMustEqualTotal: '⚠️ 현금 + 온라인 금액의 합이 항목 총액과 같아야 합니다',
   labelAttachSlip:       '영수증 첨부',
   uploadZoneText:        '탭하여 영수증 이미지 선택',
   uploadZoneHint:        'PNG / JPG — 최대 5MB',
@@ -118,4 +117,6 @@ window.I18N_PARTS.ko = {
   ariaClose:               '닫기',
   cameraBtn:             'Take Photo',
   ariaPriceSuggest:      'Price suggestions',
+  splitAddCurrency:      '＋ Add currency',
+  warnSplitNeedOne:      '⚠️ Turn on at least one split amount',
 };

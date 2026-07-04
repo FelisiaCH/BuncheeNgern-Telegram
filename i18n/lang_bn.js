@@ -55,7 +55,6 @@ window.I18N_PARTS.bn = {
   labelSplitCash:        'নগদ পরিমাণ',
   labelSplitOnline:      'অনলাইন পরিমাণ',
   warnSplitRequired:     '⚠️ ভাগ করা পেমেন্টের জন্য নগদ এবং অনলাইন উভয় পরিমাণ লিখুন',
-  warnSplitMustEqualTotal: '⚠️ নগদ + অনলাইন অবশ্যই লাইনের মোট পরিমাণের সমান হতে হবে',
   labelAttachSlip:       'রসিদ সংযুক্ত করুন',
   uploadZoneText:        'রসিদের ছবি নির্বাচন করতে ট্যাপ করুন',
   uploadZoneHint:        'PNG / JPG — সর্বোচ্চ 5 MB',
@@ -118,4 +117,6 @@ window.I18N_PARTS.bn = {
   ariaClose:               'বন্ধ করুন',
   cameraBtn:             'Take Photo',
   ariaPriceSuggest:      'Price suggestions',
+  splitAddCurrency:      '＋ Add currency',
+  warnSplitNeedOne:      '⚠️ Turn on at least one split amount',
 };

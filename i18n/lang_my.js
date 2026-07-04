@@ -55,7 +55,6 @@ window.I18N_PARTS.my = {
   labelSplitCash:        'ငွေသားပမာဏ',
   labelSplitOnline:      'အွန်လိုင်းပမာဏ',
   warnSplitRequired:     '⚠️ ငွေသား နှင့် အွန်လိုင်း ပမာဏ နှစ်ခုလုံး ထည့်ပါ',
-  warnSplitMustEqualTotal: '⚠️ ငွေသား + အွန်လိုင်း = စုစုပေါင်းပမာဏ ဖြစ်ရမည်',
   labelAttachSlip:       'ပြေစာတွဲမည်',
   uploadZoneText:        'ပြေစာပုံ ရွေးရန် နှိပ်ပါ',
   uploadZoneHint:        'PNG / JPG — 5 MB အထိ',
@@ -118,4 +117,6 @@ window.I18N_PARTS.my = {
   ariaClose:               'ပိတ်ပါ',
   cameraBtn:             'Take Photo',
   ariaPriceSuggest:      'Price suggestions',
+  splitAddCurrency:      '＋ Add currency',
+  warnSplitNeedOne:      '⚠️ Turn on at least one split amount',
 };
