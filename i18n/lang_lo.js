@@ -119,4 +119,6 @@ window.I18N_PARTS.lo = {
   ariaPriceSuggest:      'ລາຄາແນະນຳ',
   splitAddCurrency:      '＋ ເພີ່ມສະກຸນເງິນ',
   warnSplitNeedOne:      '⚠️ ເປີດໃຊ້ຍອດແບ່ງຈ່າຍຢ່າງໜ້ອຍ 1 ລາຍການ',
+  defaultBranch1:        'ສາຂາ 1',
+  defaultBranch2:        'ສາຂາ 2',
 };
