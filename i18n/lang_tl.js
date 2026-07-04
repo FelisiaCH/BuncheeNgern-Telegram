@@ -119,4 +119,6 @@ window.I18N_PARTS.tl = {
   ariaPriceSuggest:      'Price suggestions',
   splitAddCurrency:      '＋ Add currency',
   warnSplitNeedOne:      '⚠️ Turn on at least one split amount',
+  defaultBranch1:        'Branch 1',
+  defaultBranch2:        'Branch 2',
 };

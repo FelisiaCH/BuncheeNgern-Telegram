@@ -119,4 +119,6 @@ window.I18N_PARTS.th = {
   ariaPriceSuggest:      'ราคาแนะนำ',
   splitAddCurrency:      '＋ เพิ่มสกุลเงิน',
   warnSplitNeedOne:      '⚠️ เปิดใช้ยอดแบ่งจ่ายอย่างน้อย 1 รายการ',
+  defaultBranch1:        'สาขา 1',
+  defaultBranch2:        'สาขา 2',
 };

@@ -1163,17 +1163,46 @@ function renderPriceSuggest() {
   });
 }
 
+// 🗣️ Language Settings — must resolve BEFORE the branch block below, because
+// the new-user default branch names are seeded in the active UI language.
+// (Only window.LANGS + localStorage + navigator are needed here, all available.)
+const LANG_KEY = 'appLang';
+const DEFAULT_LANG = 'th';
+
+function detectDeviceLang() {
+  const tags = (navigator.languages && navigator.languages.length)
+    ? navigator.languages
+    : [navigator.language || ''];
+  for (let i = 0; i < tags.length; i++) {
+    const base = String(tags[i] || '').split('-')[0].toLowerCase();
+    if (LANGS[base]) return base;
+  }
+  return 'en';
+}
+
+const _savedLang = localStorage.getItem(LANG_KEY);
+let currentLang = LANGS[_savedLang] ? _savedLang : detectDeviceLang();
+
 // 🔧 Branches & Constants
 const BRANCHES_KEY    = 'savedBranches';
-const DEFAULT_BRANCHES = ['สาขา 1', 'สาขา 2'];
 const BRANCH_ICONS    = ['🏪', '🏬', '🏢', '🏭', '🏛️', '🏦'];
+
+// Default branch names for a NEW user, in the active UI language (t() isn't
+// defined yet at module load, so read the I18N dict directly). Branches are
+// persisted DATA matched against Sheet rows — saved branches are NEVER
+// translated or renamed; this only seeds the very first defaults.
+function defaultBranches() {
+  const pick = k => (window.I18N?.[k]?.[currentLang]
+    ?? window.I18N?.[k]?.[DEFAULT_LANG] ?? window.I18N?.[k]?.en ?? k);
+  return [pick('defaultBranch1'), pick('defaultBranch2')];
+}
 
 function loadBranches() {
   try {
     const saved = JSON.parse(localStorage.getItem(BRANCHES_KEY) || 'null');
     if (Array.isArray(saved) && saved.length) return saved.map(String);
   } catch { }
-  return [...DEFAULT_BRANCHES];
+  return defaultBranches();
 }
 
 let BRANCHES    = loadBranches();
@@ -1212,24 +1241,6 @@ let BRANCH_FILTER_IDS = {};
 let dashDate    = new Date();
 let loadDashSeq = 0;
 const rawApiCache  = {};
-
-// 🗣️ Language Settings
-const LANG_KEY = 'appLang';
-const DEFAULT_LANG = 'th';
-
-function detectDeviceLang() {
-  const tags = (navigator.languages && navigator.languages.length)
-    ? navigator.languages
-    : [navigator.language || ''];
-  for (let i = 0; i < tags.length; i++) {
-    const base = String(tags[i] || '').split('-')[0].toLowerCase();
-    if (LANGS[base]) return base;
-  }
-  return 'en';
-}
-
-const _savedLang = localStorage.getItem(LANG_KEY);
-let currentLang = LANGS[_savedLang] ? _savedLang : detectDeviceLang();
 
 // 🎨 Theme Settings
 const THEME_KEY = 'appTheme';
