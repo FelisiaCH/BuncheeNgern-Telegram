@@ -55,7 +55,6 @@ window.I18N_PARTS.en = {
   labelSplitCash:        'Cash amount',
   labelSplitOnline:      'Online amount',
   warnSplitRequired:     '⚠️ Enter both Cash and Online amounts for Split payment',
-  warnSplitMustEqualTotal: '⚠️ Cash + Online must equal the line total',
   labelAttachSlip:       'Attach Slip',
   uploadZoneText:        'Tap to select slip image',
   uploadZoneHint:        'PNG / JPG — up to 5 MB',
@@ -118,4 +117,6 @@ window.I18N_PARTS.en = {
   ariaClose:               'Close',
   cameraBtn:             'Take Photo',
   ariaPriceSuggest:      'Price suggestions',
+  splitAddCurrency:      '＋ Add currency',
+  warnSplitNeedOne:      '⚠️ Turn on at least one split amount',
 };

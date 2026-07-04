@@ -55,7 +55,6 @@ window.I18N_PARTS.pt = {
   labelSplitCash:        'Valor em dinheiro',
   labelSplitOnline:      'Valor online',
   warnSplitRequired:     '⚠️ Informe os valores em dinheiro e online para o pagamento dividido',
-  warnSplitMustEqualTotal: '⚠️ Dinheiro + Online deve ser igual ao total da linha',
   labelAttachSlip:       'Anexar comprovante',
   uploadZoneText:        'Toque para selecionar a imagem do comprovante',
   uploadZoneHint:        'PNG / JPG — até 5 MB',
@@ -118,4 +117,6 @@ window.I18N_PARTS.pt = {
   ariaClose:               'Fechar',
   cameraBtn:             'Take Photo',
   ariaPriceSuggest:      'Price suggestions',
+  splitAddCurrency:      '＋ Add currency',
+  warnSplitNeedOne:      '⚠️ Turn on at least one split amount',
 };

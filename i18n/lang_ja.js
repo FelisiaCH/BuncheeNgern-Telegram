@@ -55,7 +55,6 @@ window.I18N_PARTS.ja = {
   labelSplitCash:        '現金の金額',
   labelSplitOnline:      'オンラインの金額',
   warnSplitRequired:     '⚠️ 分割払いには現金とオンライン両方の金額を入力してください',
-  warnSplitMustEqualTotal: '⚠️ 現金 + オンラインの合計は行の合計額と一致する必要があります',
   labelAttachSlip:       '証明書を添付',
   uploadZoneText:        'タップして証明書の画像を選択',
   uploadZoneHint:        'PNG / JPG — 最大5MB',
@@ -118,4 +117,6 @@ window.I18N_PARTS.ja = {
   ariaClose:               '閉じる',
   cameraBtn:             'Take Photo',
   ariaPriceSuggest:      'Price suggestions',
+  splitAddCurrency:      '＋ Add currency',
+  warnSplitNeedOne:      '⚠️ Turn on at least one split amount',
 };

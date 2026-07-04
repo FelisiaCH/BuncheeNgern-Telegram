@@ -55,7 +55,6 @@ window.I18N_PARTS.lo = {
   labelSplitCash:        'ຈຳນວນເງິນສົດ',
   labelSplitOnline:      'ຈຳນວນອອນລາຍ',
   warnSplitRequired:     '⚠️ ກະລຸນາໃສ່ທັງຈຳນວນເງິນສົດ ແລະ ອອນລາຍ',
-  warnSplitMustEqualTotal: '⚠️ ເງິນສົດ + ອອນລາຍ ຕ້ອງເທົ່າກັບຍອດລວມ',
   labelAttachSlip:       'ແນບສະລິບ',
   uploadZoneText:        'ແຕະເພື່ອເລືອກຮູບສະລິບ',
   uploadZoneHint:        'PNG / JPG — ຂະໜາດບໍ່ເກີນ 5 MB',
@@ -118,4 +117,6 @@ window.I18N_PARTS.lo = {
   ariaClose:               'ປິດ',
   cameraBtn:             'ຖ່າຍຮູບ',
   ariaPriceSuggest:      'ລາຄາແນະນຳ',
+  splitAddCurrency:      '＋ ເພີ່ມສະກຸນເງິນ',
+  warnSplitNeedOne:      '⚠️ ເປີດໃຊ້ຍອດແບ່ງຈ່າຍຢ່າງໜ້ອຍ 1 ລາຍການ',
 };

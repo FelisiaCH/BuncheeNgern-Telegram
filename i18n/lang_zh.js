@@ -55,7 +55,6 @@ window.I18N_PARTS.zh = {
   labelSplitCash:        '现金金额',
   labelSplitOnline:      '线上金额',
   warnSplitRequired:     '⚠️ 拆分支付需同时填写现金和线上金额',
-  warnSplitMustEqualTotal: '⚠️ 现金 + 线上金额必须等于该行总额',
   labelAttachSlip:       '上传凭证',
   uploadZoneText:        '点击选择凭证图片',
   uploadZoneHint:        'PNG / JPG — 最大 5 MB',
@@ -118,4 +117,6 @@ window.I18N_PARTS.zh = {
   ariaClose:               '关闭',
   cameraBtn:             'Take Photo',
   ariaPriceSuggest:      'Price suggestions',
+  splitAddCurrency:      '＋ Add currency',
+  warnSplitNeedOne:      '⚠️ Turn on at least one split amount',
 };

@@ -55,7 +55,6 @@ window.I18N_PARTS.es = {
   labelSplitCash:        'Monto en efectivo',
   labelSplitOnline:      'Monto en línea',
   warnSplitRequired:     '⚠️ Ingresa el monto en efectivo y en línea para el pago dividido',
-  warnSplitMustEqualTotal: '⚠️ Efectivo + En línea debe ser igual al total de la línea',
   labelAttachSlip:       'Adjuntar comprobante',
   uploadZoneText:        'Toca para seleccionar la imagen del comprobante',
   uploadZoneHint:        'PNG / JPG — hasta 5 MB',
@@ -118,4 +117,6 @@ window.I18N_PARTS.es = {
   ariaClose:               'Cerrar',
   cameraBtn:             'Take Photo',
   ariaPriceSuggest:      'Price suggestions',
+  splitAddCurrency:      '＋ Add currency',
+  warnSplitNeedOne:      '⚠️ Turn on at least one split amount',
 };

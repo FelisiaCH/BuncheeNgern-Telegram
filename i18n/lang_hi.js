@@ -55,7 +55,6 @@ window.I18N_PARTS.hi = {
   labelSplitCash:        'नकद राशि',
   labelSplitOnline:      'ऑनलाइन राशि',
   warnSplitRequired:     '⚠️ विभाजित भुगतान के लिए नकद और ऑनलाइन दोनों राशि दर्ज करें',
-  warnSplitMustEqualTotal: '⚠️ नकद + ऑनलाइन का योग पंक्ति की कुल राशि के बराबर होना चाहिए',
   labelAttachSlip:       'पर्ची संलग्न करें',
   uploadZoneText:        'पर्ची की छवि चुनने के लिए टैप करें',
   uploadZoneHint:        'PNG / JPG — अधिकतम 5 MB',
@@ -118,4 +117,6 @@ window.I18N_PARTS.hi = {
   ariaClose:               'बंद करें',
   cameraBtn:             'Take Photo',
   ariaPriceSuggest:      'Price suggestions',
+  splitAddCurrency:      '＋ Add currency',
+  warnSplitNeedOne:      '⚠️ Turn on at least one split amount',
 };
