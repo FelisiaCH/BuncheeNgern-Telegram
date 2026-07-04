@@ -116,4 +116,5 @@ window.I18N_PARTS.my = {
   pickerItemTitle:               'ပစ္စည်းရွေးပါ',
   placeholderSearchItem:               'ပစ္စည်းရှာရန်',
   ariaClose:               'ပိတ်ပါ',
+  cameraBtn:             'Take Photo',
 };

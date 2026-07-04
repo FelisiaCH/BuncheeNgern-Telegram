@@ -116,4 +116,5 @@ window.I18N_PARTS.th = {
   pickerItemTitle:               'เลือกรายการ',
   placeholderSearchItem:               'ค้นหารายการ',
   ariaClose:               'ปิด',
+  cameraBtn:             'ถ่ายรูป',
 };

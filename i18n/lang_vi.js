@@ -116,4 +116,5 @@ window.I18N_PARTS.vi = {
   pickerItemTitle:               'Chọn mục',
   placeholderSearchItem:               'Tìm mục',
   ariaClose:               'Đóng',
+  cameraBtn:             'Take Photo',
 };

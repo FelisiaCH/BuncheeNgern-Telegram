@@ -116,4 +116,5 @@ window.I18N_PARTS.en = {
   pickerItemTitle:               'Select item',
   placeholderSearchItem:               'Search item',
   ariaClose:               'Close',
+  cameraBtn:             'Take Photo',
 };

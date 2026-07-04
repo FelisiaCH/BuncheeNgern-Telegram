@@ -581,7 +581,8 @@ option{background:#0E1526}
 /* 🔐 Login Layout Tweaks */
 .login-wrap{flex:2;display:flex;align-items:center;justify-content:center;padding:20px}
 .login-footer{text-align:center;padding:14px 0 20px;font-size:12px;font-weight:500;color:var(--txt-muted)}
-#f-file{display:none}
+#f-file,#f-cam{display:none}
+.cam-btn{width:100%;margin-top:8px;padding:11px}
 #sub-btn{margin-top:16px}
 
 /* 🌐 Language Switcher */
@@ -914,6 +915,7 @@ option{background:#0E1526}
     <div id="slip-grp" class="fg hidden">
       <label class="fl" data-i18n="labelAttachSlip">แนบสลิป</label>
       <input type="file" id="f-file" accept="image/*" onchange="onFileChg(this)">
+      <input type="file" id="f-cam" accept="image/*" capture="environment" onchange="onFileChg(this)">
       <div class="upload-zone" id="uz"
            onclick="document.getElementById('f-file').click()"
            ondragover="onDragOver(event)" ondragleave="onDragLeave()" ondrop="onDrop(event)">
@@ -926,6 +928,7 @@ option{background:#0E1526}
         </div>
         <img id="slip-img" class="slip-prev hidden" alt="Slip preview">
       </div>
+      <button type="button" class="btn-ghost cam-btn" onclick="document.getElementById('f-cam').click()">📷 <span data-i18n="cameraBtn">ถ่ายรูป</span></button>
       <button id="clr-slip" class="clear-slip-btn hidden" onclick="clearSlip(event)">✕ <span data-i18n="clearSlipBtn">ลบสลิป</span></button>
     </div>
 
@@ -1799,7 +1802,7 @@ async function compressImg(file) {
 }
 function clearSlip(e) {
   if (e) e.stopPropagation();
-  A.slip = null; $('f-file').value = '';
+  A.slip = null; $('f-file').value = ''; $('f-cam').value = '';
   $('slip-img').classList.add('hidden'); $('slip-img').src = '';
   $('uz-ph').style.display = ''; $('clr-slip').classList.add('hidden');
 }

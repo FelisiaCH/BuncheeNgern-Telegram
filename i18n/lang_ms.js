@@ -116,4 +116,5 @@ window.I18N_PARTS.ms = {
   pickerItemTitle:               'Pilih item',
   placeholderSearchItem:               'Cari item',
   ariaClose:               'Tutup',
+  cameraBtn:             'Take Photo',
 };

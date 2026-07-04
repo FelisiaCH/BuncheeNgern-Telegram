@@ -116,4 +116,5 @@ window.I18N_PARTS.km = {
   pickerItemTitle:               'ជ្រើសរើសធាតុ',
   placeholderSearchItem:               'ស្វែងរកធាតុ',
   ariaClose:               'បិទ',
+  cameraBtn:             'Take Photo',
 };
