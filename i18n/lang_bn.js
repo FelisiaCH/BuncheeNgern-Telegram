@@ -116,4 +116,5 @@ window.I18N_PARTS.bn = {
   pickerItemTitle:               'আইটেম নির্বাচন করুন',
   placeholderSearchItem:               'আইটেম খুঁজুন',
   ariaClose:               'বন্ধ করুন',
+  cameraBtn:             'Take Photo',
 };

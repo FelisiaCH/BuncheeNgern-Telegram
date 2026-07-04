@@ -116,4 +116,5 @@ window.I18N_PARTS.hi = {
   pickerItemTitle:               'आइटम चुनें',
   placeholderSearchItem:               'आइटम खोजें',
   ariaClose:               'बंद करें',
+  cameraBtn:             'Take Photo',
 };

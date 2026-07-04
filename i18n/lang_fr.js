@@ -116,4 +116,5 @@ window.I18N_PARTS.fr = {
   pickerItemTitle:               'Choisir un article',
   placeholderSearchItem:               'Rechercher un article',
   ariaClose:               'Fermer',
+  cameraBtn:             'Take Photo',
 };

@@ -116,4 +116,5 @@ window.I18N_PARTS.lo = {
   pickerItemTitle:               'ເລືອກລາຍການ',
   placeholderSearchItem:               'ຊອກຫາລາຍການ',
   ariaClose:               'ປິດ',
+  cameraBtn:             'ຖ່າຍຮູບ',
 };

@@ -116,4 +116,5 @@ window.I18N_PARTS.zh = {
   pickerItemTitle:               '选择项目',
   placeholderSearchItem:               '搜索项目',
   ariaClose:               '关闭',
+  cameraBtn:             'Take Photo',
 };

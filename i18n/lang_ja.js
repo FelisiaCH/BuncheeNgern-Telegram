@@ -116,4 +116,5 @@ window.I18N_PARTS.ja = {
   pickerItemTitle:               '項目を選択',
   placeholderSearchItem:               '項目を検索',
   ariaClose:               '閉じる',
+  cameraBtn:             'Take Photo',
 };

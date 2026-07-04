@@ -116,4 +116,5 @@ window.I18N_PARTS.tl = {
   pickerItemTitle:               'Pumili ng item',
   placeholderSearchItem:               'Maghanap ng item',
   ariaClose:               'Isara',
+  cameraBtn:             'Take Photo',
 };
