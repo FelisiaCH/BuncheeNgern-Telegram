@@ -117,4 +117,5 @@ window.I18N_PARTS.hi = {
   placeholderSearchItem:               'आइटम खोजें',
   ariaClose:               'बंद करें',
   cameraBtn:             'Take Photo',
+  ariaPriceSuggest:      'Price suggestions',
 };

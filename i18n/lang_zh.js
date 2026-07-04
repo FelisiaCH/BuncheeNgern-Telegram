@@ -117,4 +117,5 @@ window.I18N_PARTS.zh = {
   placeholderSearchItem:               '搜索项目',
   ariaClose:               '关闭',
   cameraBtn:             'Take Photo',
+  ariaPriceSuggest:      'Price suggestions',
 };

@@ -117,4 +117,5 @@ window.I18N_PARTS.km = {
   placeholderSearchItem:               'ស្វែងរកធាតុ',
   ariaClose:               'បិទ',
   cameraBtn:             'Take Photo',
+  ariaPriceSuggest:      'Price suggestions',
 };

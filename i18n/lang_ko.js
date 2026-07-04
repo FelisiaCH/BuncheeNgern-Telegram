@@ -117,4 +117,5 @@ window.I18N_PARTS.ko = {
   placeholderSearchItem:               '항목 검색',
   ariaClose:               '닫기',
   cameraBtn:             'Take Photo',
+  ariaPriceSuggest:      'Price suggestions',
 };

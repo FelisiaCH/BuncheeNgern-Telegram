@@ -304,6 +304,21 @@ option{background:#0E1526}
 .cur-remove-btn:hover{background:var(--red-dim);border-color:var(--red-brd)}
 .cur-add-btn{width:100%;margin-top:10px;padding:11px}
 
+/* 💡 Price-suggestion chips (×10/×100/×1000) */
+.price-suggest{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.price-suggest:empty{display:none}
+.price-chip{
+  flex:1 1 auto;min-width:0;min-height:34px;padding:7px 12px;
+  background:var(--indigo-dim);border:1px solid var(--indigo-brd);
+  border-radius:20px;color:var(--indigo);
+  font-size:13px;font-weight:700;font-family:'Outfit',system-ui,sans-serif;
+  font-variant-numeric:tabular-nums;cursor:pointer;text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  transition:background var(--ease),transform var(--ease)
+}
+.price-chip:hover{background:rgba(129,140,248,.16)}
+.price-chip:active{transform:scale(.96)}
+
 /* 📎 Slip Upload Zone */
 .upload-zone{
   border:2px dashed rgba(46,232,180,.2);border-radius:var(--r-sm);
@@ -760,7 +775,8 @@ option{background:#0E1526}
   .seg:active,.branch-chip:active,.nb:active,.sf:active,.ctab:active,.lang-btn:active,
   .icon-btn:active,.nav-arrow:active:not(:disabled),.lo-btn:active,.combo-toggle:active,
   .cur-remove-btn:active,.combo-opt:active,.btn:active:not(:disabled),.ref-btn:active,
-  .menu-action-btn:active,.branch-del-btn:active,.item-popup-close:active{transform:none}
+  .menu-action-btn:active,.branch-del-btn:active,.item-popup-close:active,
+  .price-chip:active{transform:none}
 }
 </style>
 </head>
@@ -884,8 +900,9 @@ option{background:#0E1526}
       <label class="fl" data-i18n="labelAmount">จำนวนเงิน</label>
       <div class="pg">
         <select id="f-cur" class="cur-sel" aria-label="สกุลเงิน" data-i18n-aria="ariaCurrency"></select>
-        <input type="text" id="f-price" class="prc-in amt-fmt" placeholder="0" inputmode="decimal">
+        <input type="text" id="f-price" class="prc-in amt-fmt" placeholder="0" inputmode="decimal" oninput="renderPriceSuggest()">
       </div>
+      <div id="price-suggest" class="price-suggest" role="group" aria-label="ราคาแนะนำ" data-i18n-aria="ariaPriceSuggest"></div>
       <div class="seg-wrap" id="sg-pay-0" style="margin-top:8px">
         <button class="seg cash on" onclick="setPrimaryPay('Cash',this)">💵 <span data-i18n="payCash">เงินสด</span></button>
         <button class="seg qr" onclick="setPrimaryPay('Online',this)">📱 <span data-i18n="payQR">Online Payment</span></button>
@@ -1125,6 +1142,27 @@ document.addEventListener('input', e => {
   const diff = el.value.length - before.length;
   try { el.setSelectionRange(Math.max(0, caret + diff), Math.max(0, caret + diff)); } catch (_) {}
 });
+// 💡 Price-suggestion chips — ×10/×100/×1000 shortcuts under the primary amount.
+// Tapping a chip fills #f-price and re-fires 'input' so formatting + chips re-run.
+function renderPriceSuggest() {
+  const wrap = $('price-suggest');
+  if (!wrap) return;
+  const base = amt($('f-price').value);
+  wrap.innerHTML = '';
+  if (!isFinite(base) || base <= 0) return;
+  [10, 100, 1000].forEach(mult => {
+    const val = Math.round(base * mult * 100) / 100; // avoid FP artifacts on decimals
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'price-chip';
+    btn.textContent = formatAmount(String(val));
+    btn.addEventListener('click', () => {
+      $('f-price').value = formatAmount(String(val));
+      $('f-price').dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    wrap.appendChild(btn);
+  });
+}
 
 // 🔧 Branches & Constants
 const BRANCHES_KEY    = 'savedBranches';
@@ -1915,7 +1953,7 @@ async function doSubmit() {
 }
 
 function resetForm() {
-  $('f-item').value = ''; closeCombo(); $('f-price').value = ''; $('f-cur').value = CURRENCIES.length ? CURRENCIES[0].code : '';
+  $('f-item').value = ''; closeCombo(); $('f-price').value = ''; renderPriceSuggest(); $('f-cur').value = CURRENCIES.length ? CURRENCIES[0].code : '';
   A.fd.pay = 'Cash'; A.fd.splitCash = ''; A.fd.splitOnline = '';
   A.fd.extraCur = []; renderCurLines();
   clearSlip(); setMsg('f-msg');
