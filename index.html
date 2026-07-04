@@ -873,7 +873,7 @@ option{background:#0E1526}
       <label class="fl" data-i18n="labelAmount">จำนวนเงิน</label>
       <div class="pg">
         <select id="f-cur" class="cur-sel" aria-label="สกุลเงิน" data-i18n-aria="ariaCurrency"></select>
-        <input type="number" id="f-price" class="prc-in" placeholder="0" inputmode="decimal" min="0" step="any">
+        <input type="text" id="f-price" class="prc-in amt-fmt" placeholder="0" inputmode="decimal">
       </div>
       <div class="seg-wrap" id="sg-pay-0" style="margin-top:8px">
         <button class="seg cash on" onclick="setPrimaryPay('Cash',this)">💵 <span data-i18n="payCash">เงินสด</span></button>
@@ -883,11 +883,11 @@ option{background:#0E1526}
       <div id="split-grp-0" class="hidden" style="margin-top:8px">
         <div class="pg" style="margin-bottom:6px">
           <span class="cur-sel" style="pointer-events:none;color:var(--amber)">💵</span>
-          <input type="number" id="split-cash-0" class="prc-in" data-i18n-placeholder="labelSplitCash" placeholder="Cash amount" inputmode="decimal" min="0" step="any" oninput="A.fd.splitCash=this.value">
+          <input type="text" id="split-cash-0" class="prc-in amt-fmt" data-i18n-placeholder="labelSplitCash" placeholder="Cash amount" inputmode="decimal" oninput="A.fd.splitCash=this.value">
         </div>
         <div class="pg">
           <span class="cur-sel" style="pointer-events:none;color:var(--teal)">📱</span>
-          <input type="number" id="split-online-0" class="prc-in" data-i18n-placeholder="labelSplitOnline" placeholder="Online amount" inputmode="decimal" min="0" step="any" oninput="A.fd.splitOnline=this.value">
+          <input type="text" id="split-online-0" class="prc-in amt-fmt" data-i18n-placeholder="labelSplitOnline" placeholder="Online amount" inputmode="decimal" oninput="A.fd.splitOnline=this.value">
         </div>
       </div>
       <div id="cur-lines"></div>
@@ -1089,6 +1089,32 @@ const SCRIPT_URL       = "YOUR_APPS_SCRIPT_URL_HERE";
 
 // 🛠️ DOM Helper (must be defined before any early init calls below)
 const $ = id => document.getElementById(id);
+
+// 💰 Amount helpers — inputs display grouped values ("1,234.56") but every read
+// goes through amt()/parseAmount() so the backend always receives raw numbers.
+// strip grouping → parseable numeric string
+const parseAmount = v => String(v ?? '').replace(/,/g, '').trim();
+// numeric value (NaN if empty/invalid)
+const amt = v => { const n = parseFloat(parseAmount(v)); return isNaN(n) ? NaN : n; };
+// format with en-US grouping; keep a trailing decimal the user is typing
+function formatAmount(v){
+  let s = parseAmount(v).replace(/[^\d.]/g, '');
+  const d = s.indexOf('.');
+  if (d !== -1) s = s.slice(0, d + 1) + s.slice(d + 1).replace(/\./g, ''); // one dot only
+  let [int, dec] = s.split('.');
+  int = (int || '').replace(/^0+(?=\d)/, '');
+  const grouped = int ? Number(int).toLocaleString('en-US') : '';
+  return dec !== undefined ? `${grouped || '0'}.${dec.slice(0, 2)}` : grouped;
+}
+// One delegated listener formats every .amt-fmt input, current and future
+document.addEventListener('input', e => {
+  const el = e.target;
+  if (!(el.classList && el.classList.contains('amt-fmt'))) return;
+  const before = el.value, caret = el.selectionStart;
+  el.value = formatAmount(el.value);
+  const diff = el.value.length - before.length;
+  try { el.setSelectionRange(Math.max(0, caret + diff), Math.max(0, caret + diff)); } catch (_) {}
+});
 
 // 🔧 Branches & Constants
 const BRANCHES_KEY    = 'savedBranches';
@@ -2041,7 +2067,7 @@ function renderCurLines() {
           <select class="cur-sel" id="x-cur-sel-${i}" name="x-cur-sel-${i}" aria-label="${esc(t('ariaCurrency'))}">
             ${CURRENCIES.map(c => `<option value="${c.code}"${c.code === line.currency ? ' selected' : ''}>${c.code} ${c.symbol}</option>`).join('')}
           </select>
-          <input type="number" class="prc-in" id="x-cur-price-${i}" name="x-cur-price-${i}" placeholder="0" inputmode="decimal" min="0" step="any" value="${line.price ?? ''}">
+          <input type="text" class="prc-in amt-fmt" id="x-cur-price-${i}" name="x-cur-price-${i}" placeholder="0" inputmode="decimal" value="${formatAmount(line.price ?? '')}">
         </div>
         <button type="button" class="cur-remove-btn" aria-label="${esc(t('ariaRemoveCurrency'))}">✕</button>
       </div>
@@ -2053,11 +2079,11 @@ function renderCurLines() {
       <div class="split-grp${line.pay==='Split'?'':' hidden'}">
         <div class="pg" style="margin-bottom:6px">
           <span class="cur-sel" style="pointer-events:none;color:var(--amber)">💵</span>
-          <input type="number" class="prc-in split-cash-in" id="x-split-cash-${i}" name="x-split-cash-${i}" placeholder="${esc(t('labelSplitCash'))}" inputmode="decimal" min="0" step="any" value="${line.splitCash ?? ''}">
+          <input type="text" class="prc-in split-cash-in amt-fmt" id="x-split-cash-${i}" name="x-split-cash-${i}" placeholder="${esc(t('labelSplitCash'))}" inputmode="decimal" value="${formatAmount(line.splitCash ?? '')}">
         </div>
         <div class="pg">
           <span class="cur-sel" style="pointer-events:none;color:var(--teal)">📱</span>
-          <input type="number" class="prc-in split-online-in" id="x-split-online-${i}" name="x-split-online-${i}" placeholder="${esc(t('labelSplitOnline'))}" inputmode="decimal" min="0" step="any" value="${line.splitOnline ?? ''}">
+          <input type="text" class="prc-in split-online-in amt-fmt" id="x-split-online-${i}" name="x-split-online-${i}" placeholder="${esc(t('labelSplitOnline'))}" inputmode="decimal" value="${formatAmount(line.splitOnline ?? '')}">
         </div>
       </div>
     `;
@@ -2098,7 +2124,7 @@ function removeCurLine(i) {
 // 📝 Entry Submission Flow
 async function doSubmit() {
   const item  = $('f-item').value.trim();
-  const price = parseFloat($('f-price').value);
+  const price = amt($('f-price').value);
   const cur   = $('f-cur').value;
   setMsg('f-msg');
 
@@ -2106,13 +2132,13 @@ async function doSubmit() {
   if (!item)               { setMsg('f-msg', t('warnEnterItemName'),'warn'); return; }
   if (!price || price <= 0){ setMsg('f-msg', t('warnEnterValidAmount'),'warn'); return; }
   const extraAmounts = A.fd.extraCur.map(line => ({
-    currency: line.currency, price: parseFloat(line.price),
-    pay: line.pay, splitCash: parseFloat(line.splitCash), splitOnline: parseFloat(line.splitOnline),
+    currency: line.currency, price: amt(line.price),
+    pay: line.pay, splitCash: amt(line.splitCash), splitOnline: amt(line.splitOnline),
   }));
   if (extraAmounts.some(a => !a.price || a.price <= 0)) { setMsg('f-msg', t('warnEnterValidAmount'),'warn'); return; }
 
   if (A.fd.pay === 'Split') {
-    const sc = parseFloat(A.fd.splitCash), so = parseFloat(A.fd.splitOnline);
+    const sc = amt(A.fd.splitCash), so = amt(A.fd.splitOnline);
     if (!(sc > 0) || !(so > 0)) { setMsg('f-msg', t('warnSplitRequired'),'warn'); return; }
     if (Math.abs((sc + so) - price) > 0.001) { setMsg('f-msg', t('warnSplitMustEqualTotal'),'warn'); return; }
   }
@@ -2129,7 +2155,7 @@ async function doSubmit() {
 
   const toPayMethod = p => p === 'Online' ? 'Online Payment' : p === 'Split' ? 'Split' : 'Cash';
   const primaryAmt = { currency: cur, price, paymentMethod: toPayMethod(A.fd.pay) };
-  if (A.fd.pay === 'Split') { primaryAmt.splitCash = parseFloat(A.fd.splitCash); primaryAmt.splitOnline = parseFloat(A.fd.splitOnline); }
+  if (A.fd.pay === 'Split') { primaryAmt.splitCash = amt(A.fd.splitCash); primaryAmt.splitOnline = amt(A.fd.splitOnline); }
   const amounts = [primaryAmt, ...extraAmounts.map(a => {
     const obj = { currency: a.currency, price: a.price, paymentMethod: toPayMethod(a.pay) };
     if (a.pay === 'Split') { obj.splitCash = a.splitCash; obj.splitOnline = a.splitOnline; }
