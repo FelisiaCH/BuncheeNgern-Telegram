@@ -573,6 +573,12 @@ option{background:#0E1526}
 }
 .combo-opt:not(:last-child){border-bottom:1px solid var(--brd)}
 .combo-opt:hover,.combo-opt:focus{background:var(--teal-dim);color:var(--teal);outline:none}
+.combo-cat{
+  padding:7px 12px 4px;font-size:11px;font-weight:800;letter-spacing:.4px;
+  text-transform:uppercase;color:var(--txt-muted);pointer-events:none;
+  position:sticky;top:0;background:var(--bg-card)
+}
+.combo-cat:first-child{padding-top:8px}
 
 /* 🪟 Item Picker Popup (modal — reuses the .ov backdrop + .ov-card animation) */
 .item-popup-card{
@@ -1380,9 +1386,45 @@ function applyTranslations() {
 // 🧾 Item Picker — localized suggestions feed BOTH an inline type-ahead dropdown
 // (while typing) and a modal popup (chevron button). The field is ALWAYS free
 // text: any typed value, even one not in the list, submits unchanged.
-function itemSuggestionList() {
+// Grouped suggestions [{cat, items:[]}]; tolerates a legacy flat string[].
+function itemSuggestionGroups() {
   const v = t('itemSuggestions');
-  return Array.isArray(v) ? v : [];
+  if (Array.isArray(v) && v.length && typeof v[0] === 'object') return v;           // grouped shape
+  if (Array.isArray(v)) return v.length ? [{ cat: '', items: v.map(String) }] : []; // legacy flat
+  return [];
+}
+// Flat list of every item string (used for match counts).
+function itemSuggestionList() {
+  return itemSuggestionGroups().flatMap(g => (g.items || []).map(String));
+}
+
+// Render groups whose items match `query` into `container` (empty query → all).
+// `wire(btn, opt)` attaches the pick handler — inline uses mousedown so the pick
+// beats the field's blur; the popup uses click. Returns total matched item count.
+function buildGroupedOptions(container, query, wire) {
+  const q = String(query || '').trim().toLowerCase();
+  container.innerHTML = '';
+  let count = 0;
+  itemSuggestionGroups().forEach(g => {
+    const items = (g.items || []).filter(o => !q || String(o).toLowerCase().includes(q));
+    if (!items.length) return;
+    if (g.cat) {
+      const h = document.createElement('div');
+      h.className = 'combo-cat';
+      h.textContent = g.cat;
+      container.appendChild(h);
+    }
+    items.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'combo-opt';
+      btn.textContent = opt;
+      wire(btn, opt);
+      container.appendChild(btn);
+    });
+    count += items.length;
+  });
+  return count;
 }
 
 // --- Inline type-ahead dropdown (under the field) ---
@@ -1391,19 +1433,8 @@ function itemSuggestionList() {
 function renderComboOptions(query) {
   const drop = $('combo-drop');
   if (!drop) return 0;
-  const q = String(query || '').trim().toLowerCase();
-  const opts = itemSuggestionList().filter(o => !q || String(o).toLowerCase().includes(q));
-  drop.innerHTML = '';
-  opts.forEach(opt => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'combo-opt';
-    btn.textContent = opt;
-    // mousedown (not click) so the pick fires BEFORE the field's blur closes it
-    btn.addEventListener('mousedown', e => { e.preventDefault(); pickCombo(opt); });
-    drop.appendChild(btn);
-  });
-  return opts.length;
+  return buildGroupedOptions(drop, query, (btn, opt) =>
+    btn.addEventListener('mousedown', e => { e.preventDefault(); pickCombo(opt); }));
 }
 function initCombo() {
   // Open/close is driven by the field's own focus/input/blur events — no
@@ -1443,19 +1474,10 @@ function onItemPopupBackdrop(e) { if (e.target === $('item-popup')) closeItemPop
 function renderItemPopupList(query) {
   const list = $('item-popup-list');
   if (!list) return 0;
-  const q = String(query || '').trim().toLowerCase();
-  const opts = itemSuggestionList().filter(o => !q || String(o).toLowerCase().includes(q));
-  list.innerHTML = '';
-  if (!opts.length) { list.innerHTML = '<div class="item-popup-empty">—</div>'; return 0; }
-  opts.forEach(opt => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'combo-opt';
-    btn.textContent = opt;
-    btn.addEventListener('click', () => pickItemFromPopup(opt));
-    list.appendChild(btn);
-  });
-  return opts.length;
+  const n = buildGroupedOptions(list, query, (btn, opt) =>
+    btn.addEventListener('click', () => pickItemFromPopup(opt)));
+  if (!n) list.innerHTML = '<div class="item-popup-empty">—</div>';
+  return n;
 }
 function pickItemFromPopup(val) {
   $('f-item').value = val;
