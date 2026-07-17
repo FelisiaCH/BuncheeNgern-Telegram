@@ -45,7 +45,6 @@ window.I18N_PARTS.my = {
   ariaSelectItem:        'ပစ္စည်းရွေးပါ',
   labelAmount:           'ပမာဏ',
   ariaCurrency:          'ငွေကြေး',
-  btnAddCurrency:        '+ ငွေကြေး ထပ်ထည့်ရန်',
   ariaRemoveCurrency:    'ဤငွေကြေးကို ဖယ်ရှားမည်',
   labelBranch:           'ဌာနခွဲ',
   labelPaymentMethod:    'ငွေချေနည်းလမ်း',

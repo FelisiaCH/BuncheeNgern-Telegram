@@ -45,7 +45,6 @@ window.I18N_PARTS.ms = {
   ariaSelectItem:        'Pilih item',
   labelAmount:           'Jumlah',
   ariaCurrency:          'Mata Wang',
-  btnAddCurrency:        '+ Tambah Mata Wang',
   ariaRemoveCurrency:    'Buang mata wang ini',
   labelBranch:           'Cawangan',
   labelPaymentMethod:    'Kaedah Pembayaran',

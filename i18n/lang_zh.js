@@ -45,7 +45,6 @@ window.I18N_PARTS.zh = {
   ariaSelectItem:        '选择项目',
   labelAmount:           '金额',
   ariaCurrency:          '货币',
-  btnAddCurrency:        '+ 添加货币',
   ariaRemoveCurrency:    '移除此货币',
   labelBranch:           '分店',
   labelPaymentMethod:    '付款方式',

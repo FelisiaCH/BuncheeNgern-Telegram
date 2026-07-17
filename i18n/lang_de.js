@@ -45,7 +45,6 @@ window.I18N_PARTS.de = {
   ariaSelectItem:        'Artikel auswählen',
   labelAmount:           'Betrag',
   ariaCurrency:          'Währung',
-  btnAddCurrency:        '+ Währung hinzufügen',
   ariaRemoveCurrency:    'Diese Währung entfernen',
   labelBranch:           'Filiale',
   labelPaymentMethod:    'Zahlungsmethode',

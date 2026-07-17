@@ -45,7 +45,6 @@ window.I18N_PARTS.vi = {
   ariaSelectItem:        'Chọn mục',
   labelAmount:           'Số tiền',
   ariaCurrency:          'Tiền tệ',
-  btnAddCurrency:        '+ Thêm tiền tệ',
   ariaRemoveCurrency:    'Xóa loại tiền này',
   labelBranch:           'Chi nhánh',
   labelPaymentMethod:    'Phương thức thanh toán',

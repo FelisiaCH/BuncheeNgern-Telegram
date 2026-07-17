@@ -45,7 +45,6 @@ window.I18N_PARTS.th = {
   ariaSelectItem:        'เลือกรายการ',
   labelAmount:           'จำนวนเงิน',
   ariaCurrency:          'สกุลเงิน',
-  btnAddCurrency:        '+ เพิ่มสกุลเงิน',
   ariaRemoveCurrency:    'ลบสกุลเงินนี้',
   labelBranch:           'สาขา',
   labelPaymentMethod:    'ช่องทางชำระเงิน',

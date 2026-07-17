@@ -45,7 +45,6 @@ window.I18N_PARTS.ko = {
   ariaSelectItem:        '항목 선택',
   labelAmount:           '금액',
   ariaCurrency:          '화폐',
-  btnAddCurrency:        '+ 화폐 추가',
   ariaRemoveCurrency:    '이 화폐 제거',
   labelBranch:           '지점',
   labelPaymentMethod:    '결제 방법',

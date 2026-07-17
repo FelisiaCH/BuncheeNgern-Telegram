@@ -45,7 +45,6 @@ window.I18N_PARTS.bn = {
   ariaSelectItem:        'আইটেম নির্বাচন করুন',
   labelAmount:           'পরিমাণ',
   ariaCurrency:          'মুদ্রা',
-  btnAddCurrency:        '+ মুদ্রা যুক্ত করুন',
   ariaRemoveCurrency:    'এই মুদ্রাটি অপসারণ করুন',
   labelBranch:           'শাখা',
   labelPaymentMethod:    'পেমেন্ট পদ্ধতি',

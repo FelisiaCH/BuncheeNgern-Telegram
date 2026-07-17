@@ -45,7 +45,6 @@ window.I18N_PARTS.tl = {
   ariaSelectItem:        'Pumili ng item',
   labelAmount:           'Halaga',
   ariaCurrency:          'Pera',
-  btnAddCurrency:        '+ Magdagdag ng Pera',
   ariaRemoveCurrency:    'Alisin ang pera na ito',
   labelBranch:           'Sangay',
   labelPaymentMethod:    'Paraan ng Bayad',

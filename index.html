@@ -280,21 +280,6 @@ option{background:#0E1526}
 .prc-in::-webkit-inner-spin-button{-webkit-appearance:none}
 .prc-in[type=number]{-moz-appearance:textfield;appearance:textfield}
 
-/* ➕ Multi-Currency Repeater */
-/* Stack vertically so the payment buttons (.seg-wrap) get a full-width row and
-   their labels never truncate; the currency field + remove button share the top row. */
-.cur-line{display:flex;flex-direction:column;gap:8px;margin-top:8px}
-.cur-line-top{display:flex;gap:8px;align-items:stretch}
-.cur-line-top .pg{flex:1}
-.cur-remove-btn{
-  flex:0 0 auto;width:42px;border:1px solid var(--brd);
-  background:var(--bg-input);border-radius:var(--r-sm);
-  color:var(--red);font-size:16px;cursor:pointer;
-  transition:background var(--ease),border-color var(--ease)
-}
-.cur-remove-btn:hover{background:var(--red-dim);border-color:var(--red-brd)}
-.cur-add-btn{width:100%;margin-top:10px;padding:11px}
-
 /* 💡 Price-suggestion chips (×10/×100/×1000) */
 .price-suggest{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .price-suggest:empty{display:none}
@@ -751,7 +736,7 @@ option{background:#0E1526}
 /* 👆 Tap feedback — subtle press scale (touch devices have no hover) */
 .seg:active,.branch-chip:active,.nb:active,.sf:active,.ctab:active,.lang-btn:active,
 .icon-btn:active,.nav-arrow:active:not(:disabled),.lo-btn:active,.combo-toggle:active,
-.cur-remove-btn:active,.combo-opt:active{transform:scale(.96)}
+.combo-opt:active{transform:scale(.96)}
 
 /* 📱 Phones — comfortable ~44px tap targets (Apple/Google HIG) without enlarging desktop */
 @media (max-width:480px){
@@ -764,7 +749,6 @@ option{background:#0E1526}
   .combo-toggle{width:46px}
   .item-popup-close{width:44px;height:44px}
   .branch-del-btn{width:36px;height:36px}
-  .cur-remove-btn{min-width:44px}
   .clear-slip-btn{padding:9px 16px}
 }
 
@@ -788,7 +772,7 @@ option{background:#0E1526}
   /* also neutralize the tap-scale feedback under reduced-motion */
   .seg:active,.branch-chip:active,.nb:active,.sf:active,.ctab:active,.lang-btn:active,
   .icon-btn:active,.nav-arrow:active:not(:disabled),.lo-btn:active,.combo-toggle:active,
-  .cur-remove-btn:active,.combo-opt:active,.btn:active:not(:disabled),.ref-btn:active,
+  .combo-opt:active,.btn:active:not(:disabled),.ref-btn:active,
   .menu-action-btn:active,.branch-del-btn:active,.item-popup-close:active,
   .price-chip:active{transform:none}
 }
@@ -922,10 +906,6 @@ option{background:#0E1526}
         <button class="seg split" onclick="setPrimaryPay('Split',this)">✂️ <span data-i18n="paySplit">แบ่งจ่าย</span></button>
       </div>
       <div id="split-grp-0" class="hidden" style="margin-top:8px"></div>
-      <div id="cur-lines"></div>
-      <button type="button" class="btn-ghost cur-add-btn" onclick="addCurLine()">
-        <span data-i18n="btnAddCurrency">+ เพิ่มสกุลเงิน</span>
-      </button>
     </div>
 
     <div class="fg">
@@ -1235,7 +1215,7 @@ const A = {
   me:          null,
   userEmail:   '',
   sessionToken: null,
-  fd: { type:'income', shop: BRANCHES[0], pay:'Cash', splitBuckets: [], extraCur: [] },
+  fd: { type:'income', shop: BRANCHES[0], pay:'Cash', splitBuckets: [] },
   slip:      null,
 };
 let dashByBranchCur  = {};
@@ -1368,7 +1348,6 @@ function applyTranslations() {
   renderManageCurrenciesList();
   renderCurrencyPicker($('cur-picker-search')?.value || '');
   renderComboOptions($('f-item')?.value || '');
-  renderCurLines();   // extra lines (incl. their split builders) carry baked labels
   if (A.fd.pay === 'Split') renderSplitBuilder($('split-grp-0'), A.fd);
 
   if (!$('scr-app').classList.contains('hidden')) {
@@ -1614,16 +1593,12 @@ function commitCurrencies(list) {
   localStorage.setItem(CURRENCIES_KEY, JSON.stringify(CURRENCIES));
   if (!CURRENCIES.length) activeCurTab = '';
   else if (!CURRENCIES.find(c => c.code === activeCurTab)) activeCurTab = CURRENCIES[0].code;
-  // Reconcile extra form lines pointing at a now-deleted currency: reset them to
-  // the first available code so the stored state matches the rebuilt dropdowns.
-  // Without this, the <select> silently falls back to the first option while
-  // A.fd.extraCur[i].currency keeps the deleted code, and submit sends the stale one.
   const curFallback = CURRENCIES.length ? CURRENCIES[0].code : '';
-  A.fd.extraCur.forEach(line => {
-    if (!CURRENCIES.find(c => c.code === line.currency)) line.currency = curFallback;
+  (A.fd.splitBuckets || []).forEach(b => {
+    if (!CURRENCIES.find(c => c.code === b.currency)) b.currency = curFallback;
   });
   renderCurSelect();
-  renderCurLines();
+  if (A.fd.pay === 'Split') renderSplitBuilder($('split-grp-0'), A.fd);
   renderManageCurrenciesList();
   renderCurrencyPicker($('cur-picker-search')?.value || '');
   if (!$('scr-app').classList.contains('hidden') && !$('tab-dash').classList.contains('hidden')) {
@@ -2191,8 +2166,7 @@ function setPrimaryPay(val, btn) {
   updateSlipVisibility();
 }
 function updateSlipVisibility() {
-  const needs = A.fd.pay === 'Online' || A.fd.pay === 'Split' ||
-                A.fd.extraCur.some(l => l.pay === 'Online' || l.pay === 'Split');
+  const needs = A.fd.pay === 'Online' || A.fd.pay === 'Split';
   $('slip-grp').classList.toggle('hidden', !needs);
   if (!needs) clearSlip();
 }
@@ -2261,68 +2235,6 @@ function onDrop(e) {
   if (f?.type.startsWith('image/')) loadFile(f);
 }
 
-// 💱 Multi-Currency Repeater
-function renderCurLines() {
-  const wrap = $('cur-lines');
-  wrap.innerHTML = '';
-  A.fd.extraCur.forEach((line, i) => {
-    const row = document.createElement('div');
-    row.className = 'cur-line';
-    row.innerHTML = `
-      <div class="cur-line-top">
-        <div class="pg${line.pay==='Split'?' split-on':''}">
-          <select class="cur-sel" id="x-cur-sel-${i}" name="x-cur-sel-${i}" aria-label="${esc(t('ariaCurrency'))}">
-            ${CURRENCIES.map(c => `<option value="${c.code}"${c.code === line.currency ? ' selected' : ''}>${c.code} ${c.symbol}</option>`).join('')}
-          </select>
-          <input type="text" class="prc-in amt-fmt" id="x-cur-price-${i}" name="x-cur-price-${i}" placeholder="0" inputmode="decimal" value="${formatAmount(line.price ?? '')}">
-        </div>
-        <button type="button" class="cur-remove-btn" aria-label="${esc(t('ariaRemoveCurrency'))}">✕</button>
-      </div>
-      <div class="seg-wrap">
-        <button class="seg cash${line.pay==='Cash'?' on':''}" type="button">💵 <span>${esc(t('payCash'))}</span></button>
-        <button class="seg qr${line.pay==='Online'?' on':''}" type="button">📱 <span>${esc(t('payQR'))}</span></button>
-        <button class="seg split${line.pay==='Split'?' on':''}" type="button">✂️ <span>${esc(t('paySplit'))}</span></button>
-      </div>
-      <div class="split-grp${line.pay==='Split'?'':' hidden'}"></div>
-    `;
-    const sel          = row.querySelector('select');
-    const pgEl         = row.querySelector('.pg');
-    const input        = row.querySelector('.prc-in');
-    const segBtns      = row.querySelectorAll('.seg-wrap .seg');
-    const splitGrp     = row.querySelector('.split-grp');
-
-    sel.addEventListener('change', () => { A.fd.extraCur[i].currency = sel.value; });
-    input.addEventListener('input', () => { A.fd.extraCur[i].price = input.value; });
-    segBtns.forEach(btn => btn.addEventListener('click', () => {
-      const val = btn.classList.contains('cash') ? 'Cash' : btn.classList.contains('qr') ? 'Online' : 'Split';
-      A.fd.extraCur[i].pay = val;
-      segBtns.forEach(b => b.classList.remove('on'));
-      btn.classList.add('on');
-      const isSplit = val === 'Split';
-      if (isSplit) {
-        seedSplitBuckets(A.fd.extraCur[i], A.fd.extraCur[i].currency);
-        renderSplitBuilder(splitGrp, A.fd.extraCur[i]);
-      }
-      pgEl.classList.toggle('split-on', isSplit);   // Split hides the line's single total input
-      splitGrp.classList.toggle('hidden', !isSplit);
-      updateSlipVisibility();
-    }));
-    row.querySelector('.cur-remove-btn').addEventListener('click', () => removeCurLine(i));
-    if (line.pay === 'Split') renderSplitBuilder(splitGrp, line);
-    wrap.appendChild(row);
-  });
-  updateSlipVisibility();
-}
-function addCurLine() {
-  if (!CURRENCIES.length) { showToast(t('warnNoCurrencies'), 'warn'); return; }
-  A.fd.extraCur.push({ currency: CURRENCIES[0].code, price: '', pay: 'Cash', splitBuckets: [] });
-  renderCurLines();
-}
-function removeCurLine(i) {
-  A.fd.extraCur.splice(i, 1);
-  renderCurLines();
-}
-
 // 📝 Entry Submission Flow
 // A Split line's valid parts: ON buckets with a positive amount (raw numbers).
 function splitParts(line) {
@@ -2351,32 +2263,14 @@ async function doSubmit() {
     if (!primaryParts.length) { setMsg('f-msg', t('warnSplitNeedOne'),'warn'); return; }
   } else if (!price || price <= 0) { setMsg('f-msg', t('warnEnterValidAmount'),'warn'); return; }
 
-  const extraAmounts = A.fd.extraCur.map(line => {
-    const parts = line.pay === 'Split' ? splitParts(line) : [];
-    return {
-      currency: line.currency, pay: line.pay, parts,
-      price: line.pay === 'Split' ? partsTotal(parts) : amt(line.price),
-    };
-  });
-  for (const a of extraAmounts) {
-    if (a.pay === 'Split') {
-      if (!a.parts.length) { setMsg('f-msg', t('warnSplitNeedOne'),'warn'); return; }
-    } else if (!a.price || a.price <= 0) { setMsg('f-msg', t('warnEnterValidAmount'),'warn'); return; }
-  }
-
-  const needsSlip = A.fd.pay === 'Online' || A.fd.pay === 'Split' ||
-                    A.fd.extraCur.some(l => l.pay === 'Online' || l.pay === 'Split');
+  const needsSlip = A.fd.pay === 'Online' || A.fd.pay === 'Split';
   if (needsSlip && !A.slip) { setMsg('f-msg', t('warnAttachSlip'),'warn'); return; }
 
   const toPayMethod = p => p === 'Online' ? 'Online Payment' : p === 'Split' ? 'Split' : 'Cash';
   const primaryAmt = { currency: cur, price, paymentMethod: toPayMethod(A.fd.pay) };
   if (isPrimarySplit) primaryAmt.parts = primaryParts;
-  const amounts = [primaryAmt, ...extraAmounts.map(a => {
-    const obj = { currency: a.currency, price: a.price, paymentMethod: toPayMethod(a.pay) };
-    if (a.pay === 'Split') obj.parts = a.parts;
-    return obj;
-  })];
-  const allPays = [A.fd.pay, ...A.fd.extraCur.map(l => l.pay)];
+  const amounts = [primaryAmt];
+  const allPays = [A.fd.pay];
   const topPayMethod = allPays.every(p => p === 'Cash') ? 'Cash'
                      : allPays.every(p => p === 'Online') ? 'Online Payment'
                      : 'Cash + Online Payment';
@@ -2432,7 +2326,6 @@ async function doSubmit() {
 function resetForm() {
   $('f-item').value = ''; closeCombo(); $('f-price').value = ''; renderPriceSuggest(); $('f-cur').value = CURRENCIES.length ? CURRENCIES[0].code : '';
   A.fd.pay = 'Cash'; A.fd.splitBuckets = [];
-  A.fd.extraCur = []; renderCurLines();
   clearSlip(); setMsg('f-msg');
   document.querySelectorAll('#sg-type .seg').forEach((s,i) => s.classList.toggle('on', i===0));
   A.fd.type = 'income';
