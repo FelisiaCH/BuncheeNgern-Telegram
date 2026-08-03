@@ -117,6 +117,14 @@ function verifyGoogleToken(idToken) {
   return { email: payload.email, name: payload.name || payload.email };
 }
 
+// ⚡ CacheService front for hot-path auth reads (sessions + whitelist).
+// A cache hit skips the sheet read, the script lock, and the per-request write
+// that previously ran on EVERY request. The Sheet remains the source of truth:
+// cache entries expire after AUTH_CACHE_TTL_S, so manual Sheet edits (deleting
+// a session row, flipping a whitelist status) take effect within that window.
+const AUTH_CACHE_TTL_S = 600; // 10 minutes
+function authCache() { return CacheService.getScriptCache(); }
+
 // ✅ Email Whitelist — sheet tab 'AllowedUsers': Email | Status | Note | Last Login
 const WHITELIST_TAB     = 'AllowedUsers';
 const WHITELIST_HEADERS = ['Email', 'Status', 'Note', 'Last Login'];
@@ -125,6 +133,13 @@ function checkWhitelist(email) {
   const normalized = normalizeEmail(email);
   if (!normalized) return 'deny';
 
+  // Fast path: cached verdict — no sheet read, no lock, no Last-Login write.
+  const cKey = 'wl:' + normalized;
+  try {
+    const hit = authCache().get(cKey);
+    if (hit === 'allow' || hit === 'deny') return hit;
+  } catch (err) { /* cache unavailable — fall through to the Sheet */ }
+
   const lock = LockService.getScriptLock();
   lock.waitLock(30000);
   try {
@@ -132,18 +147,23 @@ function checkWhitelist(email) {
     const rows  = sheet.getDataRange().getValues();
     const now   = Utilities.formatDate(new Date(), ss().getSpreadsheetTimeZone(), TIMESTAMP_FORMAT);
 
+    let verdict = null;
     for (let i = 1; i < rows.length; i++) {
       const rowEmail = normalizeEmail(rows[i][0]);
       if (rowEmail !== normalized) continue;
       const status = String(rows[i][1] || '').trim().toLowerCase();
-      sheet.getRange(i + 1, 4).setValue(now);
-      return status === 'allow' ? 'allow' : 'deny';
+      sheet.getRange(i + 1, 4).setValue(now); // Last Login — now cache-TTL granularity
+      verdict = status === 'allow' ? 'allow' : 'deny';
+      break;
     }
-
-    // Unknown email — auto-log as deny, storing the NORMALIZED email so a
-    // repeat attempt matches this same row above instead of appending again
-    sheet.appendRow([normalized, 'deny', 'Auto-logged on first access attempt', now]);
-    return 'deny';
+    if (verdict === null) {
+      // Unknown email — auto-log as deny, storing the NORMALIZED email so a
+      // repeat attempt matches this same row above instead of appending again
+      sheet.appendRow([normalized, 'deny', 'Auto-logged on first access attempt', now]);
+      verdict = 'deny';
+    }
+    try { authCache().put(cKey, verdict, AUTH_CACHE_TTL_S); } catch (err) { /* best-effort */ }
+    return verdict;
   } finally {
     lock.releaseLock();
   }
@@ -236,6 +256,19 @@ function getOrCreateSessionForDevice(email, name, deviceId, deviceLabel, userAge
 
 function validateSession(token) {
   if (!token) return null;
+
+  // Fast path: cached session — no sheet read, no lock, no expiry write.
+  const cKey = 'ses:' + token;
+  try {
+    const hit = authCache().get(cKey);
+    if (hit) {
+      const s = JSON.parse(hit);
+      if (s && s.expMs > Date.now()) return { email: s.email, name: s.name };
+      // Cached-as-expired — fall through to the Sheet (source of truth), never
+      // deny from cache alone.
+    }
+  } catch (err) { /* cache unavailable/corrupt — fall through to the Sheet */ }
+
   const lock = LockService.getScriptLock();
   lock.waitLock(30000);
   try {
@@ -246,9 +279,18 @@ function validateSession(token) {
       if (String(rows[i][SES_TOKEN]) !== String(token)) continue;
       const expires = rowExpiry(rows[i]);
       if (isNaN(expires.getTime()) || expires.getTime() <= now.getTime()) return null;
-      // Roll the expiry forward so active users stay signed in
-      sheet.getRange(i + 1, SES_EXPIRES + 1).setValue(new Date(now.getTime() + SESSION_TTL_MS));
-      return { email: String(rows[i][SES_EMAIL] || ''), name: String(rows[i][SES_NAME] || '') };
+      // Roll the expiry forward so active users stay signed in. With the cache
+      // in front, this write happens at most once per TTL window per device
+      // instead of on every request — the 30-day rolling window is unaffected.
+      const newExpiry = new Date(now.getTime() + SESSION_TTL_MS);
+      sheet.getRange(i + 1, SES_EXPIRES + 1).setValue(newExpiry);
+      const session = { email: String(rows[i][SES_EMAIL] || ''), name: String(rows[i][SES_NAME] || '') };
+      try {
+        authCache().put(cKey,
+          JSON.stringify({ email: session.email, name: session.name, expMs: newExpiry.getTime() }),
+          AUTH_CACHE_TTL_S);
+      } catch (err) { /* cache write is best-effort */ }
+      return session;
     }
     return null;
   } finally {
