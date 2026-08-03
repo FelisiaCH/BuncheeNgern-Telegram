@@ -67,6 +67,7 @@
   --amber:rgb(var(--h-amber));
   --amber-dim:rgba(var(--h-amber),.08);
   --amber-brd:rgba(var(--h-amber),.22);
+  --red-solid:#E11D48;   /* expense button bg — white label clears 4.5:1 in both themes */
 
   --r:var(--radius-md);
   --r-sm:var(--radius-sm);
@@ -87,7 +88,11 @@
   --shadow-sm:0 1px 2px rgba(16,23,42,.05);
   --shadow-md:0 4px 16px rgba(16,23,42,.06);
   --shadow-lg:0 8px 40px rgba(16,23,42,.08);
-  --brd-focus:rgba(16,23,42,.45)
+  --brd-focus:rgba(16,23,42,.45);
+  --h-green:15,122,71;     /* #0F7A47 — 5.39:1 on white */
+  --h-indigo:79,70,229;    /* #4F46E5 — 6.29:1 */
+  --h-amber:180,83,9;      /* #B45309 — 5.02:1 */
+  --h-red:225,29,72;       /* #E11D48 — 4.70:1 */
 }
 html{height:100%}
 body{
@@ -255,7 +260,7 @@ option{background:var(--bg-input);color:var(--txt)}
 }
 .btn-primary{background:var(--accent);color:var(--accent-fg)}
 .btn-primary:hover:not(:disabled){opacity:.9}
-.btn-red{background:var(--red);color:#fff}
+.btn-red{background:var(--red-solid);color:#fff}
 .btn-red:hover:not(:disabled){opacity:.9}
 .btn:active:not(:disabled){transform:scale(.99);opacity:.85}
 .btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none!important}
