@@ -140,7 +140,7 @@ Note that Google sign-in now happens **once**: it mints an app session token tha
    ```
 
    These are plain constants in the file — there is no in-app settings field for them.
-2. Deploy the **whole project folder**, not just `index.html` — the app loads `i18n/lang_*.js`, `service-worker.js`, and icon/manifest files from relative paths, and will fail to load or run untranslated if those 404. From the repo root:
+2. Deploy the **whole project folder**, not just `index.html` — the app loads `css/app.css`, `js/*.js`, `i18n/lang_*.js`, `service-worker.js`, and icon/manifest files from relative paths, and will fail to load or run untranslated if those 404. From the repo root:
 
    ```bash
    npx wrangler pages deploy .
@@ -154,7 +154,9 @@ Note that Google sign-in now happens **once**: it mints an app session token tha
    const CACHE = 'buncheengern-v1.1.15';
    ```
 
-   HTML pages are fetched network-first (so most changes to `index.html` reach users on their next reload automatically), but `i18n/lang_*.js`, icons, and other static assets are served cache-first. Whenever you change any static asset, bump the `CACHE` string (e.g. `v1.1.15`) so old cached files are evicted and the new ones are fetched.
+   `index.html` is fetched network-first, so edits to the HTML shell itself reach users on their next reload. **Everything else — `css/app.css`, `js/*.js`, `i18n/lang_*.js`, icons — is served cache-first with no runtime refresh.** Since almost all application code now lives in `js/*.js`, assume any code change requires a bump: whenever you change a file under `css/`, `js/`, or `i18n/`, bump the `CACHE` string (e.g. `v1.1.38` → `v1.1.39`) so old cached files are evicted. Skipping the bump leaves installed PWAs running the old code indefinitely.
+
+   Adding a **new** file under `css/`, `js/`, or `i18n/` also requires adding its path to the `ASSETS` array in `service-worker.js` — a file missing from `ASSETS` breaks the installed app when offline.
 
 ---
 
@@ -175,8 +177,8 @@ See [docs/USAGE.md](USAGE.md) for the full day-to-day usage guide (logging entri
 | Entry saves but no Telegram message arrives | Script never authorized for external requests, bot token wrong, or chat ID(s) wrong/never messaged the bot | Run any function once in the Apps Script editor to authorize (§1.6); verify token and chat IDs (§2). The response includes `telegramOk`/`telegramError` so the app can show the exact failure as a toast |
 | Telegram error mentions "chat not found" | The bot was never messaged first (private chat), or isn't in the group, or the ID is missing its `-` prefix | Re-check §2 |
 | Slip upload fails | Script not authorized, or wrong `DRIVE_FOLDER_ID` | Authorize (§1.6); check the folder ID |
-| `i18n/lang_*.js` 404s, app stuck on splash, or UI shows untranslated keys | Only `index.html` was deployed, not the whole folder | Redeploy the entire project folder (§4.2) |
-| Code/UI changes don't show up on a phone that already installed the app | Stale service-worker cache for static assets | Bump `CACHE` in `service-worker.js` (§4.4) and reload; HTML itself is network-first so most changes should appear on a normal reload |
+| `css/app.css`, `js/*.js`, or `i18n/lang_*.js` 404s, app stuck on splash, or UI shows untranslated keys | Only `index.html` was deployed, not the whole folder | Redeploy the entire project folder (§4.2) |
+| Code/UI changes don't show up on a phone that already installed the app | Stale service-worker cache — `js/*.js` and `css/app.css` are cache-first | Bump `CACHE` in `service-worker.js` (§4.4) and reload. Only changes to `index.html` itself arrive without a bump |
 | Apps Script changes don't take effect | Edited `Code.gs` but didn't ship a new deployment version | Deploy ▸ Manage deployments ▸ edit ▸ New version ▸ Deploy (§1) |
 
 > **Telegram + special characters:** notifications are sent with HTML formatting and every interpolated field (item name, branch, author, etc.) is HTML-escaped, so names containing `_`, `*`, `` ` ``, or `[` are safe and won't break the message.
