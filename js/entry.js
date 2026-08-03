@@ -5,7 +5,7 @@ function setSeg(key, val, btn) {
   btn.classList.add('on');
   if (key === 'type') {
     const isExp = val === 'expense';
-    $('sub-btn').className = `btn ${isExp ? 'btn-red' : 'btn-teal'}`;
+    $('sub-btn').className = `btn ${isExp ? 'btn-red' : 'btn-primary'}`;
     $('sub-btn').style.cssText = 'margin-top:16px';
   }
 }
@@ -85,7 +85,7 @@ function renderSplitBuilder(wrap, line) {
       rowEl.className = 'pg split-part-row';
       const ico = document.createElement('span');
       ico.className = 'cur-sel';
-      ico.style.cssText = `pointer-events:none;color:var(--${b.source === 'Cash' ? 'amber' : 'teal'})`;
+      ico.style.cssText = `pointer-events:none;color:var(--${b.source === 'Cash' ? 'amber' : 'accent'})`;
       ico.textContent = b.source === 'Cash' ? '💵' : '📱';
       const inp = document.createElement('input');
       inp.type = 'text';
@@ -371,7 +371,7 @@ function resetForm() {
   document.querySelectorAll('#sg-type .seg').forEach((s,i) => s.classList.toggle('on', i===0));
   A.fd.type = 'income';
   const sb = $('sub-btn');
-  sb.className = 'btn btn-teal'; sb.style.cssText = 'margin-top:16px';
+  sb.className = 'btn btn-primary'; sb.style.cssText = 'margin-top:16px';
   selectBranchSegment(A.fd.shop);
   document.querySelectorAll('#sg-pay-0 .seg').forEach((s,i) => s.classList.toggle('on', i===0));
   $('split-grp-0').innerHTML = ''; $('split-grp-0').classList.add('hidden');
