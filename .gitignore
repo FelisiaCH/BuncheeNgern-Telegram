@@ -17,3 +17,7 @@ Thumbs.db
 !.dev.vars.example
 .env*
 !.env.example
+
+# one-off patch artifacts & Claude Code skills lock
+*.patch
+skills-lock.json
