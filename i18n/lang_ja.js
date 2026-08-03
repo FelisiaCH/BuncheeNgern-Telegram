@@ -45,7 +45,6 @@ window.I18N_PARTS.ja = {
   ariaSelectItem:        '項目を選択',
   labelAmount:           '金額',
   ariaCurrency:          '通貨',
-  btnAddCurrency:        '+ 通貨を追加',
   ariaRemoveCurrency:    'この通貨を削除',
   labelBranch:           '店舗',
   labelPaymentMethod:    '支払い方法',

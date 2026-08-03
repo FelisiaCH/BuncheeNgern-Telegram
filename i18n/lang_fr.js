@@ -45,7 +45,6 @@ window.I18N_PARTS.fr = {
   ariaSelectItem:        'Sélectionner un article',
   labelAmount:           'Montant',
   ariaCurrency:          'Devise',
-  btnAddCurrency:        '+ Ajouter une devise',
   ariaRemoveCurrency:    'Retirer cette devise',
   labelBranch:           'Succursale',
   labelPaymentMethod:    'Mode de paiement',

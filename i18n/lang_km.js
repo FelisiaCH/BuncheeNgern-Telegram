@@ -45,7 +45,6 @@ window.I18N_PARTS.km = {
   ariaSelectItem:        'ជ្រើសរើសមុខទំនិញ',
   labelAmount:           'ចំនួនទឹកប្រាក់',
   ariaCurrency:          'រូបិយប័ណ្ណ',
-  btnAddCurrency:        '+ បញ្ចូលរូបិយប័ណ្ណ',
   ariaRemoveCurrency:    'លុបរូបិយប័ណ្ណនេះ',
   labelBranch:           'សាខា',
   labelPaymentMethod:    'វិធីបង់ប្រាក់',

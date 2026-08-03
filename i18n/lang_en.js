@@ -45,7 +45,6 @@ window.I18N_PARTS.en = {
   ariaSelectItem:        'Select item',
   labelAmount:           'Amount',
   ariaCurrency:          'Currency',
-  btnAddCurrency:        '+ Add Currency',
   ariaRemoveCurrency:    'Remove this currency',
   labelBranch:           'Branch',
   labelPaymentMethod:    'Payment Method',

@@ -45,7 +45,6 @@ window.I18N_PARTS.hi = {
   ariaSelectItem:        'आइटम चुनें',
   labelAmount:           'राशि',
   ariaCurrency:          'मुद्रा',
-  btnAddCurrency:        '+ मुद्रा जोड़ें',
   ariaRemoveCurrency:    'इस मुद्रा को हटाएं',
   labelBranch:           'शाखा',
   labelPaymentMethod:    'भुगतान का तरीका',

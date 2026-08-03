@@ -45,7 +45,6 @@ window.I18N_PARTS.lo = {
   ariaSelectItem:        'ເລືອກລາຍການ',
   labelAmount:           'ຈຳນວນເງິນ',
   ariaCurrency:          'ສະກຸນເງິນ',
-  btnAddCurrency:        '+ ເພີ່ມສະກຸນເງິນ',
   ariaRemoveCurrency:    'ລຶບສະກຸນເງິນນີ້',
   labelBranch:           'ສາຂາ',
   labelPaymentMethod:    'ຊ່ອງທາງຊຳລະເງິນ',
