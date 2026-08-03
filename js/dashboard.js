@@ -219,6 +219,7 @@ function renderDashCur(cur) {
 
 // 🧭 Tab Navigation
 function switchTab(tab) {
+  sessionStorage.setItem('bcn_activeTab', tab);   // survives reload; cleared on full app close
   ['rec','dash','settings'].forEach(t => {
     const el = $(`tab-${t}`);
     const isActive = t === tab;

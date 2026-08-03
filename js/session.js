@@ -264,6 +264,12 @@ function enterApp(name) {
   // actually changes, and hydrated in init() on restore).
   selectBranchSegment(A.fd.shop);
   showScr('scr-app');
+  // Restore the tab that was active before a reload. sessionStorage survives
+  // reloads but not a full app close, so fresh opens still land on the record
+  // form. 'rec' needs no action (it's the HTML default); anything else is
+  // ignored as invalid.
+  const savedTab = sessionStorage.getItem('bcn_activeTab');
+  if (savedTab === 'dash' || savedTab === 'settings') switchTab(savedTab);
 }
 
 // LOCK — keep the stored token for reuse; just clear in-memory state and show
