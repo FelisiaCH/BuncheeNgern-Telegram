@@ -60,6 +60,10 @@ window.I18N_PARTS.fr = {
   clearSlipBtn:          'Retirer le reçu',
   submitBtn:             'Enregistrer',
   submitBtnSaving:       'Enregistrement...',
+  confirmTitle:          'Vérifier avant d\'enregistrer',
+  confirmHint:           'Cette entrée sera enregistrée et une notification envoyée',
+  confirmSaveBtn:        'Confirmer et enregistrer',
+  confirmEditBtn:        'Modifier',
 
   dashTitle:             'Résumé quotidien',
   refreshBtn:            'Actualiser',

@@ -60,6 +60,10 @@ window.I18N_PARTS.ko = {
   clearSlipBtn:          '영수증 제거',
   submitBtn:             '기록 저장',
   submitBtnSaving:       '저장 중...',
+  confirmTitle:          '저장 전 확인',
+  confirmHint:           '이 항목이 기록되고 알림이 전송됩니다',
+  confirmSaveBtn:        '확인 후 저장',
+  confirmEditBtn:        '수정',
 
   dashTitle:             '일별 요약',
   refreshBtn:            '새로고침',

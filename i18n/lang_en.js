@@ -60,6 +60,10 @@ window.I18N_PARTS.en = {
   clearSlipBtn:          'Remove Slip',
   submitBtn:             'Save Entry',
   submitBtnSaving:       'Saving...',
+  confirmTitle:          'Check before saving',
+  confirmHint:           'This entry will be recorded and a notification sent',
+  confirmSaveBtn:        'Confirm & Save',
+  confirmEditBtn:        'Edit',
 
   dashTitle:             'Daily Summary',
   refreshBtn:            'Refresh',

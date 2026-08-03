@@ -43,6 +43,19 @@
   </div>
 </div>
 
+<div id="cfm-sheet" class="ov hidden" onclick="onConfirmBackdrop(event)">
+  <div class="ov-card cfm-card">
+    <div class="cfm-title" data-i18n="confirmTitle">ตรวจสอบก่อนบันทึก</div>
+    <div class="cfm-type inc" id="cfm-type">รายรับ</div>
+    <div id="cfm-body"></div>
+    <div class="cfm-hint" data-i18n="confirmHint">รายการนี้จะถูกบันทึกและส่งแจ้งเตือน</div>
+    <div class="cfm-btns">
+      <button class="btn btn-ghost" onclick="cancelConfirm()" data-i18n="confirmEditBtn">แก้ไข</button>
+      <button class="btn btn-teal" id="cfm-save" onclick="confirmSubmit()" data-i18n="confirmSaveBtn">ยืนยันบันทึก</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast" class="toast">
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><path class="toast-check" d="M20 6L9 17l-5-5"/></svg>
   <span id="toast-txt"></span>

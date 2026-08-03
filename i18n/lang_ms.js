@@ -60,6 +60,10 @@ window.I18N_PARTS.ms = {
   clearSlipBtn:          'Buang Resit',
   submitBtn:             'Simpan Rekod',
   submitBtnSaving:       'Menyimpan...',
+  confirmTitle:          'Semak sebelum simpan',
+  confirmHint:           'Entri ini akan direkod dan notifikasi dihantar',
+  confirmSaveBtn:        'Sahkan & Simpan',
+  confirmEditBtn:        'Ubah',
 
   dashTitle:             'Ringkasan Harian',
   refreshBtn:            'Muat Semula',

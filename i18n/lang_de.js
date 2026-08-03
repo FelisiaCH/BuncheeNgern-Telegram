@@ -60,6 +60,10 @@ window.I18N_PARTS.de = {
   clearSlipBtn:          'Beleg entfernen',
   submitBtn:             'Buchung speichern',
   submitBtnSaving:       'Wird gespeichert...',
+  confirmTitle:          'Vor dem Speichern prüfen',
+  confirmHint:           'Dieser Eintrag wird gespeichert und eine Benachrichtigung gesendet',
+  confirmSaveBtn:        'Bestätigen & speichern',
+  confirmEditBtn:        'Bearbeiten',
 
   dashTitle:             'Tageszusammenfassung',
   refreshBtn:            'Aktualisieren',

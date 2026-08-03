@@ -60,6 +60,10 @@ window.I18N_PARTS.tl = {
   clearSlipBtn:          'Alisin ang Resibo',
   submitBtn:             'I-save ang Rekord',
   submitBtnSaving:       'Sine-save...',
+  confirmTitle:          'Suriin bago i-save',
+  confirmHint:           'Itatala ang entry na ito at magpapadala ng abiso',
+  confirmSaveBtn:        'Kumpirmahin at I-save',
+  confirmEditBtn:        'Baguhin',
 
   dashTitle:             'Araw-araw na Buod',
   refreshBtn:            'I-refresh',

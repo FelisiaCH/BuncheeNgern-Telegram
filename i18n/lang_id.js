@@ -60,6 +60,10 @@ window.I18N_PARTS.id = {
   clearSlipBtn:          'Hapus Bukti Transfer',
   submitBtn:             'Simpan Transaksi',
   submitBtnSaving:       'Menyimpan...',
+  confirmTitle:          'Periksa sebelum menyimpan',
+  confirmHint:           'Entri ini akan dicatat dan notifikasi dikirim',
+  confirmSaveBtn:        'Konfirmasi & Simpan',
+  confirmEditBtn:        'Ubah',
 
   dashTitle:             'Ringkasan Harian',
   refreshBtn:            'Segarkan',

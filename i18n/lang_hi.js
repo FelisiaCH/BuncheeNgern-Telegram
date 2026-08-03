@@ -60,6 +60,10 @@ window.I18N_PARTS.hi = {
   clearSlipBtn:          'पर्ची हटाएं',
   submitBtn:             'रिकॉर्ड सहेजें',
   submitBtnSaving:       'सहेजा जा रहा है...',
+  confirmTitle:          'सहेजने से पहले जाँचें',
+  confirmHint:           'यह प्रविष्टि दर्ज की जाएगी और सूचना भेजी जाएगी',
+  confirmSaveBtn:        'पुष्टि करें और सहेजें',
+  confirmEditBtn:        'संपादित करें',
 
   dashTitle:             'दैनिक सारांश',
   refreshBtn:            'ताज़ा करें',

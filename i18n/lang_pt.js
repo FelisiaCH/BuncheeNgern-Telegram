@@ -60,6 +60,10 @@ window.I18N_PARTS.pt = {
   clearSlipBtn:          'Remover comprovante',
   submitBtn:             'Salvar registro',
   submitBtnSaving:       'Salvando...',
+  confirmTitle:          'Verifique antes de salvar',
+  confirmHint:           'Este registro será salvo e uma notificação enviada',
+  confirmSaveBtn:        'Confirmar e salvar',
+  confirmEditBtn:        'Editar',
 
   dashTitle:             'Resumo diário',
   refreshBtn:            'Atualizar',

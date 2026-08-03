@@ -74,6 +74,20 @@ button{cursor:pointer;touch-action:manipulation}
 .ov-txt{font-size:13.5px;color:var(--txt-sub);font-weight:500}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+/* 🧾 Pre-submit Confirmation Sheet (reuses the .ov backdrop + .ov-card shell) */
+.cfm-card{padding:20px 18px;text-align:left;width:min(420px,92vw);max-width:none}
+.cfm-title{font-size:15px;font-weight:800;margin-bottom:10px}
+.cfm-type{display:inline-block;font-size:12px;font-weight:800;padding:3px 10px;border-radius:999px;margin-bottom:12px}
+.cfm-type.inc{color:var(--green);background:var(--green-dim)}
+.cfm-type.exp{color:var(--red);background:var(--red-dim)}
+.cfm-row{display:flex;justify-content:space-between;gap:14px;padding:7px 0;border-bottom:1px solid var(--brd)}
+.cfm-row:last-child{border-bottom:none}
+.cfm-k{font-size:12.5px;color:var(--txt-sub);flex-shrink:0}
+.cfm-v{font-size:13.5px;font-weight:600;text-align:right;word-break:break-word}
+.cfm-hint{font-size:11.5px;color:var(--txt-muted);margin:12px 0 14px}
+.cfm-btns{display:flex;gap:10px}
+.cfm-btns .btn{flex:1;margin-top:0}
+
 /* 🔔 Toast Notifications */
 .toast{
   position:fixed;top:68px;left:50%;

@@ -60,6 +60,10 @@ window.I18N_PARTS.km = {
   clearSlipBtn:          'លុបភស្តុតាង',
   submitBtn:             'រក្សាទុកកំណត់ត្រា',
   submitBtnSaving:       'កំពុងរក្សាទុក...',
+  confirmTitle:          'ពិនិត្យមុនរក្សាទុក',
+  confirmHint:           'ធាតុនេះនឹងត្រូវបានកត់ត្រា និងផ្ញើការជូនដំណឹង',
+  confirmSaveBtn:        'បញ្ជាក់ និងរក្សាទុក',
+  confirmEditBtn:        'កែសម្រួល',
 
   dashTitle:             'សង្ខេបប្រចាំថ្ងៃ',
   refreshBtn:            'ផ្ទុកឡើងវិញ',

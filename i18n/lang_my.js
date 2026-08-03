@@ -60,6 +60,10 @@ window.I18N_PARTS.my = {
   clearSlipBtn:          'ပြေစာဖယ်ရှားမည်',
   submitBtn:             'မှတ်တမ်းသိမ်းမည်',
   submitBtnSaving:       'သိမ်းနေသည်...',
+  confirmTitle:          'မသိမ်းမီ စစ်ဆေးပါ',
+  confirmHint:           'ဤစာရင်းကို မှတ်တမ်းတင်ပြီး အကြောင်းကြားပါမည်',
+  confirmSaveBtn:        'အတည်ပြု သိမ်းရန်',
+  confirmEditBtn:        'ပြင်ရန်',
 
   dashTitle:             'နေ့စဉ်အကျဉ်းချုပ်',
   refreshBtn:            'ပြန်လည်တင်မည်',

@@ -60,6 +60,10 @@ window.I18N_PARTS.vi = {
   clearSlipBtn:          'Xóa phiếu',
   submitBtn:             'Lưu giao dịch',
   submitBtnSaving:       'Đang lưu...',
+  confirmTitle:          'Kiểm tra trước khi lưu',
+  confirmHint:           'Mục này sẽ được ghi lại và gửi thông báo',
+  confirmSaveBtn:        'Xác nhận & Lưu',
+  confirmEditBtn:        'Sửa',
 
   dashTitle:             'Tổng kết ngày',
   refreshBtn:            'Làm mới',

@@ -253,11 +253,28 @@ async function doSubmit() {
                      : allPays.every(p => p === 'Online') ? 'Online Payment'
                      : 'Cash + Online Payment';
 
+  // Stash the validated entry and hand off to the confirmation sheet. Nothing
+  // is sent until confirmSubmit() runs.
+  A.pending = {
+    item, cur, price, amounts, topPayMethod, needsSlip,
+    type: A.fd.type === 'income' ? 'Income' : 'Expense',
+    shop: A.fd.shop,
+  };
+  showConfirmSheet();
+}
+
+// Actually save. Reached only from the confirmation sheet.
+async function confirmSubmit() {
+  const p = A.pending;
+  if (!p) return;
+  $('cfm-save').disabled = true;          // guard against a double tap
+  hideConfirmSheet();
+
   $('sub-btn').disabled = true;
   $('sub-txt').textContent = t('submitBtnSaving');
 
   try {
-    showOv(needsSlip && A.slip ? t('ovUploadingSlip') : t('ovSavingEntry'));
+    showOv(p.needsSlip && A.slip ? t('ovUploadingSlip') : t('ovSavingEntry'));
     const ts  = nowStamp();
     const tab = fmtDateTab(new Date());
     const result = await apiPost({
@@ -266,14 +283,14 @@ async function doSubmit() {
       sheetTabName:  tab,
       staffName:     A.me,
       userEmail:     A.userEmail || '',
-      itemName:      item,
-      currency:      cur,
-      price:         Number(price) || 0,
-      amounts:       amounts,
+      itemName:      p.item,
+      currency:      p.cur,
+      price:         Number(p.price) || 0,
+      amounts:       p.amounts,
       lang:          currentLang,
-      type:          A.fd.type === 'income' ? 'Income' : 'Expense',
-      shop:          A.fd.shop,
-      paymentMethod: topPayMethod,
+      type:          p.type,
+      shop:          p.shop,
+      paymentMethod: p.topPayMethod,
       fileName:      A.slip?.name || '',
       fileData:      A.slip?.b64  || '',
       mimeType:      A.slip?.mime || '',
@@ -299,9 +316,53 @@ async function doSubmit() {
     showToast(t('errGeneric', { msg: e.message }), 'err');
   }
 
+  A.pending = null;
   $('sub-btn').disabled = false;
   $('sub-txt').textContent = t('submitBtn');
 }
+
+// 🧾 Confirmation sheet — mirrors the field order of the Telegram message built
+// in Code.gs (type, item, cost lines, method, branch, author, slip) without
+// duplicating its formatting.
+function confirmRow(label, value) {
+  return `<div class="cfm-row"><span class="cfm-k">${label}</span><span class="cfm-v">${value}</span></div>`;
+}
+
+function showConfirmSheet() {
+  const p = A.pending;
+  if (!p) return;
+  const isInc = p.type === 'Income';
+
+  // Cost lines: a Split entry lists each enabled part; otherwise a single line.
+  const primary   = p.amounts[0] || {};
+  const parts     = primary.parts || [];
+  const payName   = m => m === 'Cash' ? t('payCash') : m === 'Online' ? t('payQR') : m;
+  const costLines = parts.length
+    ? parts.map(a => `${fmtN(a.amount)} ${esc(a.currency)} · ${esc(payName(a.source))}`).join('<br>')
+    : `${fmtN(p.price)} ${esc(p.cur)}`;
+
+  $('cfm-type').textContent = isInc ? t('typeIncome') : t('typeExpense');
+  $('cfm-type').className   = 'cfm-type ' + (isInc ? 'inc' : 'exp');
+
+  $('cfm-body').innerHTML = [
+    confirmRow(t('labelItemName'),      esc(p.item)),
+    confirmRow(t('labelAmount'),        costLines),
+    confirmRow(t('labelPaymentMethod'), esc(p.topPayMethod)),
+    confirmRow(t('labelBranch'),        esc(p.shop)),
+    confirmRow('👤',                    esc(A.me || '')),
+    confirmRow(t('labelAttachSlip'),    A.slip ? '✅' : '—'),
+  ].join('');
+
+  $('cfm-save').disabled = false;
+  $('cfm-sheet').classList.remove('hidden');
+}
+
+function hideConfirmSheet() { $('cfm-sheet').classList.add('hidden'); }
+
+// Cancel — return to the form with everything still filled in.
+function cancelConfirm() { A.pending = null; hideConfirmSheet(); }
+
+function onConfirmBackdrop(e) { if (e.target === $('cfm-sheet')) cancelConfirm(); }
 
 function resetForm() {
   $('f-item').value = ''; closeCombo(); $('f-price').value = ''; renderPriceSuggest(); $('f-cur').value = CURRENCIES.length ? CURRENCIES[0].code : '';

@@ -60,6 +60,10 @@ window.I18N_PARTS.lo = {
   clearSlipBtn:          'ລຶບສະລິບ',
   submitBtn:             'ບັນທຶກລາຍການ',
   submitBtnSaving:       'ກຳລັງບັນທຶກ...',
+  confirmTitle:          'ກວດສອບກ່ອນບັນທຶກ',
+  confirmHint:           'ລາຍການນີ້ຈະຖືກບັນທຶກ ແລະ ສົ່ງແຈ້ງເຕືອນ',
+  confirmSaveBtn:        'ຢືນຢັນບັນທຶກ',
+  confirmEditBtn:        'ແກ້ໄຂ',
 
   dashTitle:             'ສະຫຼຸບລາຍວັນ',
   refreshBtn:            'ໂຫຼດຄືນໃໝ່',

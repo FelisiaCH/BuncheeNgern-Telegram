@@ -60,6 +60,10 @@ window.I18N_PARTS.zh = {
   clearSlipBtn:          '移除凭证',
   submitBtn:             '保存记录',
   submitBtnSaving:       '保存中...',
+  confirmTitle:          '保存前请核对',
+  confirmHint:           '此记录将被保存并发送通知',
+  confirmSaveBtn:        '确认保存',
+  confirmEditBtn:        '修改',
 
   dashTitle:             '每日汇总',
   refreshBtn:            '刷新',

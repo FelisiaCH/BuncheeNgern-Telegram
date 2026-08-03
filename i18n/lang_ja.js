@@ -60,6 +60,10 @@ window.I18N_PARTS.ja = {
   clearSlipBtn:          '証明書を削除',
   submitBtn:             '記録を保存',
   submitBtnSaving:       '保存中...',
+  confirmTitle:          '保存前に確認',
+  confirmHint:           'この記録は保存され通知が送信されます',
+  confirmSaveBtn:        '確認して保存',
+  confirmEditBtn:        '編集',
 
   dashTitle:             '日次サマリー',
   refreshBtn:            '更新',

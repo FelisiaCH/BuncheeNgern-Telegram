@@ -60,6 +60,10 @@ window.I18N_PARTS.bn = {
   clearSlipBtn:          'রসিদ অপসারণ করুন',
   submitBtn:             'রেকর্ড সংরক্ষণ করুন',
   submitBtnSaving:       'সংরক্ষণ হচ্ছে...',
+  confirmTitle:          'সংরক্ষণের আগে যাচাই করুন',
+  confirmHint:           'এই এন্ট্রি রেকর্ড হবে এবং বিজ্ঞপ্তি পাঠানো হবে',
+  confirmSaveBtn:        'নিশ্চিত করে সংরক্ষণ',
+  confirmEditBtn:        'সম্পাদনা',
 
   dashTitle:             'দৈনিক সারাংশ',
   refreshBtn:            'রিফ্রেশ করুন',

@@ -60,6 +60,10 @@ window.I18N_PARTS.th = {
   clearSlipBtn:          'ลบสลิป',
   submitBtn:             'บันทึกรายการ',
   submitBtnSaving:       'กำลังบันทึก...',
+  confirmTitle:          'ตรวจสอบก่อนบันทึก',
+  confirmHint:           'รายการนี้จะถูกบันทึกและส่งแจ้งเตือน',
+  confirmSaveBtn:        'ยืนยันบันทึก',
+  confirmEditBtn:        'แก้ไข',
 
   dashTitle:             'สรุปรายวัน',
   refreshBtn:            'รีเฟรช',
