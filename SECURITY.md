@@ -2,7 +2,7 @@
 
 ## Overview & scope
 
-Buncheengern is a **self-hosted**, zero-dependency single-file PWA (`index.html`) with a Google Apps Script + Google Sheets/Drive backend (`Code.gs`). There is no central service: every deployment is set up and operated by whoever forks it, using their own Google account, OAuth client, Sheet, Drive folder, and Telegram bot.
+Buncheengern is a **self-hosted**, zero-dependency, build-free PWA (`index.html` + `css/app.css` + `js/*.js`) with a Google Apps Script + Google Sheets/Drive backend (`Code.gs`). There is no central service: every deployment is set up and operated by whoever forks it, using their own Google account, OAuth client, Sheet, Drive folder, and Telegram bot.
 
 Because of that, the security of any given instance depends partly on **correct setup and operation** — keeping real configuration values out of the public repository, deploying the Apps Script as documented, and curating the access allow-list. The setup and the security model are described in **[docs/SETUP.md](docs/SETUP.md)** (see its [Security](docs/SETUP.md#security) section and §1 for the `AllowedUsers` and `Sessions` tabs). This document summarizes the security model, the honest threat model, and how to report issues.
 
