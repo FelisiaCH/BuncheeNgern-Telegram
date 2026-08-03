@@ -315,10 +315,18 @@ option{background:#0E1526}
 
 /* 📎 Slip Upload Zone */
 .upload-zone{
+  position:relative;
   border:2px dashed rgba(46,232,180,.2);border-radius:var(--r-sm);
   padding:22px 16px;text-align:center;cursor:pointer;
   transition:background var(--ease),color var(--ease),border-color var(--ease),transform var(--ease),opacity var(--ease);background:rgba(46,232,180,.02)
 }
+.uz-cam{
+  position:absolute;top:8px;right:8px;width:38px;height:38px;
+  display:flex;align-items:center;justify-content:center;font-size:17px;
+  border-radius:50%;border:1px solid var(--teal-brd);
+  background:var(--bg-card);cursor:pointer;line-height:1;z-index:2
+}
+.uz-cam:hover{background:var(--teal-dim)}
 .upload-zone:hover,.upload-zone.over{
   border-color:var(--teal);background:var(--teal-dim)
 }
@@ -596,7 +604,6 @@ option{background:#0E1526}
 .login-wrap{flex:2;display:flex;align-items:center;justify-content:center;padding:20px}
 .login-footer{text-align:center;padding:14px 0 20px;font-size:12px;font-weight:500;color:var(--txt-muted)}
 #f-file,#f-cam{display:none}
-.cam-btn{width:100%;margin-top:8px;padding:11px}
 #sub-btn{margin-top:16px}
 
 /* 🌐 Language Switcher */
@@ -920,6 +927,9 @@ option{background:#0E1526}
       <div class="upload-zone" id="uz"
            onclick="document.getElementById('f-file').click()"
            ondragover="onDragOver(event)" ondragleave="onDragLeave()" ondrop="onDrop(event)">
+        <button type="button" class="uz-cam" id="uz-cam"
+                data-i18n-aria="cameraBtn" aria-label="Take Photo"
+                onclick="event.stopPropagation();document.getElementById('f-cam').click()">📷</button>
         <div id="uz-ph">
           <div class="uz-ico">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
@@ -929,7 +939,6 @@ option{background:#0E1526}
         </div>
         <img id="slip-img" class="slip-prev hidden" alt="Slip preview">
       </div>
-      <button type="button" class="btn-ghost cam-btn" onclick="document.getElementById('f-cam').click()">📷 <span data-i18n="cameraBtn">ถ่ายรูป</span></button>
       <button id="clr-slip" class="clear-slip-btn hidden" onclick="clearSlip(event)">✕ <span data-i18n="clearSlipBtn">ลบสลิป</span></button>
     </div>
 
@@ -2188,6 +2197,7 @@ async function loadFile(file) {
       img.src = (fr.result);
       img.classList.remove('hidden');
       $('uz-ph').style.display = 'none';
+      $('uz-cam').style.display = 'none';
       $('clr-slip').classList.remove('hidden');
     };
     fr.readAsDataURL(file);
@@ -2225,7 +2235,7 @@ function clearSlip(e) {
   if (e) e.stopPropagation();
   A.slip = null; $('f-file').value = ''; $('f-cam').value = '';
   $('slip-img').classList.add('hidden'); $('slip-img').src = '';
-  $('uz-ph').style.display = ''; $('clr-slip').classList.add('hidden');
+  $('uz-ph').style.display = ''; $('uz-cam').style.display = ''; $('clr-slip').classList.add('hidden');
 }
 function onDragOver(e) { e.preventDefault(); $('uz').classList.add('over'); }
 function onDragLeave()  { $('uz').classList.remove('over'); }
