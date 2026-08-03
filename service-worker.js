@@ -1,4 +1,4 @@
-const CACHE = 'buncheengern-v1.1.42';
+const CACHE = 'buncheengern-v1.1.43';
 const ASSETS = [
   './', './index.html',
   './favicon.svg',
@@ -37,8 +37,36 @@ const ASSETS = [
   './js/boot.js',
 ];
 
+// A response is only usable if it's a real 200 AND its content-type matches
+// what the path implies. Static hosts answer unknown or mid-deploy paths with a
+// 200 HTML fallback; without this check those bytes get cached under a .js/.css
+// URL and permanently break the app, because asset fetches are cache-first and
+// never revalidate.
+function typeOk(url, resp) {
+  if (!resp || !resp.ok) return false;
+  let path;
+  try { path = new URL(url, self.location.origin).pathname; } catch (err) { return true; }
+  const ct = (resp.headers.get('content-type') || '').toLowerCase();
+  if (path.endsWith('.js'))  return ct.includes('javascript') || ct.includes('ecmascript');
+  if (path.endsWith('.css')) return ct.includes('css');
+  return true;
+}
+
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+  e.waitUntil((async () => {
+    const c = await caches.open(CACHE);
+    // Validate every asset before it enters the cache. If any one is wrong we
+    // abort the whole install: the previous service worker stays in control,
+    // which is far better than activating with a poisoned cache.
+    await Promise.all(ASSETS.map(async path => {
+      const resp = await fetch(new Request(path, { cache: 'reload' }));
+      if (!typeOk(path, resp)) {
+        throw new Error('SW install aborted — bad response for ' + path +
+                        ' (' + resp.status + ' ' + (resp.headers.get('content-type') || '?') + ')');
+      }
+      await c.put(path, resp);
+    }));
+  })());
   self.skipWaiting();
 });
 
@@ -57,7 +85,8 @@ self.addEventListener('fetch', e => {
     e.respondWith(
       fetch(e.request)
         .then(resp => {
-          caches.open(CACHE).then(c => c.put(e.request, resp.clone()));
+          const copy = resp.clone();   // clone synchronously — see note below
+          caches.open(CACHE).then(c => c.put(e.request, copy));
           return resp;
         })
         .catch(() => caches.match(e.request))
@@ -65,8 +94,12 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // Cache-first for static assets (icons, lang_*.js, etc.)
-  e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request))
-  );
+  // Cache-first for static assets, with a self-healing guard: a cached response
+  // whose content-type contradicts its path was poisoned by a host fallback
+  // page, so ignore it and go to the network instead of serving broken bytes.
+  e.respondWith((async () => {
+    const cached = await caches.match(e.request);
+    if (cached && typeOk(e.request.url, cached)) return cached;
+    return fetch(e.request);
+  })());
 });
