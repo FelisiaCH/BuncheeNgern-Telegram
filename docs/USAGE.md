@@ -49,38 +49,38 @@ On success a toast confirms the save. If the Telegram notification failed separa
 
 ### Attaching a slip
 
-When any line is set to **Online Payment** or **Split**, an upload zone appears below the payment method row. Tap it or drag-and-drop a photo:
+When the payment method is **Online Payment** or **Split**, an upload zone appears below the payment method row. Tap it, drag-and-drop a photo, or tap the **📷** in the top-right corner of the zone to shoot one with the camera:
 
 - Maximum file size before compression: **5 MB**.
 - The browser automatically resizes the image to at most **1280 px** on its longest side and re-encodes it as JPEG at **~82% quality** before uploading, so the actual upload is smaller.
 - After attaching, a preview appears. Tap **✕ Remove Slip** to clear it.
-- A slip is **required** when any line is set to **Online Payment** or **Split**; submission is blocked without one.
+- A slip is **required** when the payment method is **Online Payment** or **Split**; submission is blocked without one.
 
 ---
 
 ## Multiple currencies in one transaction
 
-One bill can span several currencies (e.g. part paid in LAK, part in THB):
+To record a bill that spans several currencies (e.g. part paid in LAK, part in THB), use a **Split** payment:
 
-1. Enter the first currency and amount in the main row.
-2. Tap **+ Add Currency** to add an extra row.
-3. Choose the currency and amount for that row.
-4. Add as many rows as needed.
+1. Set the **payment method** to **Split**.
+2. Fill in the amount(s) for the first currency in the split builder.
+3. Tap **＋ Add currency** to add another currency, then enter its amount(s).
+4. Add as many currencies as needed.
 5. Tap **Save Entry**.
 
-Each currency line is saved as a separate row in the sheet, but all rows from one submission share the same **Transaction ID** so they can be grouped later. The dashboard entry count shows **bills** (distinct Transaction IDs), not rows — so a 3-currency transaction counts as one entry.
+Each active part is saved as a separate row in the sheet, but all rows from one submission share the same **Transaction ID** so they can be grouped later. The dashboard entry count shows **bills** (distinct Transaction IDs), not rows — so a multi-currency transaction counts as one entry.
 
 ---
 
 ## Split payment
 
-Each currency line — both the primary line and any additional currency rows — has three payment options: **Cash**, **Online Payment**, or **Split**.
+The payment method has three options: **Cash**, **Online Payment**, or **Split**.
 
-Choosing **Split** reveals two sub-amount fields: **Cash amount** and **Online amount**. Both must be filled in and their sum must equal the line total; the app blocks submission with a warning if they don't match.
+Choosing **Split** opens the split builder. Each currency in the split has two toggle chips — **Cash** (💵) and **Online** (📱). Turn on either or both; each one you turn on reveals an amount field, and the currency's subtotal updates live as you type. There's no separate total to match — the bill total is derived from the parts you enter. To split across currencies, tap **＋ Add currency**; to drop a currency, use the **❌** on its group. At least one amount must be turned on.
 
-A slip is required whenever any line is set to **Online Payment** or **Split**.
+A slip is required whenever the payment method is **Online Payment** or **Split**.
 
-A Split line is saved as **two rows** in the sheet: one `Cash` row with the cash portion and one `Online Payment` row with the online portion. Both rows share the same Transaction ID as the rest of the bill, so the dashboard counts Cash Income and Online Payment Income separately and correctly without any manual splitting.
+A Split is saved as **one row per active part** in the sheet — e.g. a Cash + Online split in a single currency writes two rows (one `Cash`, one `Online Payment`); adding a second currency adds more. Every row shares the same Transaction ID as the rest of the bill, so the dashboard counts Cash Income and Online Payment Income separately and correctly without any manual splitting.
 
 The bill count in the Summary tab still shows as one entry (same Transaction ID).
 
@@ -124,7 +124,7 @@ Open the **Summary** tab (chart icon, bottom nav).
 - **Online Payment Income** — sum of Income entries paid by Online Payment (including the Online Payment portion of Split lines).
 - **Total Expenses** — sum of all Expense entries.
 
-**Entry count badge** (top-right of the Summary tab) counts **distinct bills**, not rows. A multi-currency transaction that writes three rows to the sheet counts as one bill.
+**Entry count badge** (top-right of the Summary tab) counts **distinct bills**, not rows. A split transaction that writes several rows to the sheet counts as one bill.
 
 **Recent entries list** shows entries newest-first with type, item name, staff name, branch, time, payment method badge, and a link to the slip if one was uploaded.
 

@@ -5,11 +5,11 @@ Buncheengern is a zero-dependency, single-file PWA for tracking income and expen
 ## Features
 
 - Multi-branch tracking, with branches manageable from the in-app Settings tab
-- Multi-currency per transaction — add several currency/amount lines to a single entry (e.g. pay partly in LAK, partly in THB); all lines share one Transaction ID
+- Multi-currency per transaction — a **Split** payment can span several currencies (e.g. part in LAK, part in THB); each part writes its own sheet row, all sharing one Transaction ID
 - User-configurable currencies — a searchable, region-grouped picker (~85 world currencies plus popular crypto): search by code, name, or country and tap to add; only the code and symbol are stored, the list starts empty
-- Split payment per line — each currency line can be Cash, Online Payment, or Split (partly Cash + partly Online); a Split line writes two sheet rows sharing the same Transaction ID so the dashboard counts Cash Income and Online Payment Income correctly
+- Split payments — an entry's payment can be split across **Cash** and **Online Payment**, and across multiple currencies; each active part writes its own sheet row (all sharing one Transaction ID) so the dashboard counts Cash Income and Online Payment Income correctly
 - Real server-verified sign-in — a one-time Google sign-in mints a device-bound, 30-day rolling session; every request is re-checked against a Google Sheet allow-list (allow/deny per email), and unknown emails are auto-logged for review
-- Telegram notifications to a private chat, a group, or both at once
+- Telegram notifications (localized to Thai, Lao, or English; English fallback) to a private chat, a group, or both at once
 - 18 languages with a searchable language picker and automatic device-language detection on first launch (falls back to English)
 - Installable PWA with offline app-shell support
 
