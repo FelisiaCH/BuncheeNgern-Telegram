@@ -2,46 +2,90 @@
 /* 🎨 Reset & Theme Variables */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#06090F;
-  --bg-card:#0B1020;
-  --bg-input:#0E1526;
-  --bg-hover:#131D30;
-  --teal:#2EE8B4;
-  --teal-dim:rgba(46,232,180,.1);
-  --teal-glow:rgba(46,232,180,.18);
-  --teal-brd:rgba(46,232,180,.3);
-  --green:#30D67E;
-  --green-dim:rgba(48,214,126,.08);
-  --green-brd:rgba(48,214,126,.22);
-  --red:#FF4D6D;
-  --red-dim:rgba(255,77,109,.08);
-  --red-brd:rgba(255,77,109,.22);
-  --indigo:#818CF8;
-  --indigo-dim:rgba(129,140,248,.08);
-  --indigo-brd:rgba(129,140,248,.22);
-  --amber:#FFAA33;
-  --amber-dim:rgba(255,170,51,.08);
-  --amber-brd:rgba(255,170,51,.22);
-  --txt:#EDF0FF;
-  --txt-sub:#6B7FA3;
-  --txt-muted:#2A3550;
-  --brd:rgba(255,255,255,.055);
-  --brd-focus:rgba(46,232,180,.45);
-  --r:18px;--r-sm:13px;--r-xs:9px;
-  --shadow:0 8px 40px rgba(0,0,0,.55);
+  /* ─── Primitives — raw values. Components never reference these directly. ─── */
+  /* Neutral surface stack, darkest → lightest */
+  --n-950:#06090F;   /* page background        */
+  --n-900:#0B1020;   /* card surface           */
+  --n-850:#0E1526;   /* input surface          */
+  --n-800:#131D30;   /* hover surface          */
+  --n-fg:#EDF0FF;    /* primary text           */
+  --n-fg-sub:#6B7FA3;/* secondary text         */
+  --n-fg-muted:#2A3550;
+  --n-line:rgba(255,255,255,.055);
+
+  /* Accent hues as RGB triples — one source of truth per hue, so the solid,
+     dim and border variants below can never drift apart. */
+  --h-teal:46,232,180;
+  --h-green:48,214,126;
+  --h-red:255,77,109;
+  --h-indigo:129,140,248;
+  --h-amber:255,170,51;
+
+  /* ─── Scales ─── */
+  --radius-xs:9px;
+  --radius-sm:13px;
+  --radius-md:18px;
+  --radius-lg:24px;
+
+  --sp-1:4px;  --sp-2:8px;  --sp-3:12px; --sp-4:16px;
+  --sp-5:20px; --sp-6:24px; --sp-8:32px;
+
+  --shadow-sm:0 1px 2px rgba(0,0,0,.30);
+  --shadow-md:0 4px 16px rgba(0,0,0,.40);
+  --shadow-lg:0 8px 40px rgba(0,0,0,.55);
+
+  --ring-w:2px;
+  --ring:0 0 0 var(--ring-w) rgba(var(--h-teal),.45);
+
+  /* ─── Semantic layer — this is what component rules use ─── */
+  --bg:var(--n-950);
+  --bg-card:var(--n-900);
+  --bg-input:var(--n-850);
+  --bg-hover:var(--n-800);
+
+  --txt:var(--n-fg);
+  --txt-sub:var(--n-fg-sub);
+  --txt-muted:var(--n-fg-muted);
+
+  --brd:var(--n-line);
+  --brd-focus:rgba(var(--h-teal),.45);
+
+  --teal:rgb(var(--h-teal));
+  --teal-dim:rgba(var(--h-teal),.1);
+  --teal-glow:rgba(var(--h-teal),.18);
+  --teal-brd:rgba(var(--h-teal),.3);
+  --green:rgb(var(--h-green));
+  --green-dim:rgba(var(--h-green),.08);
+  --green-brd:rgba(var(--h-green),.22);
+  --red:rgb(var(--h-red));
+  --red-dim:rgba(var(--h-red),.08);
+  --red-brd:rgba(var(--h-red),.22);
+  --indigo:rgb(var(--h-indigo));
+  --indigo-dim:rgba(var(--h-indigo),.08);
+  --indigo-brd:rgba(var(--h-indigo),.22);
+  --amber:rgb(var(--h-amber));
+  --amber-dim:rgba(var(--h-amber),.08);
+  --amber-brd:rgba(var(--h-amber),.22);
+
+  --r:var(--radius-md);
+  --r-sm:var(--radius-sm);
+  --r-xs:var(--radius-xs);
+  --shadow:var(--shadow-lg);
   --ease:.22s cubic-bezier(.4,0,.2,1)
 }
 [data-theme="light"]{
-  --bg:#F4F6FB;
-  --bg-card:#FFFFFF;
-  --bg-input:#EEF1F8;
-  --bg-hover:#E4E9F4;
-  --txt:#10172A;
-  --txt-sub:#5B6B8C;
-  --txt-muted:#A9B4CC;
-  --brd:rgba(16,23,42,.08);
-  --brd-focus:rgba(46,232,180,.5);
-  --shadow:0 8px 40px rgba(16,23,42,.08)
+  --n-950:#F4F6FB;
+  --n-900:#FFFFFF;
+  --n-850:#EEF1F8;
+  --n-800:#E4E9F4;
+  --n-fg:#10172A;
+  --n-fg-sub:#5B6B8C;
+  --n-fg-muted:#A9B4CC;
+  --n-line:rgba(16,23,42,.08);
+  --shadow-sm:0 1px 2px rgba(16,23,42,.05);
+  --shadow-md:0 4px 16px rgba(16,23,42,.06);
+  --shadow-lg:0 8px 40px rgba(16,23,42,.08);
+  --brd-focus:rgba(var(--h-teal),.5)
 }
 html{height:100%}
 body{
