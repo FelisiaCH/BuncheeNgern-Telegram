@@ -44,8 +44,8 @@
 </div>
 
 <div id="cfm-sheet" class="ov hidden" onclick="onConfirmBackdrop(event)">
-  <div class="ov-card cfm-card">
-    <div class="cfm-title" data-i18n="confirmTitle">ตรวจสอบก่อนบันทึก</div>
+  <div class="ov-card cfm-card" role="dialog" aria-modal="true" aria-labelledby="cfm-title-el">
+    <div class="cfm-title" id="cfm-title-el" data-i18n="confirmTitle">ตรวจสอบก่อนบันทึก</div>
     <div class="cfm-type inc" id="cfm-type">รายรับ</div>
     <div id="cfm-body"></div>
     <div class="cfm-hint" data-i18n="confirmHint">รายการนี้จะถูกบันทึกและส่งแจ้งเตือน</div>

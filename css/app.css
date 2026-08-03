@@ -75,7 +75,7 @@ button{cursor:pointer;touch-action:manipulation}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* 🧾 Pre-submit Confirmation Sheet (reuses the .ov backdrop + .ov-card shell) */
-.cfm-card{padding:20px 18px;text-align:left;width:min(420px,92vw);max-width:none}
+.cfm-card{padding:20px 18px;text-align:left;width:min(420px,92vw);max-width:none;max-height:88vh;overflow-y:auto}
 .cfm-title{font-size:15px;font-weight:800;margin-bottom:10px}
 .cfm-type{display:inline-block;font-size:12px;font-weight:800;padding:3px 10px;border-radius:999px;margin-bottom:12px}
 .cfm-type.inc{color:var(--green);background:var(--green-dim)}
