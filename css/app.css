@@ -432,6 +432,7 @@ option{background:#0E1526}
 .mc-val.pv{color:var(--indigo)}
 .mc-val.rv{color:var(--red)}
 .mc.r .mc-val{font-size:clamp(26px,9vw,36px)}
+.mc.n .mc-val,.mc.c .mc-val{font-size:clamp(26px,9vw,36px)}
 .mc-cur{font-size:12px;font-weight:600;color:var(--txt-sub);margin-top:6px}
 
 /* 📜 Recent Entries List */
