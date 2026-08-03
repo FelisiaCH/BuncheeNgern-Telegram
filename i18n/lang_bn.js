@@ -69,6 +69,8 @@ window.I18N_PARTS.bn = {
   cardCashIncome:        'নগদ আয়',
   cardQRIncome:          'অনলাইন পেমেন্ট আয়',
   cardExpense:           'মোট ব্যয়',
+  cardNetTotal:          'নিট মোট',
+  cardCashOnHand:        'নগদ অবশিষ্ট',
   recentEntries:         'সাম্প্রতিক রেকর্ড',
   emptyDashHint:         'ডেটা লোড করতে রিফ্রেশ ট্যাপ করুন',
 

@@ -69,6 +69,8 @@ window.I18N_PARTS.de = {
   cardCashIncome:        'Bareinnahmen',
   cardQRIncome:          'Online-Zahlungseinnahmen',
   cardExpense:           'Gesamtausgaben',
+  cardNetTotal:          'Nettosumme',
+  cardCashOnHand:        'Barbestand',
   recentEntries:         'Letzte Buchungen',
   emptyDashHint:         'Zum Laden der Daten Aktualisieren antippen',
 

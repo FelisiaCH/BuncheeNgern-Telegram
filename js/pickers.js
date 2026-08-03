@@ -366,7 +366,7 @@ function renderCurTabs() {
     btn.id = 'ctab-' + code;
     btn.textContent = `${code} ${sym}`;
     btn.onclick = () => switchCurTab(code);
-    const d = (dashByCur || {})[code] || {cash:0,qr:0,exp:0};
+    const d = (dashByCur || {})[code] || {cash:0,qr:0,exp:0,expCash:0,expQr:0};
     if (d.cash > 0 || d.qr > 0 || d.exp > 0) btn.classList.add('has');
     wrap.appendChild(btn);
   });

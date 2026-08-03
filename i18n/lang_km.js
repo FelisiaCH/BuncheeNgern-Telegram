@@ -69,6 +69,8 @@ window.I18N_PARTS.km = {
   cardCashIncome:        'ចំណូលសាច់ប្រាក់',
   cardQRIncome:          'ចំណូលការបង់ប្រាក់អនឡាញ',
   cardExpense:           'ចំណាយសរុប',
+  cardNetTotal:          'សរុបសុទ្ធ',
+  cardCashOnHand:        'សាច់ប្រាក់នៅសល់',
   recentEntries:         'កំណត់ត្រាថ្មីៗ',
   emptyDashHint:         'ចុចផ្ទុកឡើងវិញដើម្បីផ្ទុកទិន្នន័យ',
 

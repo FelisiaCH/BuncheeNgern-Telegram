@@ -69,6 +69,8 @@ window.I18N_PARTS.tl = {
   cardCashIncome:        'Kita sa Cash',
   cardQRIncome:          'Kita sa Online Payment',
   cardExpense:           'Kabuuang Gastos',
+  cardNetTotal:          'Kabuuang Neto',
+  cardCashOnHand:        'Natitirang Cash',
   recentEntries:         'Mga Bagong Rekord',
   emptyDashHint:         'I-tap ang refresh para mag-load ng data',
 

@@ -69,6 +69,8 @@ window.I18N_PARTS.vi = {
   cardCashIncome:        'Thu tiền mặt',
   cardQRIncome:          'Thu trực tuyến',
   cardExpense:           'Tổng chi phí',
+  cardNetTotal:          'Tổng ròng',
+  cardCashOnHand:        'Tiền mặt còn lại',
   recentEntries:         'Giao dịch gần đây',
   emptyDashHint:         'Nhấn làm mới để tải dữ liệu',
 

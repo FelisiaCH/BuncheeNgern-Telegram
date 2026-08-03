@@ -69,6 +69,8 @@ window.I18N_PARTS.hi = {
   cardCashIncome:        'नकद आय',
   cardQRIncome:          'ऑनलाइन भुगतान आय',
   cardExpense:           'कुल व्यय',
+  cardNetTotal:          'शुद्ध कुल',
+  cardCashOnHand:        'नकद शेष',
   recentEntries:         'हाल के रिकॉर्ड',
   emptyDashHint:         'डेटा लोड करने के लिए ताज़ा करें टैप करें',
 

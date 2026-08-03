@@ -69,6 +69,8 @@ window.I18N_PARTS.ja = {
   cardCashIncome:        '現金収入',
   cardQRIncome:          'オンライン決済収入',
   cardExpense:           '総支出',
+  cardNetTotal:          '純合計',
+  cardCashOnHand:        '現金残高',
   recentEntries:         '最近の記録',
   emptyDashHint:         '更新をタップしてデータを読み込み',
 

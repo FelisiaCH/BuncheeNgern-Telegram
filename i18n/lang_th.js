@@ -69,6 +69,8 @@ window.I18N_PARTS.th = {
   cardCashIncome:        'รายรับ เงินสด',
   cardQRIncome:          'รายรับ ออนไลน์',
   cardExpense:           'รายจ่ายรวม',
+  cardNetTotal:          'ยอดสุทธิ',
+  cardCashOnHand:        'เงินสดคงเหลือ',
   recentEntries:         'รายการล่าสุด',
   emptyDashHint:         'กดปุ่มรีเฟรชเพื่อดูข้อมูล',
 

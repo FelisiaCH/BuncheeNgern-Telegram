@@ -69,6 +69,8 @@ window.I18N_PARTS.ms = {
   cardCashIncome:        'Pendapatan Tunai',
   cardQRIncome:          'Pendapatan Pembayaran Dalam Talian',
   cardExpense:           'Jumlah Perbelanjaan',
+  cardNetTotal:          'Jumlah Bersih',
+  cardCashOnHand:        'Baki Tunai',
   recentEntries:         'Rekod Terkini',
   emptyDashHint:         'Ketik muat semula untuk memuatkan data',
 

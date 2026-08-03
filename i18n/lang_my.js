@@ -69,6 +69,8 @@ window.I18N_PARTS.my = {
   cardCashIncome:        'ငွေသားဝင်ငွေ',
   cardQRIncome:          'အွန်လိုင်းဝင်ငွေ',
   cardExpense:           'စုစုပေါင်းအသုံးစရိတ်',
+  cardNetTotal:          'စုစုပေါင်း အသားတင်',
+  cardCashOnHand:        'လက်ကျန် ငွေသား',
   recentEntries:         'လတ်တလောမှတ်တမ်းများ',
   emptyDashHint:         'ဒေတာဖွင့်ရန် Refresh နှိပ်ပါ',
 

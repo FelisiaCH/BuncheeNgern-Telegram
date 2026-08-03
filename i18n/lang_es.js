@@ -69,6 +69,8 @@ window.I18N_PARTS.es = {
   cardCashIncome:        'Ingresos en efectivo',
   cardQRIncome:          'Ingresos por pago en línea',
   cardExpense:           'Gastos totales',
+  cardNetTotal:          'Total neto',
+  cardCashOnHand:        'Efectivo disponible',
   recentEntries:         'Registros recientes',
   emptyDashHint:         'Toca actualizar para cargar los datos',
 

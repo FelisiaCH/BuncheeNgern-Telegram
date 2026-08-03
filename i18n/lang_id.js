@@ -69,6 +69,8 @@ window.I18N_PARTS.id = {
   cardCashIncome:        'Pemasukan Tunai',
   cardQRIncome:          'Pemasukan Pembayaran Online',
   cardExpense:           'Total Pengeluaran',
+  cardNetTotal:          'Total Bersih',
+  cardCashOnHand:        'Sisa Kas',
   recentEntries:         'Transaksi Terbaru',
   emptyDashHint:         'Ketuk segarkan untuk memuat data',
 

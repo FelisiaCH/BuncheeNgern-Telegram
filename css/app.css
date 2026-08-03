@@ -416,6 +416,10 @@ option{background:#0E1526}
 .mc.p::before{background:linear-gradient(90deg,var(--indigo),transparent 80%)}
 .mc.r{grid-column:1/-1}
 .mc.r::before{background:linear-gradient(90deg,var(--red),transparent 80%)}
+.mc.n{grid-column:1/-1}
+.mc.n::before{background:linear-gradient(90deg,var(--indigo),transparent 80%)}
+.mc.c{grid-column:1/-1}
+.mc.c::before{background:linear-gradient(90deg,var(--green),transparent 80%)}
 .mc-lbl{
   font-size:12px;font-weight:700;color:var(--txt-sub);
   text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px

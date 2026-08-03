@@ -69,6 +69,8 @@ window.I18N_PARTS.en = {
   cardCashIncome:        'Cash Income',
   cardQRIncome:          'Online Payment Income',
   cardExpense:           'Total Expenses',
+  cardNetTotal:          'Net Total',
+  cardCashOnHand:        'Cash on Hand',
   recentEntries:         'Recent Entries',
   emptyDashHint:         'Tap refresh to load data',
 

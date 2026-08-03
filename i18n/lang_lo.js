@@ -69,6 +69,8 @@ window.I18N_PARTS.lo = {
   cardCashIncome:        'ລາຍຮັບ ເງິນສົດ',
   cardQRIncome:          'ລາຍຮັບ ອອນລາຍ',
   cardExpense:           'ລາຍຈ່າຍລວມ',
+  cardNetTotal:          'ຍອດສຸດທິ',
+  cardCashOnHand:        'ເງິນສົດຄົງເຫຼືອ',
   recentEntries:         'ລາຍການລ່າສຸດ',
   emptyDashHint:         'ກົດປຸ່ມໂຫຼດຄືນໃໝ່ເພື່ອເບິ່ງຂໍ້ມູນ',
 

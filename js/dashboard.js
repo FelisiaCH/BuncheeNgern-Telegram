@@ -108,7 +108,7 @@ function currSym(c) { const cur = CURRENCIES.find(x => x.code === c); return cur
 
 function emptyTotals() {
   const o = {};
-  CURRENCIES.forEach(c => { o[c.code] = {cash:0,qr:0,exp:0}; });
+  CURRENCIES.forEach(c => { o[c.code] = {cash:0,qr:0,exp:0,expCash:0,expQr:0}; });
   return o;
 }
 
@@ -122,11 +122,14 @@ function buildTotals(entries) {
     const branch = e.shop || '';
     const isCash = (e.paymentMethod||'').toLowerCase().includes('cash');
 
-    BRANCH_KEYS.forEach(s => { if (!result[s][cur]) result[s][cur] = {cash:0,qr:0,exp:0}; });
+    BRANCH_KEYS.forEach(s => { if (!result[s][cur]) result[s][cur] = {cash:0,qr:0,exp:0,expCash:0,expQr:0}; });
 
     const add = bucket => {
       if (e.type === 'Income') { if (isCash) bucket.cash += p; else bucket.qr += p; }
-      else bucket.exp += p;
+      else {
+        bucket.exp += p;                                           // unchanged meaning: ALL expenses
+        if (isCash) bucket.expCash += p; else bucket.expQr += p;   // new: partition of exp
+      }
     };
     add(result['All'][cur]);
     if (result[branch]) add(result[branch][cur]);
@@ -210,11 +213,22 @@ function switchCurTab(cur) {
 }
 
 function renderDashCur(cur) {
-  const d   = dashByCur[cur] || {cash:0,qr:0,exp:0};
+  const d   = dashByCur[cur] || {cash:0,qr:0,exp:0,expCash:0,expQr:0};
   const lbl = `${cur} ${currSym(cur)}`;
   $('d-cash').textContent = fmtN(d.cash); $('d-cash-c').textContent = lbl;
   $('d-qr').textContent   = fmtN(d.qr);  $('d-qr-c').textContent   = lbl;
   $('d-exp').textContent  = fmtN(d.exp);  $('d-exp-c').textContent  = lbl;
+
+  // Derived summary values — display only, never stored.
+  const net  = d.cash + d.qr - d.exp;   // net across both payment methods
+  const onHd = d.cash - d.expCash;      // physical cash left from today's takings
+
+  $('d-net').textContent   = fmtN(net);   $('d-net-c').textContent   = lbl;
+  $('d-onhand').textContent = fmtN(onHd); $('d-onhand-c').textContent = lbl;
+
+  // Colour by sign: both can legitimately go negative (expenses exceeding takings).
+  $('d-net').className    = 'mc-val ' + (net  < 0 ? 'rv' : 'gv');
+  $('d-onhand').className = 'mc-val ' + (onHd < 0 ? 'rv' : 'gv');
 }
 
 // 🧭 Tab Navigation

@@ -69,6 +69,8 @@ window.I18N_PARTS.pt = {
   cardCashIncome:        'Receita em dinheiro',
   cardQRIncome:          'Receita de Pagamento Online',
   cardExpense:           'Despesas totais',
+  cardNetTotal:          'Total líquido',
+  cardCashOnHand:        'Dinheiro em caixa',
   recentEntries:         'Registros recentes',
   emptyDashHint:         'Toque em atualizar para carregar os dados',
 
