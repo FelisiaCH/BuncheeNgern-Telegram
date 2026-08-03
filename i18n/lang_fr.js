@@ -75,6 +75,8 @@ window.I18N_PARTS.fr = {
   cardExpense:           'Dépenses totales',
   cardNetTotal:          'Total net',
   cardCashOnHand:        'Espèces restantes',
+  chartIncomeSplit:      'Répartition des revenus',
+  chartExpenseRatio:     'Dépenses par rapport aux revenus',
   recentEntries:         'Entrées récentes',
   emptyDashHint:         'Touchez actualiser pour charger les données',
 

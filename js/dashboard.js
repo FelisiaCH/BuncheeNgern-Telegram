@@ -229,6 +229,48 @@ function renderDashCur(cur) {
   // Colour by sign: both can legitimately go negative (expenses exceeding takings).
   $('d-net').className    = 'mc-val ' + (net  < 0 ? 'rv' : 'gv');
   $('d-onhand').className = 'mc-val ' + (onHd < 0 ? 'rv' : 'gv');
+
+  renderDashChart(d);
+}
+
+// 📊 Percentage charts — derived from the same per-currency totals the cards
+// use. Donut segments are drawn with stroke-dasharray (exact at 0% and 100%,
+// unlike hand-computed arc paths).
+const DONUT_C = 2 * Math.PI * 52;   // circumference for r=52 in the SVG viewBox
+
+function renderDashChart(d) {
+  const income = d.cash + d.qr;
+  const seg = (el, share, offset) => {
+    el.setAttribute('stroke-dasharray', `${share * DONUT_C} ${DONUT_C}`);
+    el.setAttribute('stroke-dashoffset', `${-offset * DONUT_C}`);
+  };
+
+  if (income <= 0) {
+    // No income for this currency — leave the track bare rather than dividing
+    // by zero or implying a 0/0 split.
+    seg($('dn-cash'), 0, 0);
+    seg($('dn-qr'),   0, 0);
+    $('pc-cash').textContent = '—';
+    $('pc-qr').textContent   = '—';
+    $('pc-exp').textContent  = '—';
+    $('bar-exp').style.width = '0%';
+    return;
+  }
+
+  const cashShare = d.cash / income;
+  const qrShare   = d.qr   / income;
+  seg($('dn-cash'), cashShare, 0);
+  seg($('dn-qr'),   qrShare,   cashShare);   // starts where the cash arc ends
+
+  const pct = n => Math.round(n * 100) + '%';
+  $('pc-cash').textContent = pct(cashShare);
+  $('pc-qr').textContent   = pct(qrShare);
+
+  // Expense ratio can legitimately exceed 100% (spending more than the day's
+  // takings). Show the true number, but clamp the bar so it can't overflow.
+  const ratio = d.exp / income;
+  $('pc-exp').textContent  = pct(ratio);
+  $('bar-exp').style.width = Math.min(ratio, 1) * 100 + '%';
 }
 
 // 🧭 Tab Navigation

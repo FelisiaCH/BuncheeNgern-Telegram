@@ -75,6 +75,8 @@ window.I18N_PARTS.id = {
   cardExpense:           'Total Pengeluaran',
   cardNetTotal:          'Total Bersih',
   cardCashOnHand:        'Sisa Kas',
+  chartIncomeSplit:      'Komposisi Pemasukan',
+  chartExpenseRatio:     'Pengeluaran vs Pemasukan',
   recentEntries:         'Transaksi Terbaru',
   emptyDashHint:         'Ketuk segarkan untuk memuat data',
 

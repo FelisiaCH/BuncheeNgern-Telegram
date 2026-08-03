@@ -75,6 +75,8 @@ window.I18N_PARTS.km = {
   cardExpense:           'ចំណាយសរុប',
   cardNetTotal:          'សរុបសុទ្ធ',
   cardCashOnHand:        'សាច់ប្រាក់នៅសល់',
+  chartIncomeSplit:      'សមាមាត្រចំណូល',
+  chartExpenseRatio:     'ចំណាយធៀបនឹងចំណូល',
   recentEntries:         'កំណត់ត្រាថ្មីៗ',
   emptyDashHint:         'ចុចផ្ទុកឡើងវិញដើម្បីផ្ទុកទិន្នន័យ',
 

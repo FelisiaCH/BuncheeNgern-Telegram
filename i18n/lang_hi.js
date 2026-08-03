@@ -75,6 +75,8 @@ window.I18N_PARTS.hi = {
   cardExpense:           'कुल व्यय',
   cardNetTotal:          'शुद्ध कुल',
   cardCashOnHand:        'नकद शेष',
+  chartIncomeSplit:      'आय संरचना',
+  chartExpenseRatio:     'आय की तुलना में व्यय',
   recentEntries:         'हाल के रिकॉर्ड',
   emptyDashHint:         'डेटा लोड करने के लिए ताज़ा करें टैप करें',
 

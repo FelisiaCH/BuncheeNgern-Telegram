@@ -75,6 +75,8 @@ window.I18N_PARTS.lo = {
   cardExpense:           'ລາຍຈ່າຍລວມ',
   cardNetTotal:          'ຍອດສຸດທິ',
   cardCashOnHand:        'ເງິນສົດຄົງເຫຼືອ',
+  chartIncomeSplit:      'ສັດສ່ວນລາຍຮັບ',
+  chartExpenseRatio:     'ລາຍຈ່າຍຕໍ່ລາຍຮັບ',
   recentEntries:         'ລາຍການລ່າສຸດ',
   emptyDashHint:         'ກົດປຸ່ມໂຫຼດຄືນໃໝ່ເພື່ອເບິ່ງຂໍ້ມູນ',
 

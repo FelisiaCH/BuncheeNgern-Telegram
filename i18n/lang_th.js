@@ -75,6 +75,8 @@ window.I18N_PARTS.th = {
   cardExpense:           'รายจ่ายรวม',
   cardNetTotal:          'ยอดสุทธิ',
   cardCashOnHand:        'เงินสดคงเหลือ',
+  chartIncomeSplit:      'สัดส่วนรายรับ',
+  chartExpenseRatio:     'รายจ่ายต่อรายรับ',
   recentEntries:         'รายการล่าสุด',
   emptyDashHint:         'กดปุ่มรีเฟรชเพื่อดูข้อมูล',
 

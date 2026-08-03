@@ -75,6 +75,8 @@ window.I18N_PARTS.vi = {
   cardExpense:           'Tổng chi phí',
   cardNetTotal:          'Tổng ròng',
   cardCashOnHand:        'Tiền mặt còn lại',
+  chartIncomeSplit:      'Cơ cấu thu',
+  chartExpenseRatio:     'Chi so với thu',
   recentEntries:         'Giao dịch gần đây',
   emptyDashHint:         'Nhấn làm mới để tải dữ liệu',
 

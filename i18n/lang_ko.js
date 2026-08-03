@@ -75,6 +75,8 @@ window.I18N_PARTS.ko = {
   cardExpense:           '총 지출',
   cardNetTotal:          '순합계',
   cardCashOnHand:        '현금 잔액',
+  chartIncomeSplit:      '수입 구성',
+  chartExpenseRatio:     '수입 대비 지출',
   recentEntries:         '최근 기록',
   emptyDashHint:         '새로고침을 탭하여 데이터를 불러오세요',
 

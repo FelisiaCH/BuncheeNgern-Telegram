@@ -75,6 +75,8 @@ window.I18N_PARTS.en = {
   cardExpense:           'Total Expenses',
   cardNetTotal:          'Net Total',
   cardCashOnHand:        'Cash on Hand',
+  chartIncomeSplit:      'Income mix',
+  chartExpenseRatio:     'Expenses vs income',
   recentEntries:         'Recent Entries',
   emptyDashHint:         'Tap refresh to load data',
 

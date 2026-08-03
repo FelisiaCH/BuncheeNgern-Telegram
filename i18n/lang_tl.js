@@ -75,6 +75,8 @@ window.I18N_PARTS.tl = {
   cardExpense:           'Kabuuang Gastos',
   cardNetTotal:          'Kabuuang Neto',
   cardCashOnHand:        'Natitirang Cash',
+  chartIncomeSplit:      'Hati ng Kita',
+  chartExpenseRatio:     'Gastos kumpara sa Kita',
   recentEntries:         'Mga Bagong Rekord',
   emptyDashHint:         'I-tap ang refresh para mag-load ng data',
 

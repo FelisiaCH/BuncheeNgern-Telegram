@@ -75,6 +75,8 @@ window.I18N_PARTS.bn = {
   cardExpense:           'মোট ব্যয়',
   cardNetTotal:          'নিট মোট',
   cardCashOnHand:        'নগদ অবশিষ্ট',
+  chartIncomeSplit:      'আয়ের বিন্যাস',
+  chartExpenseRatio:     'আয়ের তুলনায় ব্যয়',
   recentEntries:         'সাম্প্রতিক রেকর্ড',
   emptyDashHint:         'ডেটা লোড করতে রিফ্রেশ ট্যাপ করুন',
 

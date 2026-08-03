@@ -75,6 +75,8 @@ window.I18N_PARTS.ja = {
   cardExpense:           '総支出',
   cardNetTotal:          '純合計',
   cardCashOnHand:        '現金残高',
+  chartIncomeSplit:      '収入の内訳',
+  chartExpenseRatio:     '収入に対する支出',
   recentEntries:         '最近の記録',
   emptyDashHint:         '更新をタップしてデータを読み込み',
 

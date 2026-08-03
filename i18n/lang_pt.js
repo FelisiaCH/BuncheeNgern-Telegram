@@ -75,6 +75,8 @@ window.I18N_PARTS.pt = {
   cardExpense:           'Despesas totais',
   cardNetTotal:          'Total líquido',
   cardCashOnHand:        'Dinheiro em caixa',
+  chartIncomeSplit:      'Composição da receita',
+  chartExpenseRatio:     'Despesas vs receita',
   recentEntries:         'Registros recentes',
   emptyDashHint:         'Toque em atualizar para carregar os dados',
 

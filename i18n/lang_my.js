@@ -75,6 +75,8 @@ window.I18N_PARTS.my = {
   cardExpense:           'စုစုပေါင်းအသုံးစရိတ်',
   cardNetTotal:          'စုစုပေါင်း အသားတင်',
   cardCashOnHand:        'လက်ကျန် ငွေသား',
+  chartIncomeSplit:      'ဝင်ငွေ အချိုး',
+  chartExpenseRatio:     'အသုံးစရိတ် နှင့် ဝင်ငွေ',
   recentEntries:         'လတ်တလောမှတ်တမ်းများ',
   emptyDashHint:         'ဒေတာဖွင့်ရန် Refresh နှိပ်ပါ',
 

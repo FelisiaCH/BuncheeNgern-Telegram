@@ -75,6 +75,8 @@ window.I18N_PARTS.de = {
   cardExpense:           'Gesamtausgaben',
   cardNetTotal:          'Nettosumme',
   cardCashOnHand:        'Barbestand',
+  chartIncomeSplit:      'Einnahmenverteilung',
+  chartExpenseRatio:     'Ausgaben zu Einnahmen',
   recentEntries:         'Letzte Buchungen',
   emptyDashHint:         'Zum Laden der Daten Aktualisieren antippen',
 

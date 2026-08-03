@@ -75,6 +75,8 @@ window.I18N_PARTS.es = {
   cardExpense:           'Gastos totales',
   cardNetTotal:          'Total neto',
   cardCashOnHand:        'Efectivo disponible',
+  chartIncomeSplit:      'Composición de ingresos',
+  chartExpenseRatio:     'Gastos frente a ingresos',
   recentEntries:         'Registros recientes',
   emptyDashHint:         'Toca actualizar para cargar los datos',
 

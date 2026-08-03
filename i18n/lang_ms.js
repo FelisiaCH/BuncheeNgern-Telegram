@@ -75,6 +75,8 @@ window.I18N_PARTS.ms = {
   cardExpense:           'Jumlah Perbelanjaan',
   cardNetTotal:          'Jumlah Bersih',
   cardCashOnHand:        'Baki Tunai',
+  chartIncomeSplit:      'Komposisi Pendapatan',
+  chartExpenseRatio:     'Perbelanjaan vs Pendapatan',
   recentEntries:         'Rekod Terkini',
   emptyDashHint:         'Ketik muat semula untuk memuatkan data',
 

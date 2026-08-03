@@ -75,6 +75,8 @@ window.I18N_PARTS.zh = {
   cardExpense:           '总支出',
   cardNetTotal:          '净额合计',
   cardCashOnHand:        '现金余额',
+  chartIncomeSplit:      '收入构成',
+  chartExpenseRatio:     '支出占收入',
   recentEntries:         '最近记录',
   emptyDashHint:         '点击刷新以加载数据',
 

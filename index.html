@@ -244,6 +244,34 @@
         <div class="mc-val gv" id="d-onhand">0</div>
         <div class="mc-cur" id="d-onhand-c">LAK ₭</div>
       </div>
+      <div class="mc ch">
+        <div class="mc-lbl">📊 <span data-i18n="chartIncomeSplit">สัดส่วนรายรับ</span></div>
+        <div class="chart-row">
+          <svg class="donut" viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="donut-track" cx="60" cy="60" r="52"></circle>
+            <circle class="donut-seg dseg-cash" id="dn-cash" cx="60" cy="60" r="52"></circle>
+            <circle class="donut-seg dseg-qr"   id="dn-qr"   cx="60" cy="60" r="52"></circle>
+          </svg>
+          <div class="chart-legend">
+            <div class="lg-row">
+              <span class="lg-dot lg-cash"></span>
+              <span class="lg-k" data-i18n="payCash">เงินสด</span>
+              <span class="lg-v" id="pc-cash">—</span>
+            </div>
+            <div class="lg-row">
+              <span class="lg-dot lg-qr"></span>
+              <span class="lg-k" data-i18n="payQR">Online Payment</span>
+              <span class="lg-v" id="pc-qr">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ratio-lbl">
+          <span data-i18n="chartExpenseRatio">รายจ่ายต่อรายรับ</span>
+          <span id="pc-exp">—</span>
+        </div>
+        <div class="ratio-track"><div class="ratio-fill" id="bar-exp"></div></div>
+      </div>
     </div>
 
     <div class="dvd"></div>
