@@ -1,6 +1,6 @@
 # Buncheengern
 
-Buncheengern is a zero-dependency, single-file PWA for tracking income and expenses across multiple branches and currencies. Staff sign in with Google, record a transaction (optionally split across multiple currencies, or split between Cash and Online Payment in one go), and the entry is appended to a Google Sheet — slip images go to Drive, and a Telegram message is sent to your management chat(s). Access is controlled by a real, server-verified Google sign-in, not just a client-side check. The frontend is a single `index.html`; the backend is one Google Apps Script file (`Code.gs`).
+Buncheengern is a zero-dependency, build-free PWA for tracking income and expenses across multiple branches and currencies. Staff sign in with Google, record a transaction (optionally split across multiple currencies, or split between Cash and Online Payment in one go), and the entry is appended to a Google Sheet — slip images go to Drive, and a Telegram message is sent to your management chat(s). Access is controlled by a real, server-verified Google sign-in, not just a client-side check. The frontend is plain `index.html` + `css/app.css` + `js/*.js` (no bundler); the backend is one Google Apps Script file (`Code.gs`).
 
 ## Features
 
@@ -23,7 +23,7 @@ See [docs/SETUP.md#security](docs/SETUP.md#security) for the full breakdown, and
 
 | Layer | Technology |
 | --- | --- |
-| Frontend | Single-file HTML/CSS/JS PWA, 18-language i18n (`i18n/lang_*.js`), installable via `service-worker.js` |
+| Frontend | Build-free HTML/CSS/JS PWA (`index.html`, `css/app.css`, `js/*.js`), 18-language i18n (`i18n/lang_*.js`), installable via `service-worker.js` |
 | Backend | Google Apps Script (`doGet`/`doPost` Web App), scopes declared in `appsscript.json` |
 | Auth | One-time Google `id_token` verification (`tokeninfo`, `aud`, `email_verified`) → app-minted device-bound session token (30-day rolling, `Sessions` tab); allow-list (`AllowedUsers` tab) re-checked every request — see [Security](docs/SETUP.md#security) |
 | Storage | Google Sheets (one tab per day) + Google Drive (slip images) |

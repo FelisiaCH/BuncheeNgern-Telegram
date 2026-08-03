@@ -1,4 +1,4 @@
-const CACHE = 'buncheengern-v1.1.36';
+const CACHE = 'buncheengern-v1.1.37';
 const ASSETS = [
   './', './index.html',
   './favicon.svg',
@@ -27,6 +27,14 @@ const ASSETS = [
   './i18n/lang_fr.js',
   './i18n/lang_pt.js',
   './i18n/lang_de.js',
+  './css/app.css',
+  './i18n/build.js',
+  './js/core.js',
+  './js/pickers.js',
+  './js/session.js',
+  './js/entry.js',
+  './js/dashboard.js',
+  './js/boot.js',
 ];
 
 self.addEventListener('install', e => {
