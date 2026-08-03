@@ -444,23 +444,39 @@ function escapeHtml(value) {
     .replace(/>/g, '&gt;');
 }
 
+// 🌐 Telegram Notification Translations — display-only; sheet row keeps English values
+const NOTIF = {
+  en: { income:'🟢 <b>New Income</b>', expense:'🔴 <b>New Expense</b>',
+        item:'Item Name', cost:'Cost', method:'Payment Method', branch:'Branch',
+        author:'Author', slip:'Slip', view:'View Attachment',
+        pm:{ 'Cash':'Cash','Online Payment':'Online Payment','Split':'Split','Cash + Online Payment':'Cash + Online Payment' } },
+  th: { income:'🟢 <b>รายรับใหม่</b>', expense:'🔴 <b>รายจ่ายใหม่</b>',
+        item:'ชื่อรายการ', cost:'จำนวนเงิน', method:'ช่องทางชำระ', branch:'สาขา',
+        author:'ผู้บันทึก', slip:'สลิป', view:'ดูสลิป',
+        pm:{ 'Cash':'เงินสด','Online Payment':'ชำระออนไลน์','Split':'แบ่งจ่าย','Cash + Online Payment':'เงินสด + ออนไลน์' } },
+  lo: { income:'🟢 <b>ລາຍຮັບໃໝ່</b>', expense:'🔴 <b>ລາຍຈ່າຍໃໝ່</b>',
+        item:'ຊື່ລາຍການ', cost:'ຈຳນວນເງິນ', method:'ຊ່ອງທາງຊຳລະ', branch:'ສາຂາ',
+        author:'ຜູ້ບັນທຶກ', slip:'ສະລິບ', view:'ເບິ່ງສະລິບ',
+        pm:{ 'Cash':'ເງິນສົດ','Online Payment':'ຊຳລະອອນລາຍ','Split':'ແບ່ງຈ່າຍ','Cash + Online Payment':'ເງິນສົດ + ອອນລາຍ' } },
+};
+
 // 📲 Telegram Bot Notification — fired server-side only, never from the client
 function sendTelegramNotification(data, fileUrl, amounts) {
-  const costLines = (amounts || [{ currency: data.currency, price: data.price }])
-    .map(a => a.paymentMethod === 'Split'
-      ? `(Cash: ${escapeHtml(a.splitCash)} / Online: ${escapeHtml(a.splitOnline)}) ${escapeHtml(a.currency)}`
-      : `${escapeHtml(a.price)} ${escapeHtml(a.currency)}`)
+  const L = NOTIF[data.lang] || NOTIF.en;
+  const pm = m => (L.pm && L.pm[m]) || m;
+  const costLines = (amounts || [{ currency: data.currency, price: data.price, paymentMethod: data.paymentMethod }])
+    .map(a => `${escapeHtml(String(a.price))} ${escapeHtml(a.currency)}${a.paymentMethod ? ' — ' + escapeHtml(pm(a.paymentMethod)) : ''}`)
     .join('\n');
 
   const lines = [
-    data.type === 'Income' ? '🟢 <b>New Income</b>' : '🔴 <b>New Expense</b>',
-    `<b>Item Name:</b> ${escapeHtml(data.itemName)}`,
-    `<b>Cost:</b>\n${costLines}`,
-    `<b>Payment Method:</b> ${escapeHtml(data.paymentMethod)}`,
-    `<b>Branch:</b> ${escapeHtml(data.shop)}`,
-    `<b>Author:</b> ${escapeHtml(data.userEmail || data.staffName)}`,
+    data.type === 'Income' ? L.income : L.expense,
+    `<b>${L.item}:</b> ${escapeHtml(data.itemName)}`,
+    `<b>${L.cost}:</b>\n${costLines}`,
+    `<b>${L.method}:</b> ${escapeHtml(pm(data.paymentMethod))}`,
+    `<b>${L.branch}:</b> ${escapeHtml(data.shop)}`,
+    `<b>${L.author}:</b> ${escapeHtml(data.userEmail || data.staffName)}`,
   ];
-  if (fileUrl) lines.push(`<b>Slip:</b> <a href="${escapeHtml(fileUrl)}">View Attachment</a>`);
+  if (fileUrl) lines.push(`<b>${L.slip}:</b> <a href="${escapeHtml(fileUrl)}">${L.view}</a>`);
 
   const url  = 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage';
   const text = lines.join('\n');

@@ -2302,6 +2302,7 @@ async function doSubmit() {
       currency:      cur,
       price:         Number(price) || 0,
       amounts:       amounts,
+      lang:          currentLang,
       type:          A.fd.type === 'income' ? 'Income' : 'Expense',
       shop:          A.fd.shop,
       paymentMethod: topPayMethod,
