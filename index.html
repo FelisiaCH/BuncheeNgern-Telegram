@@ -1236,6 +1236,55 @@ let BRANCH_FILTER_IDS = {};
 let dashDate    = new Date();
 let loadDashSeq = 0;
 const rawApiCache  = {};
+const DASH_CACHE_KEY = 'bcn_dashcache_v1';
+const DASH_CACHE_MAX = 30;   // cap cached day-tabs so localStorage can't grow unbounded
+let   dashCacheOrder = [];   // tab strings, oldest→newest (LRU eviction order)
+
+// Hydrate rawApiCache from localStorage on startup (called on a same-user
+// reload/restore, never after a user switch).
+function loadDashCache() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(DASH_CACHE_KEY) || 'null');
+    if (saved && saved.data && typeof saved.data === 'object') {
+      Object.keys(saved.data).forEach(k => { rawApiCache[k] = saved.data[k]; });
+      dashCacheOrder = Array.isArray(saved.order)
+        ? saved.order.filter(k => rawApiCache[k] !== undefined)
+        : Object.keys(rawApiCache);
+    }
+  } catch { /* absent or corrupt cache — start empty */ }
+}
+
+// Write the cache back to localStorage, marking `tab` as most-recently-used and
+// evicting the oldest tabs past the cap. Best-effort: quota/serialization errors
+// are swallowed because the cache is an optimization, not state of record.
+function persistDashCache(tab) {
+  if (tab) {
+    dashCacheOrder = dashCacheOrder.filter(k => k !== tab);
+    dashCacheOrder.push(tab);
+    while (dashCacheOrder.length > DASH_CACHE_MAX) delete rawApiCache[dashCacheOrder.shift()];
+  }
+  try {
+    localStorage.setItem(DASH_CACHE_KEY, JSON.stringify({ order: dashCacheOrder, data: rawApiCache }));
+  } catch { /* quota / serialization — ignore */ }
+}
+
+// Drop `tab` from the cache (memory + disk) so its next open refetches fresh.
+// Used after a submit changes today's data.
+function invalidateDashTab(tab) {
+  if (rawApiCache[tab] !== undefined) {
+    delete rawApiCache[tab];
+    dashCacheOrder = dashCacheOrder.filter(k => k !== tab);
+    persistDashCache();
+  }
+}
+
+// Wipe all cached dashboard data (memory + disk). Called on a user switch or a
+// hard logout so device B's data never surfaces under user A.
+function clearDashCache() {
+  Object.keys(rawApiCache).forEach(k => delete rawApiCache[k]);
+  dashCacheOrder = [];
+  try { localStorage.removeItem(DASH_CACHE_KEY); } catch { /* ignore */ }
+}
 
 // 🎨 Theme Settings
 const THEME_KEY = 'appTheme';
@@ -1921,6 +1970,12 @@ function clearSession() { localStorage.removeItem(SESSION_KEY); }
 function handleGoogleCredential(resp) {
   apiAuthenticate(resp.credential)
     .then(result => {
+      // If a *different* user is signing in on this device, drop the previous
+      // user's cached dashboard data. Same-user unlock keeps it (instant paint).
+      const prev = loadSession();
+      if (!prev || (prev.email || '').toLowerCase() !== (result.email || '').toLowerCase()) {
+        clearDashCache();
+      }
       A.me = result.name;
       A.userEmail = result.email;
       A.sessionToken = result.sessionToken;
@@ -1979,6 +2034,7 @@ async function init() {
     A.me = session.name;
     A.userEmail = session.email;
     A.sessionToken = session.sessionToken;
+    loadDashCache();   // same user, same device → paint last-known dashboard instantly
     selectBranchSegment(session.shop);
     enterApp(session.name);
     return;
@@ -1992,7 +2048,10 @@ function enterApp(name) {
   $('hdr-user').textContent = name;
   $('f-date-lbl').textContent = fmtDateTab(new Date());
   dashDate = new Date();
-  Object.keys(rawApiCache).forEach(k => delete rawApiCache[k]);
+  // NOTE: the dashboard cache is intentionally NOT cleared here. enterApp runs on
+  // both a same-user reload (keep cache — instant paint) and a fresh sign-in
+  // (handled per-path: cleared in handleGoogleCredential only when the user
+  // actually changes, and hydrated in init() on restore).
   selectBranchSegment(A.fd.shop);
   showScr('scr-app');
 }
@@ -2013,6 +2072,7 @@ function lockApp() {
 function doLogout() {
   if (!confirm(t('confirmLogout'))) return;
   clearSession();
+  clearDashCache();   // shared-device hard logout — leave no cached financial data behind
   A.me = null;
   A.userEmail = '';
   A.sessionToken = null;
@@ -2023,6 +2083,7 @@ function doLogout() {
 
 function forceReLogin() {
   clearSession();
+  clearDashCache();   // token expired/denied → forget this device's cached data too
   A.me = null;
   A.userEmail = '';
   A.sessionToken = null;
@@ -2323,6 +2384,7 @@ async function doSubmit() {
         showToast(t('toastTelegramFailed', { msg: result.telegramError || 'Unknown error' }), 'warn');
       }
       resetForm();
+      invalidateDashTab(tab);   // today's data changed → next dashboard open refetches fresh
     }
   } catch(e) {
     hideOv();
@@ -2418,12 +2480,17 @@ async function loadDash() {
   const isToday  = isOnToday(snapDate);
   updateDateNav();
 
-  if (!isToday && rawApiCache[tab] !== undefined) {
-    renderDash(filterByDate(rawApiCache[tab], snapDate));
-    return;
-  }
+  // Stale-while-revalidate: if we have anything cached for this tab (persisted
+  // across reloads), paint it immediately so there's no blank/spinner wait.
+  const hadCache = rawApiCache[tab] !== undefined;
+  if (hadCache) renderDash(filterByDate(rawApiCache[tab], snapDate));
 
-  showOv(t('ovLoadingData', { date: tab }));
+  // Past days effectively never change; if already cached, trust it and skip the
+  // network entirely. Today (and any uncached day) still revalidates below.
+  if (!isToday && hadCache) return;
+
+  // Nothing to show yet → fall back to the overlay so the screen isn't empty.
+  if (!hadCache) showOv(t('ovLoadingData', { date: tab }));
   try {
     const action = isToday ? 'getTodayData' : 'getDateData';
     const data   = await apiGet({ action, date: tab });
@@ -2433,12 +2500,18 @@ async function loadDash() {
 
     const raw = data.entries || [];
     rawApiCache[tab] = raw;
+    persistDashCache(tab);
     renderDash(filterByDate(raw, snapDate));
   } catch (e) {
     if (seq !== loadDashSeq) return;
     hideOv();
-    renderDash([]);
-    $('d-list').innerHTML = `<div class="empty">${t('errLoadDataFailed')}<br><small style="opacity:.6">${esc(e.message)}</small></div>`;
+    // A background refresh failed but we already have cached data on screen —
+    // keep it (don't wipe good stale data) and just surface a toast. Only show
+    // the full error state when there was nothing cached to fall back to.
+    if (!hadCache) {
+      renderDash([]);
+      $('d-list').innerHTML = `<div class="empty">${t('errLoadDataFailed')}<br><small style="opacity:.6">${esc(e.message)}</small></div>`;
+    }
     showToast(t('errGeneric', { msg: e.message }), 'err');
   }
 }
