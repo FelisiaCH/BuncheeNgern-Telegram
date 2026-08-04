@@ -104,6 +104,7 @@ window.I18N_PARTS.my = {
   warnEnterValidAmount:  '⚠️ မှန်ကန်သော ပမာဏကို ထည့်ပါ',
   warnAttachSlip:        '⚠️ ငွေလွှဲပြေစာ တွဲပါ (Online Payment အတွက် လိုအပ်သည်)',
   ovUploadingSlip:       'ပြေစာ တင်နေသည်…',
+  ovUploadingProgress:   'ဓာတ်ပုံ တင်နေသည်…',
   ovSavingEntry:         'မှတ်တမ်း သိမ်းနေသည်…',
   toastSaveSuccess:      '✅ မှတ်တမ်း အောင်မြင်စွာ သိမ်းပြီးပါပြီ!',
   toastTelegramFailed:   '⚠️ သိမ်းပြီးပါပြီ၊ သို့သော် Telegram အကြောင်းကြားချက် မအောင်မြင်ပါ- {msg}',

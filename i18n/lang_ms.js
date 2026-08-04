@@ -104,6 +104,7 @@ window.I18N_PARTS.ms = {
   warnEnterValidAmount:  '⚠️ Sila masukkan jumlah yang sah',
   warnAttachSlip:        '⚠️ Sila lampirkan resit pemindahan (diperlukan untuk Pembayaran Dalam Talian)',
   ovUploadingSlip:       'Memuat naik resit…',
+  ovUploadingProgress:   'Memuat naik foto…',
   ovSavingEntry:         'Menyimpan rekod…',
   toastSaveSuccess:      '✅ Rekod berjaya disimpan!',
   toastTelegramFailed:   '⚠️ Disimpan, tetapi pemberitahuan Telegram gagal: {msg}',

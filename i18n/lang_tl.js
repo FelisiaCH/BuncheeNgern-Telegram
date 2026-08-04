@@ -104,6 +104,7 @@ window.I18N_PARTS.tl = {
   warnEnterValidAmount:  '⚠️ Pakilagay ang tamang halaga',
   warnAttachSlip:        '⚠️ Pakilagay ang resibo ng paglilipat (kailangan para sa Online Payment)',
   ovUploadingSlip:       'Ina-upload ang resibo…',
+  ovUploadingProgress:   'Ina-upload ang larawan…',
   ovSavingEntry:         'Sine-save ang rekord…',
   toastSaveSuccess:      '✅ Matagumpay na na-save ang rekord!',
   toastTelegramFailed:   '⚠️ Na-save, ngunit nabigo ang abiso sa Telegram: {msg}',

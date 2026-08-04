@@ -104,6 +104,7 @@ window.I18N_PARTS.id = {
   warnEnterValidAmount:  '⚠️ Silakan masukkan jumlah yang valid',
   warnAttachSlip:        '⚠️ Silakan lampirkan bukti transfer (wajib untuk Pembayaran Online)',
   ovUploadingSlip:       'Mengunggah bukti transfer…',
+  ovUploadingProgress:   'Mengunggah foto…',
   ovSavingEntry:         'Menyimpan transaksi…',
   toastSaveSuccess:      '✅ Transaksi berhasil disimpan!',
   toastTelegramFailed:   '⚠️ Tersimpan, tetapi notifikasi Telegram gagal: {msg}',

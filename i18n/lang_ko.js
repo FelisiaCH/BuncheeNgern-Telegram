@@ -104,6 +104,7 @@ window.I18N_PARTS.ko = {
   warnEnterValidAmount:  '⚠️ 올바른 금액을 입력해 주세요',
   warnAttachSlip:        '⚠️ 송금 영수증을 첨부해 주세요 (온라인 결제 시 필수)',
   ovUploadingSlip:       '영수증 업로드 중…',
+  ovUploadingProgress:   '사진 업로드 중…',
   ovSavingEntry:         '기록 저장 중…',
   toastSaveSuccess:      '✅ 기록이 성공적으로 저장되었습니다!',
   toastTelegramFailed:   '⚠️ 저장되었지만 Telegram 알림 전송에 실패했습니다: {msg}',

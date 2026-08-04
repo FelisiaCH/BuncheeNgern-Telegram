@@ -104,6 +104,7 @@ window.I18N_PARTS.bn = {
   warnEnterValidAmount:  '⚠️ অনুগ্রহ করে একটি সঠিক পরিমাণ লিখুন',
   warnAttachSlip:        '⚠️ অনুগ্রহ করে ট্রান্সফার রসিদ সংযুক্ত করুন (অনলাইন পেমেন্টের জন্য প্রয়োজন)',
   ovUploadingSlip:       'রসিদ আপলোড হচ্ছে…',
+  ovUploadingProgress:   'ছবি আপলোড হচ্ছে…',
   ovSavingEntry:         'রেকর্ড সংরক্ষণ হচ্ছে…',
   toastSaveSuccess:      '✅ রেকর্ড সফলভাবে সংরক্ষিত হয়েছে!',
   toastTelegramFailed:   '⚠️ সংরক্ষিত হয়েছে, কিন্তু Telegram নোটিফিকেশন ব্যর্থ হয়েছে: {msg}',

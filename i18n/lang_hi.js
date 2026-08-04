@@ -104,6 +104,7 @@ window.I18N_PARTS.hi = {
   warnEnterValidAmount:  '⚠️ कृपया सही राशि दर्ज करें',
   warnAttachSlip:        '⚠️ कृपया ट्रांसफर पर्ची संलग्न करें (ऑनलाइन भुगतान के लिए आवश्यक)',
   ovUploadingSlip:       'पर्ची अपलोड हो रही है…',
+  ovUploadingProgress:   'फ़ोटो अपलोड हो रही है…',
   ovSavingEntry:         'रिकॉर्ड सहेजा जा रहा है…',
   toastSaveSuccess:      '✅ रिकॉर्ड सफलतापूर्वक सहेजा गया!',
   toastTelegramFailed:   '⚠️ सहेजा गया, लेकिन Telegram सूचना भेजना विफल रहा: {msg}',

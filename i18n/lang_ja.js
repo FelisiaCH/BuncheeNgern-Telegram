@@ -104,6 +104,7 @@ window.I18N_PARTS.ja = {
   warnEnterValidAmount:  '⚠️ 有効な金額を入力してください',
   warnAttachSlip:        '⚠️ 振込証明書を添付してください（オンライン決済の場合必須）',
   ovUploadingSlip:       '証明書をアップロード中…',
+  ovUploadingProgress:   '写真をアップロード中…',
   ovSavingEntry:         '記録を保存中…',
   toastSaveSuccess:      '✅ 記録を保存しました！',
   toastTelegramFailed:   '⚠️ 保存しましたが、Telegram通知の送信に失敗しました：{msg}',

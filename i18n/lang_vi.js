@@ -104,6 +104,7 @@ window.I18N_PARTS.vi = {
   warnEnterValidAmount:  '⚠️ Vui lòng nhập số tiền hợp lệ',
   warnAttachSlip:        '⚠️ Vui lòng đính kèm phiếu chuyển khoản (bắt buộc với Online Payment)',
   ovUploadingSlip:       'Đang tải phiếu lên…',
+  ovUploadingProgress:   'Đang tải ảnh lên…',
   ovSavingEntry:         'Đang lưu giao dịch…',
   toastSaveSuccess:      '✅ Đã lưu giao dịch thành công!',
   toastTelegramFailed:   '⚠️ Đã lưu, nhưng thông báo Telegram thất bại: {msg}',

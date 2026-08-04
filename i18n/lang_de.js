@@ -104,6 +104,7 @@ window.I18N_PARTS.de = {
   warnEnterValidAmount:  '⚠️ Bitte einen gültigen Betrag eingeben',
   warnAttachSlip:        '⚠️ Bitte den Überweisungsbeleg anhängen (erforderlich für Online-Zahlung)',
   ovUploadingSlip:       'Beleg wird hochgeladen…',
+  ovUploadingProgress:   'Foto wird hochgeladen…',
   ovSavingEntry:         'Buchung wird gespeichert…',
   toastSaveSuccess:      '✅ Buchung erfolgreich gespeichert!',
   toastTelegramFailed:   '⚠️ Gespeichert, aber Telegram-Benachrichtigung fehlgeschlagen: {msg}',

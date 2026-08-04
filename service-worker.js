@@ -1,4 +1,4 @@
-const CACHE = 'buncheengern-v1.1.49';
+const CACHE = 'buncheengern-v1.1.50';
 const ASSETS = [
   './', './index.html',
   './favicon.svg',

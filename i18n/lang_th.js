@@ -104,6 +104,7 @@ window.I18N_PARTS.th = {
   warnEnterValidAmount:  '⚠️ กรุณากรอกจำนวนเงินให้ถูกต้อง',
   warnAttachSlip:        '⚠️ กรุณาแนบสลิปการโอนเงิน (ต้องมีเมื่อเลือก Online Payment)',
   ovUploadingSlip:       'กำลังอัพโหลดสลิป…',
+  ovUploadingProgress:   'กำลังอัปโหลดรูป…',
   ovSavingEntry:         'กำลังบันทึกรายการ…',
   toastSaveSuccess:      '✅ บันทึกรายการสำเร็จ!',
   toastTelegramFailed:   '⚠️ บันทึกแล้ว แต่การแจ้งเตือน Telegram ล้มเหลว: {msg}',

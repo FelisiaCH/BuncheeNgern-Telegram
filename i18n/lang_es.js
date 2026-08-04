@@ -104,6 +104,7 @@ window.I18N_PARTS.es = {
   warnEnterValidAmount:  '⚠️ Por favor ingresa un monto válido',
   warnAttachSlip:        '⚠️ Por favor adjunta el comprobante de transferencia (obligatorio para Pago en línea)',
   ovUploadingSlip:       'Subiendo comprobante…',
+  ovUploadingProgress:   'Subiendo la foto…',
   ovSavingEntry:         'Guardando registro…',
   toastSaveSuccess:      '✅ ¡Registro guardado correctamente!',
   toastTelegramFailed:   '⚠️ Guardado, pero falló la notificación de Telegram: {msg}',

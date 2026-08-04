@@ -104,6 +104,7 @@ window.I18N_PARTS.en = {
   warnEnterValidAmount:  '⚠️ Please enter a valid amount',
   warnAttachSlip:        '⚠️ Please attach a transfer slip (required for Online Payment)',
   ovUploadingSlip:       'Uploading slip…',
+  ovUploadingProgress:   'Uploading photo…',
   ovSavingEntry:         'Saving entry…',
   toastSaveSuccess:      '✅ Entry saved successfully!',
   toastTelegramFailed:   '⚠️ Saved, but Telegram notification failed: {msg}',

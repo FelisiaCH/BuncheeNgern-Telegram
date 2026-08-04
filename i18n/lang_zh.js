@@ -104,6 +104,7 @@ window.I18N_PARTS.zh = {
   warnEnterValidAmount:  '⚠️ 请输入有效金额',
   warnAttachSlip:        '⚠️ 请上传转账凭证（线上支付时必填）',
   ovUploadingSlip:       '正在上传凭证…',
+  ovUploadingProgress:   '正在上传照片…',
   ovSavingEntry:         '正在保存记录…',
   toastSaveSuccess:      '✅ 记录保存成功！',
   toastTelegramFailed:   '⚠️ 已保存，但 Telegram 通知发送失败：{msg}',

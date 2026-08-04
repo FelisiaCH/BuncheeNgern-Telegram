@@ -104,6 +104,7 @@ window.I18N_PARTS.km = {
   warnEnterValidAmount:  '⚠️ សូមបញ្ចូលចំនួនទឹកប្រាក់ត្រឹមត្រូវ',
   warnAttachSlip:        '⚠️ សូមភ្ជាប់ភស្តុតាងផ្ទេរប្រាក់ (ត្រូវការសម្រាប់ការបង់ប្រាក់អនឡាញ)',
   ovUploadingSlip:       'កំពុងបញ្ចូលភស្តុតាង…',
+  ovUploadingProgress:   'កំពុងផ្ទុករូបភាព…',
   ovSavingEntry:         'កំពុងរក្សាទុកកំណត់ត្រា…',
   toastSaveSuccess:      '✅ បានរក្សាទុកកំណត់ត្រាដោយជោគជ័យ!',
   toastTelegramFailed:   '⚠️ បានរក្សាទុក ប៉ុន្តែការជូនដំណឹង Telegram បានបរាជ័យ៖ {msg}',

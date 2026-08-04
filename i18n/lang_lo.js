@@ -104,6 +104,7 @@ window.I18N_PARTS.lo = {
   warnEnterValidAmount:  '⚠️ ກະລຸນາປ້ອນຈຳນວນເງິນໃຫ້ຖືກຕ້ອງ',
   warnAttachSlip:        '⚠️ ກະລຸນາແນບສະລິບການໂອນເງິນ (ຕ້ອງມີເມື່ອເລືອກ Online Payment)',
   ovUploadingSlip:       'ກຳລັງອັບໂຫຼດສະລິບ…',
+  ovUploadingProgress:   'ກຳລັງອັບໂຫຼດຮູບ…',
   ovSavingEntry:         'ກຳລັງບັນທຶກລາຍການ…',
   toastSaveSuccess:      '✅ ບັນທຶກລາຍການສຳເລັດ!',
   toastTelegramFailed:   '⚠️ ບັນທຶກແລ້ວ ແຕ່ການແຈ້ງເຕືອນ Telegram ລົ້ມເຫຼວ: {msg}',

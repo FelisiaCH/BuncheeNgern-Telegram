@@ -104,6 +104,7 @@ window.I18N_PARTS.fr = {
   warnEnterValidAmount:  '⚠️ Veuillez entrer un montant valide',
   warnAttachSlip:        '⚠️ Veuillez joindre le reçu de transfert (requis pour le paiement en ligne)',
   ovUploadingSlip:       'Téléchargement du reçu…',
+  ovUploadingProgress:   'Envoi de la photo…',
   ovSavingEntry:         'Enregistrement en cours…',
   toastSaveSuccess:      '✅ Entrée enregistrée avec succès !',
   toastTelegramFailed:   '⚠️ Enregistré, mais la notification Telegram a échoué : {msg}',
