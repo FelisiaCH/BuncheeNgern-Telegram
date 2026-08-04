@@ -1,0 +1,32 @@
+/* Reset, base typography, structural utilities. Depends on tokens.css being
+   loaded first (uses var(--bg)/var(--txt)/var(--ease) etc).
+   Per bcn-v2-system-design.md §9.
+*/
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+html{height:100%}
+body{
+  font-family:'Outfit',system-ui,sans-serif;
+  background:var(--bg);color:var(--txt);
+  min-height:100dvh;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  transition:background var(--ease),color var(--ease);
+}
+input,select,button{font-family:'Outfit',system-ui,sans-serif}
+button{cursor:pointer;touch-action:manipulation}
+
+.hidden{display:none!important}
+.screen{min-height:100dvh;display:flex;flex-direction:column}
+
+/* ── Thai/Lao typography — NOT YET DONE ─────────────────────────────────
+   §9 calls this out as new and overdue: "Thai and Lao stack vowels and tone
+   marks above and below the baseline and get clipped at Latin line-heights.
+   v2 sets script-aware line-height and font stacks, and every layout gets
+   checked in Lao."
+   The design doc does not give concrete line-height/font-stack values, and
+   this needs actual visual verification in Lao (the primary language here),
+   not a guessed number — so nothing is set below. Do not ship Phase 3 without
+   filling this in and checking real Lao/Thai text against it.
+
+   :lang(th), :lang(lo) { line-height: ???; font-family: ???, 'Outfit', ...; }
+*/

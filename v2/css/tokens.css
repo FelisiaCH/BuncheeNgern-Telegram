@@ -1,0 +1,101 @@
+/* Design tokens — three layers: primitives → scales → semantic aliases.
+   Ported from v1 (css/app.css), per bcn-v2-system-design.md §9: "that
+   architecture worked." Values are v1's proven, WCAG-AA-checked set —
+   NOT redesigned here. The customisable-accent-preset system described in
+   §9 is Phase 3 scope and does not exist yet; --accent* below is still the
+   single fixed neutral accent carried over from v1.
+*/
+:root{
+  /* ─── Primitives — raw values. Components never reference these directly. ─── */
+  --n-950:#06090F;
+  --n-900:#0B1020;
+  --n-850:#0E1526;
+  --n-800:#131D30;
+  --n-fg:#EDF0FF;
+  --n-fg-sub:#6B7FA3;
+  --n-fg-muted:#2A3550;
+  --n-fg-rgb:237,240,255;
+  --n-line:rgba(255,255,255,.10);
+
+  --h-green:48,214,126;
+  --h-red:255,77,109;
+  --h-indigo:129,140,248;
+  --h-amber:255,170,51;
+
+  /* ─── Scales ─── */
+  --radius-xs:6px;
+  --radius-sm:8px;
+  --radius-md:10px;
+  --radius-lg:14px;
+
+  --sp-1:4px;  --sp-2:8px;  --sp-3:12px; --sp-4:16px;
+  --sp-5:20px; --sp-6:24px; --sp-8:32px;
+
+  --shadow-sm:0 1px 2px rgba(0,0,0,.24);
+  --shadow-md:0 2px 8px rgba(0,0,0,.30);
+  --shadow-lg:0 8px 24px rgba(0,0,0,.40);
+
+  --ring-w:2px;
+  --ring:0 0 0 var(--ring-w) rgba(var(--n-fg-rgb),.55);
+
+  /* ─── Semantic layer — this is what component rules use ─── */
+  --bg:var(--n-950);
+  --bg-card:var(--n-900);
+  --bg-input:var(--n-850);
+  --bg-hover:var(--n-800);
+
+  --txt:var(--n-fg);
+  --txt-sub:var(--n-fg-sub);
+  --txt-muted:var(--n-fg-muted);
+
+  --brd:var(--n-line);
+  --brd-focus:rgba(var(--n-fg-rgb),.45);
+
+  --accent:var(--n-fg);
+  --accent-fg:var(--n-950);
+  --accent-dim:rgba(var(--n-fg-rgb),.08);
+  --accent-glow:rgba(var(--n-fg-rgb),.14);
+  --accent-brd:rgba(var(--n-fg-rgb),.20);
+
+  --green:rgb(var(--h-green));
+  --green-dim:rgba(var(--h-green),.08);
+  --green-brd:rgba(var(--h-green),.22);
+  --red:rgb(var(--h-red));
+  --red-dim:rgba(var(--h-red),.08);
+  --red-brd:rgba(var(--h-red),.22);
+  --indigo:rgb(var(--h-indigo));
+  --indigo-dim:rgba(var(--h-indigo),.08);
+  --indigo-brd:rgba(var(--h-indigo),.22);
+  --amber:rgb(var(--h-amber));
+  --amber-dim:rgba(var(--h-amber),.08);
+  --amber-brd:rgba(var(--h-amber),.22);
+  --red-solid:#E11D48;   /* expense button bg — clears 4.5:1 in both themes */
+
+  --r:var(--radius-md);
+  --r-sm:var(--radius-sm);
+  --r-xs:var(--radius-xs);
+  --shadow:var(--shadow-lg);
+  --ease:.22s cubic-bezier(.4,0,.2,1);
+}
+[data-theme="light"]{
+  --n-950:#F4F6FB;
+  --n-900:#FFFFFF;
+  --n-850:#EEF1F8;
+  --n-800:#E4E9F4;
+  --n-fg:#10172A;
+  --n-fg-sub:#5B6B8C;
+  --n-fg-muted:#A9B4CC;
+  --n-fg-rgb:16,23,42;
+  --n-line:rgba(16,23,42,.10);
+  --shadow-sm:0 1px 2px rgba(16,23,42,.05);
+  --shadow-md:0 4px 16px rgba(16,23,42,.06);
+  --shadow-lg:0 8px 40px rgba(16,23,42,.08);
+  --brd-focus:rgba(16,23,42,.45);
+  /* Data-hue triples overridden here only (not globally) — dark theme already
+     clears WCAG AA and must not be touched; see the light-theme contrast fix
+     this same session. */
+  --h-green:15,122,71;
+  --h-indigo:79,70,229;
+  --h-amber:180,83,9;
+  --h-red:225,29,72;
+}
