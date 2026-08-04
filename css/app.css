@@ -516,6 +516,45 @@ input:focus-visible{outline:none;box-shadow:var(--ring)}
 .mc.n .mc-val,.mc.c .mc-val{font-size:clamp(26px,9vw,36px)}
 .mc-cur{font-size:12px;font-weight:600;color:var(--txt-sub);margin-top:6px}
 
+/* 🦴 Skeleton placeholders — shown only while a day with no cached data loads.
+   Shapes mirror the real card values and entry rows so nothing shifts when the
+   data arrives. */
+.skel{
+  background:var(--bg-hover);
+  border-radius:var(--r-xs);
+  position:relative;overflow:hidden;
+  color:transparent!important
+}
+.skel::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,var(--accent-dim),transparent);
+  transform:translateX(-100%);
+  animation:skel-sweep 1.4s ease-in-out infinite
+}
+@keyframes skel-sweep{to{transform:translateX(100%)}}
+
+/* Card values: keep the real element, mask it while loading. */
+.is-loading .mc-val{
+  background:var(--bg-hover);border-radius:var(--r-xs);
+  color:transparent!important;
+  position:relative;overflow:hidden;
+  min-height:1em
+}
+.is-loading .mc-val::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,var(--accent-dim),transparent);
+  transform:translateX(-100%);
+  animation:skel-sweep 1.4s ease-in-out infinite
+}
+.is-loading .mc-cur{opacity:.35}
+
+/* Skeleton entry rows reuse the .ei shell so heights match exactly. */
+.ei-skel{pointer-events:none}
+.ei-skel .skel-ic{width:38px;height:38px;border-radius:11px;flex-shrink:0}
+.ei-skel .skel-l1{height:13px;width:58%;margin-bottom:7px}
+.ei-skel .skel-l2{height:11px;width:38%}
+.ei-skel .skel-amt{height:15px;width:74px;flex-shrink:0}
+
 /* 📜 Recent Entries List */
 .sec-top{
   display:flex;align-items:center;justify-content:space-between;
@@ -919,4 +958,5 @@ input:focus-visible{outline:none;box-shadow:var(--ring)}
   .combo-opt:active,.btn:active:not(:disabled),.ref-btn:active,
   .menu-action-btn:active,.branch-del-btn:active,.item-popup-close:active,
   .price-chip:active{transform:none}
+  .skel::after,.is-loading .mc-val::after{animation:none}
 }

@@ -60,6 +60,31 @@ function forceLoadDash() {
   loadDash();
 }
 
+// 🦴 Skeleton for the cold dashboard load. The cards keep their real markup and
+// are masked via a class, so the layout can't shift when values arrive; the
+// entry list gets placeholder rows built from the same .ei shell.
+function showDashSkeleton() {
+  const dash = $('tab-dash');
+  if (dash) dash.classList.add('is-loading');
+  const list = $('d-list');
+  if (list) {
+    list.innerHTML = Array.from({ length: 4 }, () =>
+      `<div class="ei ei-skel">
+         <div class="skel skel-ic"></div>
+         <div style="flex:1;min-width:0">
+           <div class="skel skel-l1"></div>
+           <div class="skel skel-l2"></div>
+         </div>
+         <div class="skel skel-amt"></div>
+       </div>`).join('');
+  }
+}
+
+function hideDashSkeleton() {
+  const dash = $('tab-dash');
+  if (dash) dash.classList.remove('is-loading');
+}
+
 async function loadDash() {
   const seq      = ++loadDashSeq;
   const snapDate = new Date(dashDate);
@@ -76,13 +101,13 @@ async function loadDash() {
   // network entirely. Today (and any uncached day) still revalidates below.
   if (!isToday && hadCache) return;
 
-  // Nothing to show yet → fall back to the overlay so the screen isn't empty.
-  if (!hadCache) showOv(t('ovLoadingData', { date: tab }));
+  // Nothing to show yet → fall back to the skeleton so the screen isn't empty.
+  if (!hadCache) showDashSkeleton();
   try {
     const action = isToday ? 'getTodayData' : 'getDateData';
     const data   = await apiGet({ action, date: tab });
-    if (seq !== loadDashSeq) return;
-    hideOv();
+    if (seq !== loadDashSeq) { hideDashSkeleton(); return; }
+    hideDashSkeleton();
     if (data.error) throw new Error(data.error);
 
     const raw = data.entries || [];
@@ -90,8 +115,8 @@ async function loadDash() {
     persistDashCache(tab);
     renderDash(filterByDate(raw, snapDate));
   } catch (e) {
-    if (seq !== loadDashSeq) return;
-    hideOv();
+    if (seq !== loadDashSeq) { hideDashSkeleton(); return; }
+    hideDashSkeleton();
     // A background refresh failed but we already have cached data on screen —
     // keep it (don't wipe good stale data) and just surface a toast. Only show
     // the full error state when there was nothing cached to fall back to.
