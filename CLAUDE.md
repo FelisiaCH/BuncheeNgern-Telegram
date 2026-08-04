@@ -10,6 +10,11 @@ cleverness. Prefer the smallest change that works.
 - Hosting: Cloudflare Pages (frontend). `gh-pages` is a **separate stubbed demo
   build** — backend/auth removed, sample data only. Don't sync changes there
   unless asked.
+- **Upload progress is impossible on this backend.** Attaching an `xhr.upload`
+  listener forces a CORS preflight; Apps Script does not answer `OPTIONS`, so
+  the request fails outright. `fetch` works precisely because it cannot report
+  upload progress. Verified in production — do not retry this without first
+  putting a proxy in front of Apps Script that handles `OPTIONS`.
 
 ## Invariants (do not violate without being told to)
 - **Never change the Sheets row schema** (`ENTRY_HEADERS`, `SESSION_HEADERS`,

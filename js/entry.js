@@ -274,8 +274,7 @@ async function confirmSubmit() {
   $('sub-txt').textContent = t('submitBtnSaving');
 
   try {
-    const hasSlip = !!(p.needsSlip && A.slip);
-    showOv(hasSlip ? t('ovUploadingProgress') : t('ovSavingEntry'));
+    showOv(p.needsSlip && A.slip ? t('ovUploadingSlip') : t('ovSavingEntry'));
     const ts  = nowStamp();
     const tab = fmtDateTab(new Date());
     const payload = {
@@ -297,19 +296,7 @@ async function confirmSubmit() {
       mimeType:      A.slip?.mime || '',
     };
 
-    let result;
-    if (hasSlip) {
-      // Real percentage while the photo uploads, then an indeterminate state
-      // for the server work (Drive + Sheet + Telegram), which reports nothing.
-      setOvProgress(0);
-      result = await apiPostWithProgress(payload, frac => {
-        if (frac >= 1) { showOv(t('ovSavingEntry')); setOvProgress(-1); }
-        else setOvProgress(frac);
-      });
-    } else {
-      // No photo: the body is ~1KB, so a bar would jump to 100% and stall.
-      result = await apiPost(payload);
-    }
+    const result = await apiPost(payload);
 
     hideOv();
 

@@ -124,15 +124,6 @@ button{cursor:pointer;touch-action:manipulation}
 .spin-btn{width:20px;height:20px;margin:0 auto}
 .ov-txt{font-size:13.5px;color:var(--txt-sub);font-weight:500}
 @keyframes spin{to{transform:rotate(360deg)}}
-.ov-prog{margin-top:14px;width:180px}
-.ov-track{height:6px;border-radius:999px;background:var(--bg-hover);overflow:hidden}
-.ov-bar{height:100%;width:0;border-radius:999px;background:var(--accent);transition:width .18s linear}
-.ov-pct{margin-top:7px;font-size:12px;font-weight:700;color:var(--txt-sub);font-variant-numeric:tabular-nums}
-.ov-prog.indeterminate .ov-bar{
-  width:40%!important;transition:none;
-  animation:ov-indet 1.1s ease-in-out infinite
-}
-@keyframes ov-indet{0%{transform:translateX(-120%)}100%{transform:translateX(320%)}}
 
 /* 🧾 Pre-submit Confirmation Sheet (reuses the .ov backdrop + .ov-card shell) */
 .cfm-card{padding:20px 18px;text-align:left;width:min(420px,92vw);max-width:none;max-height:88vh;overflow-y:auto}
@@ -968,5 +959,4 @@ input:focus-visible{outline:none;box-shadow:var(--ring)}
   .menu-action-btn:active,.branch-del-btn:active,.item-popup-close:active,
   .price-chip:active{transform:none}
   .skel::after,.is-loading .mc-val::after{animation:none}
-  .ov-prog.indeterminate .ov-bar{animation:none;width:100%!important;opacity:.5}
 }

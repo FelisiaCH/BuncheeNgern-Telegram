@@ -38,31 +38,7 @@ function showOv(msg) {
   $('ov-msg').textContent = msg || t('loadingGeneric');
   $('ov').classList.remove('hidden');
 }
-function hideOv() { clearOvProgress(); $('ov').classList.add('hidden'); }
-
-// Overlay progress. Call setOvProgress(fraction) for a real percentage, or
-// setOvProgress(-1) for indeterminate (server-side work, or a browser that
-// can't report upload length).
-function setOvProgress(frac) {
-  const wrap = $('ov-prog');
-  const bar  = $('ov-bar');
-  const pct  = $('ov-pct');
-  if (!wrap || !bar || !pct) return;
-  wrap.classList.remove('hidden');
-  if (frac < 0) {
-    wrap.classList.add('indeterminate');
-    bar.style.width = '100%';
-    pct.textContent = '';
-  } else {
-    wrap.classList.remove('indeterminate');
-    bar.style.width = Math.round(frac * 100) + '%';
-    pct.textContent = Math.round(frac * 100) + '%';
-  }
-}
-function clearOvProgress() {
-  const wrap = $('ov-prog');
-  if (wrap) { wrap.classList.add('hidden'); wrap.classList.remove('indeterminate'); }
-}
+function hideOv() { $('ov').classList.add('hidden'); }
 
 // 📡 API Request Layer
 // Shared by both transports: the backend signals a dead session or a revoked
@@ -139,51 +115,6 @@ function apiPost(bodyObj) {
     headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
     body:    JSON.stringify({ ...bodyObj, sessionToken: A.sessionToken || '' }),
   });
-}
-
-// 📡 XHR transport — used only where upload progress matters. Mirrors
-// _apiFetch's contract exactly (same timeout, same error strings, same auth
-// handling) so callers can't tell them apart apart from the progress callback.
-// fetch() cannot report upload progress, which is the only reason this exists.
-function _apiXhr(url, bodyStr, onProgress) {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', url, true);
-    xhr.timeout = API_TIMEOUT;
-    xhr.setRequestHeader('Content-Type', 'text/plain;charset=UTF-8');
-
-    if (onProgress && xhr.upload) {
-      xhr.upload.onprogress = e => {
-        // lengthComputable is false on some mobile browsers; report -1 so the
-        // caller can fall back to an indeterminate state rather than showing 0%.
-        onProgress(e.lengthComputable && e.total > 0 ? e.loaded / e.total : -1);
-      };
-      // Bytes are gone; everything after this is server-side work we can't see.
-      xhr.upload.onload = () => onProgress(1);
-    }
-
-    xhr.onload = () => {
-      if (xhr.status < 200 || xhr.status >= 300) {
-        reject(new Error(`HTTP ${xhr.status}${xhr.statusText ? ' ' + xhr.statusText : ''}`));
-        return;
-      }
-      let data;
-      try { data = JSON.parse(xhr.responseText); }
-      catch (err) { reject(new Error('Invalid response from server')); return; }
-      try { resolve(_checkAuthError(data)); }
-      catch (err) { reject(err); }
-    };
-    xhr.ontimeout = () => reject(new Error(`Request timed out after ${API_TIMEOUT / 1000}s — the server took too long to respond`));
-    xhr.onerror   = () => reject(new Error('Network error — check your internet connection'));
-    xhr.send(bodyStr);
-  });
-}
-
-// Same payload shape as apiPost, with an optional upload-progress callback.
-function apiPostWithProgress(bodyObj, onProgress) {
-  if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return Promise.reject(new Error('SCRIPT_URL is not set — see README for setup instructions'));
-  const body = JSON.stringify({ ...bodyObj, sessionToken: A.sessionToken || '' });
-  return _apiXhr(SCRIPT_URL, body, onProgress);
 }
 
 // 📱 Device identity — a stable random id per device (how the backend recognizes
