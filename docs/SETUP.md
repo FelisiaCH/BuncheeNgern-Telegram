@@ -147,6 +147,25 @@ Note that Google sign-in now happens **once**: it mints an app session token tha
    ```
 
    (or the equivalent "deploy this folder" flow on Netlify/GitHub Pages). Deploying only `index.html` is a common mistake and breaks the app.
+
+   Once set up, prefer `./scripts/deploy.sh` — it refuses to deploy if `index.html`
+   still holds placeholder config (which would break every API call and sign-in),
+   checks that no real `SCRIPT_URL` has been committed, and runs a secret scan
+   before uploading.
+
+   Optional but recommended — block committing real credentials:
+
+   ```sh
+   cat > .git/hooks/pre-commit <<'EOF'
+   #!/bin/sh
+   if git diff --cached index.html | grep -qE '^\+.*script\.google\.com/macros/s/'; then
+     echo "BLOCKED: index.html contains a real SCRIPT_URL. Commit placeholders only."
+     exit 1
+   fi
+   EOF
+   chmod +x .git/hooks/pre-commit
+   ```
+
 3. Open the page on that HTTPS URL.
 4. **Bump the service worker cache on every change.** `service-worker.js` defines:
 

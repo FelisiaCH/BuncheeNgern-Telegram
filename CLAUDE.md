@@ -31,10 +31,10 @@ Miss either and installed PWAs keep running old code / break offline.
 
 ## Deployment — three independent steps
 - `git push` ships **nothing to users**. It only updates the GitHub repo.
-- Frontend goes live via `npx wrangler pages deploy .` — this Pages project is
-  direct-upload, **not** git-connected. Expect a "working directory has
-  uncommitted changes" warning: `index.html` holds real local config that is
-  deliberately never committed.
+- Frontend goes live via `./scripts/deploy.sh` (wraps `wrangler pages deploy`
+  with guards: refuses placeholder config, refuses a committed real
+  `SCRIPT_URL`, runs the secret scan). This Pages project is direct-upload,
+  **not** git-connected.
 - `Code.gs` needs Apps Script ▸ Deploy ▸ Manage deployments ▸ edit ▸
   **New version** ▸ Deploy. Saving the editor is not deploying.
 
