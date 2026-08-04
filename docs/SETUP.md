@@ -151,7 +151,7 @@ Note that Google sign-in now happens **once**: it mints an app session token tha
 4. **Bump the service worker cache on every change.** `service-worker.js` defines:
 
    ```js
-   const CACHE = 'buncheengern-v1.1.15';
+   const CACHE = 'buncheengern-v1.1.38';
    ```
 
    `index.html` is fetched network-first, so edits to the HTML shell itself reach users on their next reload. **Everything else — `css/app.css`, `js/*.js`, `i18n/lang_*.js`, icons — is served cache-first with no runtime refresh.** Since almost all application code now lives in `js/*.js`, assume any code change requires a bump: whenever you change a file under `css/`, `js/`, or `i18n/`, bump the `CACHE` string (e.g. `v1.1.38` → `v1.1.39`) so old cached files are evicted. Skipping the bump leaves installed PWAs running the old code indefinitely.

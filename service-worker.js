@@ -85,7 +85,7 @@ self.addEventListener('fetch', e => {
     e.respondWith(
       fetch(e.request)
         .then(resp => {
-          const copy = resp.clone();   // clone synchronously — see note below
+          const copy = resp.clone();   // clone before returning — the page may consume the body first
           caches.open(CACHE).then(c => c.put(e.request, copy));
           return resp;
         })
