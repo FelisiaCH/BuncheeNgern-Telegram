@@ -29,11 +29,16 @@ cleverness. Prefer the smallest change that works.
 - Any **new** file there must also be added to the `ASSETS` array.
 Miss either and installed PWAs keep running old code / break offline.
 
-## Deployment
-- `git push` ships the **frontend only** (Cloudflare Pages).
-- `Code.gs` changes require a manual redeploy: Apps Script editor ▸ Deploy ▸
-  Manage deployments ▸ edit ▸ **New version** ▸ Deploy. Committing is not
-  shipping.
+## Deployment — three independent steps
+- `git push` ships **nothing to users**. It only updates the GitHub repo.
+- Frontend goes live via `npx wrangler pages deploy .` — this Pages project is
+  direct-upload, **not** git-connected. Expect a "working directory has
+  uncommitted changes" warning: `index.html` holds real local config that is
+  deliberately never committed.
+- `Code.gs` needs Apps Script ▸ Deploy ▸ Manage deployments ▸ edit ▸
+  **New version** ▸ Deploy. Saving the editor is not deploying.
+
+Committing is not shipping. Pushing is not shipping either.
 
 ## Workflow
 - One commit per feature; conventional-commit messages.
