@@ -62,3 +62,12 @@ function applyTranslationsToDom() {
     el.classList.toggle('hidden', !txt);
   });
 }
+
+// Explicit export line per bcn-v2-phase1-entry-prompt.md §1b — `function`
+// declarations are already window properties in a classic script, but every
+// module ends with the assignment anyway so the rule has no exceptions to
+// remember.
+window.initLang                = initLang;
+window.t                       = t;
+window.setLang                 = setLang;
+window.applyTranslationsToDom  = applyTranslationsToDom;

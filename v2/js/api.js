@@ -93,3 +93,8 @@ function apiAuthenticate(idToken, deviceInfo) {
     }),
   });
 }
+
+// Explicit export line per bcn-v2-phase1-entry-prompt.md §1b.
+window.apiGet          = apiGet;
+window.apiPost         = apiPost;
+window.apiAuthenticate = apiAuthenticate;

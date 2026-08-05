@@ -3,65 +3,195 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BuncheeNgern v2 — skeleton (Phase 0, not in use)</title>
+<title>BuncheeNgern v2 — entry screen (Phase 1, not in use)</title>
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/components.css">
 </head>
 <body>
 
 <!--
-  Phase 0 skeleton per bcn-v2-system-design.md. Not linked from v1, not
-  registered with any service worker, not in service-worker.js's ASSETS —
-  this file is unreachable to real users unless they type the URL directly.
-  v1 (the real, deployed app) is completely untouched by anything in v2/.
+  Phase 1 per bcn-v2-phase1-entry-prompt.md: the entry screen only (type,
+  item, currency + inline add, payment toggles, amount(s), branch, slip,
+  confirmation sheet, submit). Not linked from v1, not registered with any
+  service worker, not in service-worker.js's ASSETS — unreachable to real
+  users unless they type the URL directly. v1 is completely untouched.
 
-  Only what Phase 0's row in §10 calls for exists here: skeleton project,
-  tokens, base CSS, store, api, i18n port. Screens (entry/dashboard/settings),
-  the sidebar layout, charts, the accent-preset picker and Thai/Lao type
-  tuning are Phase 1–3 and are NOT built yet — each needs its own concrete,
-  reviewed spec before code gets written, same as every other change this
-  session. See v2/README.md.
+  Not in this phase: dashboard, sidebar, settings, the rich item picker with
+  grouped suggestions, accent presets, Thai/Lao type pass. See v2/README.md.
 -->
 
-<div style="padding:32px;max-width:480px;margin:0 auto">
-  <h1 style="font-size:20px;font-weight:800;margin-bottom:8px">BuncheeNgern v2 — Phase 0 skeleton</h1>
-  <p style="color:var(--txt-sub);font-size:13px;line-height:1.6;margin-bottom:20px">
-    Not the live app. This page exists to prove tokens.css, base.css, store.js,
-    api.js and i18n.js load and wire together. Nothing here is user-facing.
-  </p>
-  <div id="check" style="background:var(--bg-card);border:1px solid var(--brd);border-radius:var(--r);padding:16px;font-size:13px;line-height:1.9"></div>
+<div id="screen-entry" class="screen">
+  <header class="app-hdr">
+    <div class="hdr-brand">
+      <div class="hdr-badge">🧾</div>
+      <span class="hdr-name">BuncheeNgern</span>
+    </div>
+  </header>
+
+  <div class="tab-body">
+    <div class="tab-top">
+      <h1 class="tab-ttl" data-i18n="navRecord">Record</h1>
+      <span class="date-chip" id="entry-date"></span>
+    </div>
+
+    <!-- Type -->
+    <div class="fg">
+      <span class="fl" data-i18n="labelType">Entry Type</span>
+      <div class="seg-wrap" id="type-toggle">
+        <button type="button" class="seg inc" data-action="setType" data-value="income" data-i18n="typeIncome">Income</button>
+        <button type="button" class="seg exp" data-action="setType" data-value="expense" data-i18n="typeExpense">Expense</button>
+      </div>
+    </div>
+
+    <!-- Item -->
+    <div class="fg">
+      <label class="fl" for="f-item" data-i18n="labelItemName">Item Name</label>
+      <input type="text" id="f-item" class="fi" data-bind="item" autocomplete="off"
+             data-i18n-placeholder="labelItemName" placeholder="Item Name">
+    </div>
+
+    <!-- Currency + inline add -->
+    <div class="fg">
+      <span class="fl" data-i18n="ariaCurrency">Currency</span>
+      <div class="cur-row-wrap">
+        <select id="f-cur" class="fs" data-bind="currency" data-i18n-aria="ariaCurrency" aria-label="Currency"></select>
+        <button type="button" id="add-cur-toggle" class="btn-ghost" data-action="toggleAddCurrency" data-i18n="splitAddCurrency">＋ Add currency</button>
+      </div>
+      <!-- Currency codes/symbols are language-neutral (ISO codes, not prose)
+           — the two placeholders below are examples, not translated text. -->
+      <div id="add-cur-form" class="add-cur-form hidden">
+        <input type="text" id="add-cur-code" class="fi" placeholder="USD" maxlength="8"
+               data-i18n-aria="ariaCurrency" aria-label="Currency code" autocomplete="off">
+        <input type="text" id="add-cur-sym" class="fi" placeholder="$" maxlength="4" autocomplete="off">
+        <button type="button" class="btn btn-primary" data-action="confirmAddCurrency" data-i18n="splitAddCurrency">＋ Add currency</button>
+      </div>
+    </div>
+
+    <!-- Payment toggles — independent; both on is a split, so there is no
+         mode requiring separate validation. -->
+    <div class="fg">
+      <span class="fl" data-i18n="labelPaymentMethod">Payment Method</span>
+      <div class="seg-wrap">
+        <button type="button" class="seg cash" id="tog-cash" data-action="toggleCash" data-i18n="payCash">Cash</button>
+        <button type="button" class="seg qr" id="tog-online" data-action="toggleOnline" data-i18n="payQR">Online Payment</button>
+      </div>
+    </div>
+
+    <!-- Amount(s) -->
+    <div class="fg" id="amt-cash-row">
+      <label class="fl" for="f-cash-amt" data-i18n="labelSplitCash">Cash amount</label>
+      <div class="pg">
+        <span class="cur-sel" id="cash-cur-sym"></span>
+        <input type="text" id="f-cash-amt" class="prc-in amt-fmt" data-bind="cashAmount"
+               inputmode="decimal" placeholder="0">
+      </div>
+    </div>
+    <div class="fg hidden" id="amt-online-row">
+      <label class="fl" for="f-online-amt" data-i18n="labelSplitOnline">Online amount</label>
+      <div class="pg">
+        <span class="cur-sel" id="online-cur-sym"></span>
+        <input type="text" id="f-online-amt" class="prc-in amt-fmt" data-bind="onlineAmount"
+               inputmode="decimal" placeholder="0">
+      </div>
+    </div>
+    <div class="total-row hidden" id="amt-total-row">
+      <span data-i18n="labelAmount">Amount</span>
+      <span class="total-val" id="amt-total-val"></span>
+    </div>
+
+    <!-- Branch -->
+    <div class="fg">
+      <span class="fl" data-i18n="labelBranch">Branch</span>
+      <div class="branch-grid" id="branch-grid"></div>
+    </div>
+
+    <!-- Slip — shown only when the Online toggle is on (structural rule,
+         not remembered state; see entry.js). -->
+    <div id="slip-grp" class="fg hidden">
+      <span class="fl" data-i18n="labelAttachSlip">Attach Slip</span>
+      <div class="upload-zone" id="uz" data-action="openFilePicker">
+        <input type="file" id="f-file" accept="image/*" data-bind="slipFile" style="display:none">
+        <img id="slip-img" class="slip-prev hidden" alt="">
+        <div id="uz-ph">
+          <div class="uz-txt" data-i18n="uploadZoneText">Tap to select slip image</div>
+          <div class="uz-hint" data-i18n="uploadZoneHint">PNG / JPG — up to 5 MB</div>
+        </div>
+      </div>
+      <button type="button" id="clr-slip" class="clear-slip-btn hidden" data-action="clearSlip">✕</button>
+    </div>
+
+    <div id="f-msg" class="msg hidden"></div>
+
+    <button type="button" id="sub-btn" class="btn btn-primary" data-action="submitEntry" disabled>
+      <span id="sub-txt" data-i18n="submitBtn">Save Entry</span>
+    </button>
+  </div>
 </div>
 
-<!-- i18n data — reused unchanged from v1, per §2. Not duplicated into v2/. -->
+<!-- Confirmation sheet — reuses the .ov backdrop + .ov-card shell. -->
+<div id="cfm-sheet" class="ov hidden" data-action="confirmBackdrop">
+  <div class="ov-card cfm-card">
+    <div class="cfm-title" data-i18n="confirmTitle">Check before saving</div>
+    <div id="cfm-type" class="cfm-type"></div>
+    <div id="cfm-body"></div>
+    <div class="cfm-hint" data-i18n="confirmHint">This entry will be recorded and a notification sent</div>
+    <div class="cfm-btns">
+      <button type="button" class="btn btn-ghost" data-action="cancelConfirm" data-i18n="confirmEditBtn">Edit</button>
+      <button type="button" id="cfm-save" class="btn btn-primary" data-action="confirmSubmit" data-i18n="confirmSaveBtn">Confirm &amp; Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast"><span id="toast-txt"></span></div>
+
+<!-- Loading overlay -->
+<div id="ov" class="ov hidden">
+  <div class="ov-card">
+    <div class="spin"></div>
+    <div class="ov-txt" id="ov-msg"></div>
+  </div>
+</div>
+
+<!-- i18n data — reused unchanged from v1, per bcn-v2-system-design.md §2.
+     All 18 language files load (Phase 0 only loaded 3, so Lao silently fell
+     back to English — Lao is this deployment's primary language). lang_en
+     must precede the rest: build.js uses it as the fallback base. -->
 <script src="../i18n/lang_meta.js"></script>
 <script src="../i18n/lang_en.js"></script>
 <script src="../i18n/lang_th.js"></script>
+<script src="../i18n/lang_lo.js"></script>
+<script src="../i18n/lang_vi.js"></script>
+<script src="../i18n/lang_my.js"></script>
+<script src="../i18n/lang_zh.js"></script>
+<script src="../i18n/lang_ja.js"></script>
+<script src="../i18n/lang_ko.js"></script>
+<script src="../i18n/lang_id.js"></script>
+<script src="../i18n/lang_ms.js"></script>
+<script src="../i18n/lang_tl.js"></script>
+<script src="../i18n/lang_km.js"></script>
+<script src="../i18n/lang_hi.js"></script>
+<script src="../i18n/lang_bn.js"></script>
+<script src="../i18n/lang_es.js"></script>
+<script src="../i18n/lang_fr.js"></script>
+<script src="../i18n/lang_pt.js"></script>
+<script src="../i18n/lang_de.js"></script>
 <script src="../i18n/build.js"></script>
 
-<script src="js/store.js"></script>
-<script src="js/i18n.js"></script>
 <script>
 // ⚙️ Configuration — stays inline per CLAUDE.md. Placeholder until this
-// screen does something that needs a real request; not wired to a live
-// endpoint in Phase 0.
+// screen is tested against a real endpoint; not wired to a live deployment.
 const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID_HERE";
 const SCRIPT_URL       = "YOUR_APPS_SCRIPT_URL_HERE";
 </script>
-<script src="js/api.js"></script>
-<script>
-  initLang();
-  store.subscribe(() => applyTranslationsToDom());
-  applyTranslationsToDom();
 
-  const state = store.get();
-  document.getElementById('check').innerHTML = [
-    `store.get().lang → <b>${state.lang}</b>`,
-    `t('tagline') → <b>${t('tagline') || '(empty — I18N did not load)'}</b>`,
-    `typeof store.set → <b>${typeof store.set}</b>`,
-    `typeof apiGet → <b>${typeof apiGet}</b>`,
-    `typeof apiPost → <b>${typeof apiPost}</b>`,
-    `SCRIPT_URL configured → <b>${SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE'}</b>`,
-  ].map(l => `<div>${l}</div>`).join('');
-</script>
+<script src="js/store.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/config.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/api.js"></script>
+<script src="js/entry.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>

@@ -35,3 +35,8 @@ const store = (() => {
 
   return { get, set, subscribe };
 })();
+
+// Explicit export line per bcn-v2-phase1-entry-prompt.md §1b — `const store`
+// creates a lexical binding, not a window property. Anything reaching for
+// window.store found undefined before this line existed.
+window.store = store;

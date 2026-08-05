@@ -1,10 +1,40 @@
-# BuncheeNgern v2 — Phase 0 skeleton
+# BuncheeNgern v2 — Phase 1: entry screen
+
+Implements `bcn-v2-phase1-entry-prompt.md`: the entry screen only (type,
+item, currency + inline add, payment toggles, amount(s), branch, slip,
+confirmation sheet, submit). Nothing here is reachable by real users: v1
+(`/index.html` + `css/app.css` + `js/*.js`) is completely unmodified, still
+the only thing deployed, and still the only thing referenced by
+`service-worker.js`'s `ASSETS`.
+
+## Phase 1, on top of Phase 0
+
+| File | Notes |
+|---|---|
+| `js/config.js` | Branches/currencies/theme, `bcn2_`-prefixed keys, seeded once from v1's `savedBranches`/`savedCurrencies`/`appTheme`. |
+| `js/ui.js` | `esc`, amount formatting (`amt`/`formatAmount`, ported from v1 `js/core.js`), `fmtN`/`nowStamp`/`fmtDateTab`, toast, overlay, and the two document-level `data-action`/`data-bind` delegated listeners every screen uses instead of inline `onclick`. |
+| `js/entry.js` | The screen: state in `store.entry`, two independent payment toggles (no more three-way Cash/Online/Split choice), the slip rule as a structural `online.on` check, `compressImg` ported unchanged, the wire-format `'Split'` reconstruction Code.gs still requires when both toggles are on. |
+| `js/app.js` | Boot: theme, language, mount, one store subscription, one initial render. |
+| `css/components.css` | Header, fields, buttons, toggles, branch grid, amount rows, slip zone, confirmation sheet, toast, overlay — ported from v1 `css/app.css`, re-scoped to this screen's markup. |
+| `index.html` | All 18 language files now load (Phase 0 loaded 3, so Lao silently fell back to English). `store`/`i18n`/`api` each gained an explicit `window.X = X` export line — `const store` was a lexical binding, not a `window` property. |
+
+Three Phase 0 findings this phase fixed: missing language files, missing
+`window.*` exports, and zero `data-i18n` nodes to exercise `applyTranslationsToDom()`.
+
+## Deliberately not built yet
+
+- `ui.js`/`dashboard.js`/`settings.js`/`charts.js`, `css/dashboard.css` — Phases 2–3.
+- The rich item picker with grouped suggestions — v1's is 374 lines and gets
+  its own phase; item name is a plain text input for now.
+- Accent presets, Thai/Lao type pass, sidebar layout — Phase 3 (§9).
+- The `getRangeData` backend endpoint — Phase 2, needs an Apps Script redeploy.
+- The `index.html`/SW cutover — not until every phase is verified.
+
+<details>
+<summary>Phase 0 (skeleton) — original notes</summary>
 
 Implements only what `bcn-v2-system-design.md` §10 lists for **Phase 0**
 ("Skeleton project, tokens, base CSS, store, api, i18n port" — risk: none).
-Nothing here is reachable by real users: v1 (`/index.html` + `css/app.css` +
-`js/*.js`) is completely unmodified, still the only thing deployed, and
-still the only thing referenced by `service-worker.js`'s `ASSETS`.
 
 ## What's here and why
 
@@ -17,7 +47,7 @@ still the only thing referenced by `service-worker.js`'s `ASSETS`.
 | `js/i18n.js` | Ported | `t()`/`setLang()`/generic `data-i18n*` DOM application, from `js/core.js`. The 18 language files and `i18n/build.js` are **not duplicated** — `v2/index.html` loads them from the existing top-level `i18n/` directory, per §2 ("carry over unchanged"). Screen-specific re-render calls v1's `applyTranslations()` made directly (`renderBranchSegments`, `refreshDashUI`, ...) are gone; a lang change is just `store.set()` and screens subscribe when they exist. |
 | `index.html` | Skeleton | Loads the above, runs a visible sanity check (`store`/`api`/`i18n` wired correctly), nothing else. Nothing reachable by real users. |
 
-## Deliberately not built yet
+## Deliberately not built yet (as of Phase 0)
 
 Everything else in the design doc needs its own concrete spec before code
 gets written — same discipline as every other change this session (a

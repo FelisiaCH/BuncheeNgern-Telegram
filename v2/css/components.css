@@ -1,0 +1,244 @@
+/* Entry-screen components — header, fields, buttons, toggles, branch grid,
+   amount rows, slip upload zone, confirmation sheet, toast, overlay.
+   Depends on tokens.css + base.css being loaded first.
+
+   Values are ported from v1 css/app.css (per bcn-v2-system-design.md §9,
+   "that architecture worked") — not redesigned, just re-scoped to what this
+   phase's markup needs. No bottom nav / sidebar yet: Phase 1 is a single
+   screen, so .tab-body only needs top clearance under the fixed header.
+*/
+
+/* 🧭 Header */
+.app-hdr{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(6,9,15,.88);-webkit-backdrop-filter:blur(28px);backdrop-filter:blur(28px);
+  border-bottom:1px solid var(--brd);
+  height:58px;display:flex;align-items:center;
+  padding:0 16px
+}
+[data-theme="light"] .app-hdr{background:rgba(244,246,251,.88)}
+.hdr-brand{display:flex;align-items:center;gap:10px}
+.hdr-badge{
+  width:30px;height:30px;border-radius:9px;
+  background:linear-gradient(135deg,#0E1526,#1A2A4A);
+  border:1px solid rgba(var(--n-fg-rgb),.25);
+  display:flex;align-items:center;justify-content:center;font-size:15px
+}
+[data-theme="light"] .hdr-badge{background:linear-gradient(135deg,var(--bg-input),var(--bg-hover))}
+.hdr-name{font-size:16px;font-weight:800;letter-spacing:-.3px;color:var(--txt)}
+
+/* 📑 Screen body */
+.tab-body{padding:74px 16px 40px;max-width:480px;margin:0 auto;width:100%}
+.tab-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.tab-ttl{font-size:21px;font-weight:800;letter-spacing:-.6px}
+.date-chip{
+  font-size:12px;font-weight:600;color:var(--txt-sub);
+  background:var(--bg-card);border:1px solid var(--brd);
+  border-radius:20px;padding:4px 12px;white-space:nowrap
+}
+
+/* 📋 Form fields */
+.fg{margin-bottom:16px}
+.fl{
+  display:block;font-size:12px;font-weight:700;
+  color:var(--txt-sub);text-transform:uppercase;
+  letter-spacing:.85px;margin-bottom:8px
+}
+.fi{
+  width:100%;padding:13px 15px;
+  background:var(--bg-input);border:1px solid var(--brd);
+  border-radius:var(--r-sm);color:var(--txt);font-size:16px;
+  font-weight:400;outline:none;
+  transition:border-color var(--ease),box-shadow var(--ease);
+  -webkit-appearance:none;appearance:none
+}
+.fi:focus,.fs:focus{border-color:var(--brd-focus);box-shadow:var(--ring)}
+.fi::placeholder{color:var(--txt-muted)}
+.fs{
+  width:100%;padding:13px 38px 13px 15px;
+  background:var(--bg-input);border:1px solid var(--brd);
+  border-radius:var(--r-sm);color:var(--txt);font-size:16px;
+  font-weight:400;outline:none;-webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7FA3' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;background-size:16px;
+  transition:border-color var(--ease),box-shadow var(--ease)
+}
+option{background:var(--bg-input);color:var(--txt)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:none;box-shadow:var(--ring)}
+
+/* 💬 Inline status messages */
+.msg{
+  display:flex;align-items:flex-start;gap:9px;
+  padding:12px 14px;border-radius:var(--r-xs);
+  font-size:13px;line-height:1.6;margin-top:12px;font-weight:500
+}
+.msg.err{background:var(--red-dim);border:1px solid var(--red-brd);color:var(--red)}
+.msg.ok{background:var(--green-dim);border:1px solid var(--green-brd);color:var(--green)}
+.msg.warn{background:var(--amber-dim);border:1px solid var(--amber-brd);color:var(--amber)}
+
+/* 🔘 Buttons */
+.btn{
+  width:100%;padding:13px 15px;border:1px solid transparent;
+  border-radius:var(--r-sm);
+  color:var(--accent-fg);font-size:15px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  cursor:pointer;transition:opacity var(--ease),transform var(--ease),background var(--ease)
+}
+.btn-primary{background:var(--accent);color:var(--accent-fg)}
+.btn-primary:hover:not(:disabled){opacity:.9}
+.btn-red{background:var(--red-solid);color:#fff}
+.btn-red:hover:not(:disabled){opacity:.9}
+.btn:active:not(:disabled){transform:scale(.99);opacity:.85}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-ghost{
+  background:transparent;border:1px solid var(--brd);
+  color:var(--txt-sub);font-size:13px;font-weight:600;
+  padding:13px 14px;border-radius:var(--r-sm);white-space:nowrap;cursor:pointer;
+  transition:background var(--ease),color var(--ease)
+}
+.btn-ghost:hover:not(:disabled){background:var(--bg-hover);color:var(--txt)}
+
+/* 🎚️ Segmented toggles — used both for the mutually-exclusive type chips
+   (income/expense) and the two INDEPENDENT payment toggles (cash/online).
+   The CSS doesn't know or care which; the .on class is applied per-button by
+   entry.js and, unlike v1's single-select segments, siblings are never
+   cleared for the payment row. */
+.seg-wrap{
+  display:flex;background:var(--bg-input);border:1px solid var(--brd);
+  border-radius:var(--r-sm);padding:4px;gap:3px
+}
+.seg{
+  flex:1;min-width:0;padding:10px 6px;background:transparent;border:none;
+  border-radius:var(--r-xs);color:var(--txt-sub);
+  font-size:13.5px;font-weight:500;font-family:'Outfit',system-ui,sans-serif;
+  cursor:pointer;transition:background var(--ease),color var(--ease);text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.seg.inc.on{background:var(--green-dim);color:var(--green);font-weight:700}
+.seg.exp.on{background:var(--red-dim);color:var(--red);font-weight:700}
+.seg.cash.on{background:var(--amber-dim);color:var(--amber);font-weight:700}
+.seg.qr.on{background:var(--accent-dim);color:var(--accent);font-weight:700}
+
+/* 🏪 Branch chip picker */
+.branch-grid{display:flex;flex-wrap:wrap;gap:6px}
+.branch-chip{
+  flex:0 1 auto;max-width:100%;padding:9px 14px;
+  background:var(--bg-input);border:1px solid var(--brd);
+  border-radius:var(--r-xs);color:var(--txt-sub);
+  font-size:13px;font-weight:500;font-family:'Outfit',system-ui,sans-serif;
+  cursor:pointer;transition:background var(--ease),color var(--ease),border-color var(--ease);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.branch-chip.on{background:var(--indigo-dim);color:var(--indigo);font-weight:700;border-color:var(--indigo-brd)}
+.branch-empty-hint{font-size:12px;color:var(--txt-muted);padding:6px 0}
+
+/* 💱 Currency row + inline add-currency form */
+.cur-row-wrap{display:flex;gap:8px;align-items:stretch}
+.cur-row-wrap .fs{flex:1}
+.add-cur-form{
+  display:flex;gap:8px;margin-top:8px;
+  background:var(--bg-card);border:1px solid var(--brd);
+  border-radius:var(--r-sm);padding:10px
+}
+.add-cur-form .fi{flex:1;min-width:0}
+
+/* 💵 Amount rows — one per enabled tender, a static currency tag + input */
+.pg{
+  display:flex;background:var(--bg-input);border:1px solid var(--brd);
+  border-radius:var(--r-sm);overflow:hidden;
+  transition:border-color var(--ease),box-shadow var(--ease)
+}
+.pg:focus-within{border-color:var(--brd-focus);box-shadow:var(--ring)}
+.cur-sel{
+  padding:13px 10px;background:rgba(var(--n-fg-rgb),.07);
+  border:none;border-right:1px solid var(--brd);
+  color:var(--accent);font-size:14px;font-weight:700;
+  min-width:64px;text-align:center;pointer-events:none;
+  display:flex;align-items:center;justify-content:center;gap:4px
+}
+.prc-in{
+  flex:1;min-width:0;padding:13px 14px;background:transparent;border:none;
+  color:var(--txt);font-size:16px;font-weight:500;
+  font-family:'Outfit',system-ui,sans-serif;outline:none
+}
+.prc-in::placeholder{color:var(--txt-muted)}
+
+/* Read-only total shown only when both tenders are on */
+.total-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:11px 14px;background:var(--bg-card);border:1px solid var(--brd);
+  border-radius:var(--r-sm);font-size:13px;color:var(--txt-sub);margin-top:8px
+}
+.total-row .total-val{font-weight:800;color:var(--txt);font-variant-numeric:tabular-nums}
+
+/* 📎 Slip upload zone */
+.upload-zone{
+  position:relative;
+  border:2px dashed rgba(var(--n-fg-rgb),.2);border-radius:var(--r-sm);
+  padding:22px 16px;text-align:center;cursor:pointer;
+  transition:background var(--ease),border-color var(--ease);background:rgba(var(--n-fg-rgb),.02)
+}
+.upload-zone:hover{border-color:var(--accent);background:var(--accent-dim)}
+.uz-txt{font-size:14px;font-weight:500;color:var(--txt-sub);margin-bottom:3px}
+.uz-hint{font-size:12px;color:var(--txt-muted)}
+.slip-prev{
+  width:100%;border-radius:var(--r-xs);max-height:200px;
+  object-fit:cover;display:block
+}
+.clear-slip-btn{
+  display:inline-flex;align-items:center;gap:5px;margin-top:10px;
+  padding:7px 14px;background:var(--red-dim);border:1px solid var(--red-brd);
+  border-radius:8px;color:var(--red);font-size:12px;font-weight:600;
+  cursor:pointer;font-family:'Outfit',system-ui,sans-serif
+}
+
+/* ⏳ Overlay + 🧾 confirmation sheet (the sheet reuses the overlay backdrop) */
+.ov{
+  position:fixed;inset:0;z-index:800;
+  background:rgba(6,9,15,.8);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center
+}
+[data-theme="light"] .ov{background:rgba(16,23,42,.35)}
+.ov-card{
+  background:var(--bg-card);border:1px solid var(--brd);
+  border-radius:var(--r);padding:28px 40px;text-align:center;min-width:190px
+}
+.spin{
+  width:30px;height:30px;border:2.5px solid var(--brd);border-top-color:var(--accent);
+  border-radius:50%;margin:0 auto 14px;animation:spin .7s linear infinite
+}
+.ov-txt{font-size:13.5px;color:var(--txt-sub);font-weight:500}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.cfm-card{padding:20px 18px;text-align:left;width:min(420px,92vw);max-width:none;max-height:88vh;overflow-y:auto}
+.cfm-title{font-size:15px;font-weight:800;margin-bottom:10px}
+.cfm-type{display:inline-block;font-size:12px;font-weight:800;padding:3px 10px;border-radius:999px;margin-bottom:12px}
+.cfm-type.inc{color:var(--green);background:var(--green-dim)}
+.cfm-type.exp{color:var(--red);background:var(--red-dim)}
+.cfm-row{display:flex;justify-content:space-between;gap:14px;padding:7px 0;border-bottom:1px solid var(--brd)}
+.cfm-row:last-child{border-bottom:none}
+.cfm-k{font-size:12.5px;color:var(--txt-sub);flex-shrink:0}
+.cfm-v{font-size:13.5px;font-weight:600;text-align:right;word-break:break-word}
+.cfm-btns{display:flex;gap:10px;margin-top:14px}
+.cfm-btns .btn{flex:1;margin-top:0}
+
+/* 🔔 Toast */
+.toast{
+  position:fixed;top:68px;left:50%;
+  transform:translateX(-50%) translateY(-10px);
+  background:var(--bg-card);border:1px solid var(--green-brd);
+  border-radius:12px;padding:12px 22px;color:var(--green);
+  font-size:13px;font-weight:600;
+  display:flex;align-items:center;gap:8px;z-index:9999;
+  opacity:0;pointer-events:none;white-space:normal;
+  max-width:min(92vw,440px);text-align:center;
+  box-shadow:var(--shadow);transition:opacity .25s,transform .25s
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.err{border-color:var(--red-brd);color:var(--red)}
+.toast.warn{border-color:var(--amber-brd);color:var(--amber)}
+
+@media (max-width:480px){
+  .seg{min-height:44px}
+  .branch-chip{min-height:40px}
+}
