@@ -100,8 +100,11 @@ function renderBranchChips() {
     .join('');
 }
 
-// ── Validation — bcn-v2-phase1-entry-prompt.md §4, evaluated on every
-// render for the submit button's disabled state, in the stated order. ──
+// ── Validation — bcn-v2-phase1-entry-prompt.md §4 plus
+// bcn-v2-phase1-followup-prompt.md's rule 6, evaluated on every render for
+// the submit button's disabled state, in the stated order. Without rule 6,
+// an otherwise-valid entry could submit with entry.branch === '', writing an
+// empty shop column that every dashboard branch filter reads. ──
 function validationReason(e) {
   if (!e.cash.on && !e.online.on) return 'warnSplitNeedOne';
   if (!e.item.trim()) return 'warnEnterItemName';
@@ -109,6 +112,7 @@ function validationReason(e) {
   if (e.online.on && !(amt(e.online.amount) > 0)) return 'warnEnterValidAmount';
   if (e.online.on && !e.slip) return 'warnAttachSlip';
   if (!e.currency) return 'warnNoCurrencies';
+  if (!e.branch) return 'warnNeedOneBranch';
   return null;
 }
 

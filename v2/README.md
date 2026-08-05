@@ -11,7 +11,7 @@ the only thing deployed, and still the only thing referenced by
 
 | File | Notes |
 |---|---|
-| `js/config.js` | Branches/currencies/theme, `bcn2_`-prefixed keys, seeded once from v1's `savedBranches`/`savedCurrencies`/`appTheme`. |
+| `js/config.js` | Branches/currencies/theme, `bcn2_`-prefixed keys, seeded once from v1's `savedBranches`/`savedCurrencies`/`appTheme`. If no branches exist yet (v1 or v2), seeds two localized default names and persists them immediately — branch names are persisted data, so they must not shift if the UI language changes later. |
 | `js/ui.js` | `esc`, amount formatting (`amt`/`formatAmount`, ported from v1 `js/core.js`), `fmtN`/`nowStamp`/`fmtDateTab`, toast, overlay, and the two document-level `data-action`/`data-bind` delegated listeners every screen uses instead of inline `onclick`. |
 | `js/entry.js` | The screen: state in `store.entry`, two independent payment toggles (no more three-way Cash/Online/Split choice), the slip rule as a structural `online.on` check, `compressImg` ported unchanged, the wire-format `'Split'` reconstruction Code.gs still requires when both toggles are on. |
 | `js/app.js` | Boot: theme, language, mount, one store subscription, one initial render. |
@@ -20,6 +20,22 @@ the only thing deployed, and still the only thing referenced by
 
 Three Phase 0 findings this phase fixed: missing language files, missing
 `window.*` exports, and zero `data-i18n` nodes to exercise `applyTranslationsToDom()`.
+
+### Phase 1 follow-up
+
+Two findings from testing Phase 1 in a real browser: an entry could be
+submitted with `entry.branch === ''` (v2 had no default branches, and branch
+wasn't in the validation list), and local testing starts from an empty
+config because seeding is per-origin. Both are fixed/documented — see
+`bcn-v2-phase1-followup-prompt.md`.
+
+### Local testing starts empty
+
+`bcn2_*` config is seeded from v1's localStorage, and localStorage is
+per-origin. Served from `localhost:8000` there is no v1 data to seed from, so
+v2 starts with default branches and **no currencies** — add one with the inline
+"＋" control before the entry form can be completed. On production both apps
+share an origin and seeding works normally.
 
 ## Deliberately not built yet
 
