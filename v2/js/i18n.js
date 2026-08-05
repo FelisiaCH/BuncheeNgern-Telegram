@@ -13,7 +13,7 @@
 // screens (Phase 1+) subscribe to the store and re-render themselves, per
 // §7 point 1. That's the actual point of introducing store.js.
 
-const LANG_KEY     = 'appLang';
+const LANG_KEY     = 'bcn2_lang'; // v2-isolated: never write a key v1 reads
 const DEFAULT_LANG = 'th'; // matches v1 — primary language for this deployment
 
 function detectDeviceLang() {
@@ -28,8 +28,16 @@ function detectDeviceLang() {
 }
 
 function initLang() {
-  const saved = localStorage.getItem(LANG_KEY);
-  const lang  = (window.LANGS && window.LANGS[saved]) ? saved : detectDeviceLang();
+  let saved = localStorage.getItem(LANG_KEY);
+  // First run: adopt v1's choice, then diverge. v2 must never write 'appLang'.
+  if (saved === null) {
+    const v1 = localStorage.getItem('appLang');
+    if (v1 && window.LANGS && window.LANGS[v1]) {
+      saved = v1;
+      localStorage.setItem(LANG_KEY, v1);
+    }
+  }
+  const lang = (window.LANGS && window.LANGS[saved]) ? saved : detectDeviceLang();
   store.set({ lang });
   return lang;
 }
