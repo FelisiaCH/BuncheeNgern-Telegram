@@ -104,7 +104,15 @@ function renderBranchChips() {
 // bcn-v2-phase1-followup-prompt.md's rule 6, evaluated on every render for
 // the submit button's disabled state, in the stated order. Without rule 6,
 // an otherwise-valid entry could submit with entry.branch === '', writing an
-// empty shop column that every dashboard branch filter reads. ──
+// empty shop column that every dashboard branch filter reads. Rule 6 also
+// requires membership in the current branch list (not just non-empty) —
+// state.entry.branch survives resetEntryForm(), so a stale/removed name
+// must not silently pass and land under a name nothing filters on. This
+// deliberately does NOT reject a branch/item/currency for looking like a
+// spreadsheet formula (see sanitizeCell() below) — branch names are
+// persisted data the user may not be able to rename (Phase 1 has no branch
+// editor), so rejecting at validation time could strand the form
+// permanently instead of just neutralizing the value on the wire. ──
 function validationReason(e) {
   if (!e.cash.on && !e.online.on) return 'warnSplitNeedOne';
   if (!e.item.trim()) return 'warnEnterItemName';
@@ -112,7 +120,7 @@ function validationReason(e) {
   if (e.online.on && !(amt(e.online.amount) > 0)) return 'warnEnterValidAmount';
   if (e.online.on && !e.slip) return 'warnAttachSlip';
   if (!e.currency) return 'warnNoCurrencies';
-  if (!e.branch) return 'warnNeedOneBranch';
+  if (!e.branch || !getBranches().includes(e.branch)) return 'warnNeedOneBranch';
   return null;
 }
 
@@ -303,21 +311,38 @@ function buildPending(e) {
   };
 }
 
+// Google Sheets treats a value beginning with =, +, -, @, tab, or CR as a
+// live formula when written via appendRow() (Code.gs) — not sanitized
+// server-side. Neutralized here by prefixing Sheets' own "force text"
+// apostrophe rather than rejecting the value at validation time (see the
+// comment on validationReason() above for why reject is the wrong failure
+// mode for this field). Applied to every free-text/user-extensible field
+// that reaches appendRow(): item name, branch, and currency code (currency
+// is user-extensible too — confirmAddCurrency() only upper-cases it, no
+// charset restriction).
+const FORMULA_LEAD = /^\s*[=+\-@\t\r]/; // \s already covers tab, CR, and NBSP per spec
+const sanitizeCell = s => FORMULA_LEAD.test(s) ? `'${s}` : s;
+
 // Full payload keys are unchanged from v1 so Code.gs cannot tell v1 from v2.
 function buildPayload(p, state) {
+  const amounts = p.amounts.map(a => ({
+    ...a,
+    currency: sanitizeCell(a.currency),
+    ...(a.parts ? { parts: a.parts.map(pt => ({ ...pt, currency: sanitizeCell(pt.currency) })) } : {}),
+  }));
   return {
     action:        'submitEntry',
     timestamp:     nowStamp(),
     sheetTabName:  fmtDateTab(new Date()),
     staffName:     state.staffName || '', // no auth screen yet this phase
     userEmail:     state.userEmail || '',
-    itemName:      p.item,
-    currency:      p.amounts[0].currency,
+    itemName:      sanitizeCell(p.item),
+    currency:      amounts[0].currency,
     price:         Number(p.amounts[0].price) || 0,
-    amounts:       p.amounts,
+    amounts,
     lang:          state.lang,
     type:          p.type,
-    shop:          p.branch,
+    shop:          sanitizeCell(p.branch),
     paymentMethod: p.topPayMethod,
     fileName:      p.slip?.name || '',
     fileData:      p.slip?.b64  || '',

@@ -27,7 +27,7 @@ document.addEventListener('click', e => {
 
 // 🔤 esc — ported unchanged from v1 js/session.js.
 function esc(s) {
-  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 // 💰 Amount helpers — ported unchanged from v1 js/core.js. Inputs display

@@ -16,14 +16,28 @@ const BRANCHES_KEY_V1   = 'savedBranches';
 const CURRENCIES_KEY_V1 = 'savedCurrencies';
 const THEME_KEY_V1      = 'appTheme';
 
+// localStorage can throw (QuotaExceededError; SecurityError in
+// storage-blocked contexts like Safari Private Browsing). seedFromV1() runs
+// at module top level below, before the window.* exports at the bottom of
+// this file — an unguarded throw there aborts config.js entirely and every
+// caller of window.getBranches/getCurrencies/getTheme becomes a
+// ReferenceError. Every localStorage touch in this file goes through these
+// two so a blocked/full store degrades to in-memory defaults instead.
+function safeGet(key) {
+  try { return localStorage.getItem(key); } catch { return null; }
+}
+function safeSet(key, val) {
+  try { localStorage.setItem(key, val); } catch { /* storage blocked/full — proceed unpersisted */ }
+}
+
 // First run only: v2 key absent, v1 key present → copy the raw string across
 // unparsed (both sides use the same JSON/plain-string shape for a given key,
 // so no re-encoding is needed). After this, the two keys are independent —
 // this never runs again once bcn2_* exists, even if v1's value later changes.
 function seedFromV1(v2Key, v1Key) {
-  if (localStorage.getItem(v2Key) !== null) return;
-  const v1Val = localStorage.getItem(v1Key);
-  if (v1Val !== null) localStorage.setItem(v2Key, v1Val);
+  if (safeGet(v2Key) !== null) return;
+  const v1Val = safeGet(v1Key);
+  if (v1Val !== null) safeSet(v2Key, v1Val);
 }
 seedFromV1(BRANCHES_KEY_V2, BRANCHES_KEY_V1);
 seedFromV1(CURRENCIES_KEY_V2, CURRENCIES_KEY_V1);
@@ -32,31 +46,41 @@ seedFromV1(THEME_KEY_V2, THEME_KEY_V1);
 // Default branch names for a NEW user, in the active UI language. Branches
 // are persisted DATA matched against Sheet rows: saved branches are NEVER
 // translated or renamed later — this only seeds the very first defaults.
+// Uses t() directly (already the single source of truth for the lang/
+// DEFAULT_LANG/en fallback chain, and defaults an unset lang to DEFAULT_LANG
+// itself) instead of re-implementing a second, looser fallback here.
+// Returns null if window.I18N hasn't loaded yet — callers must not persist
+// that, or a transient load failure bakes the literal i18n keys in forever.
 function defaultBranches() {
-  const lang = store.get().lang;
-  const pick = k => (window.I18N?.[k]?.[lang]
-    ?? window.I18N?.[k]?.en ?? k);
-  return [pick('defaultBranch1'), pick('defaultBranch2')];
+  if (!window.I18N?.defaultBranch1 || !window.I18N?.defaultBranch2) return null;
+  const b1 = t('defaultBranch1'), b2 = t('defaultBranch2');
+  return (b1 && b2) ? [b1, b2] : null; // i18n/build.js can fill a slot with '' — treat that as unresolved too
 }
 
 // Branches are persisted DATA (CLAUDE.md: "Branch names are persisted data.
 // Only new-user defaults may be localized."). Unlike v1 (which leaves the
 // seed unpersisted until the user first edits branches), the default names
-// are written back immediately on first read — so they can never shift if
+// are written back immediately once resolved — so they can never shift if
 // the UI language changes later, which is exactly what that invariant means.
 function getBranches() {
   try {
-    const saved = JSON.parse(localStorage.getItem(BRANCHES_KEY_V2) || 'null');
-    if (Array.isArray(saved) && saved.length) return saved.map(String);
+    const saved = JSON.parse(safeGet(BRANCHES_KEY_V2) || 'null');
+    if (Array.isArray(saved) && saved.length) {
+      // Filter, don't coerce — a corrupt entry (null, a number, an object)
+      // must not become the literal branch chip "null"/"3"/"[object Object]".
+      const list = saved.filter(s => typeof s === 'string' && s.trim());
+      if (list.length) return list;
+    }
   } catch { /* corrupt value — fall through to defaults */ }
   const defaults = defaultBranches();
-  localStorage.setItem(BRANCHES_KEY_V2, JSON.stringify(defaults));
+  if (!defaults) return ['Branch 1', 'Branch 2']; // I18N not loaded yet — in-memory only, not persisted
+  safeSet(BRANCHES_KEY_V2, JSON.stringify(defaults));
   return defaults;
 }
 
 function getCurrencies() {
   try {
-    const saved = JSON.parse(localStorage.getItem(CURRENCIES_KEY_V2) || 'null');
+    const saved = JSON.parse(safeGet(CURRENCIES_KEY_V2) || 'null');
     if (Array.isArray(saved) && saved.length) return saved.filter(c => c && c.code && c.symbol);
   } catch { /* corrupt value — fall through to empty */ }
   return [];
@@ -73,17 +97,17 @@ function addCurrency(code, symbol) {
   const existing = list.find(c => c.code.toUpperCase() === code);
   if (existing) return existing;
   const entry = { code, symbol };
-  localStorage.setItem(CURRENCIES_KEY_V2, JSON.stringify([...list, entry]));
+  safeSet(CURRENCIES_KEY_V2, JSON.stringify([...list, entry]));
   return entry;
 }
 
 function getTheme() {
-  return localStorage.getItem(THEME_KEY_V2) === 'light' ? 'light' : 'dark';
+  return safeGet(THEME_KEY_V2) === 'light' ? 'light' : 'dark';
 }
 
 function setTheme(theme) {
   const t = theme === 'light' ? 'light' : 'dark';
-  localStorage.setItem(THEME_KEY_V2, t);
+  safeSet(THEME_KEY_V2, t);
   return t;
 }
 
@@ -91,7 +115,6 @@ function setTheme(theme) {
 // `const`/`function` bindings are visible to later <script> tags by identifier
 // lookup, but NOT as window.* properties. Anything reaching for window.getX
 // needs this assigned explicitly.
-window.defaultBranches = defaultBranches;
 window.getBranches   = getBranches;
 window.getCurrencies = getCurrencies;
 window.addCurrency   = addCurrency;
