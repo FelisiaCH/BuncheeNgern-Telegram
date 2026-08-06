@@ -1,4 +1,4 @@
-# BuncheeNgern v2 — Phase 1: entry screen
+# BuncheeNgern v2 — Phase 1.5: session &amp; authentication
 
 Implements `bcn-v2-phase1-entry-prompt.md`: the entry screen only (type,
 item, currency + inline add, payment toggles, amount(s), branch, slip,
@@ -20,6 +20,60 @@ the only thing deployed, and still the only thing referenced by
 
 Three Phase 0 findings this phase fixed: missing language files, missing
 `window.*` exports, and zero `data-i18n` nodes to exercise `applyTranslationsToDom()`.
+
+## Phase 1.5, on top of Phase 1
+
+Implements `bcn-v2-phase1.5-session-auth.md` — the gap Phase 1 shipped with:
+`store.get().sessionToken` was never set by anything, so every request sent
+`sessionToken: ''` and the backend answered `AUTH_EXPIRED`. Phase 1's own
+manual test 8 ("submit a both-on entry") could never have passed.
+
+**Store contract this phase owns** (top-level keys, not a nested object —
+`entry.js`'s `buildPayload()` reads `state.staffName`/`state.userEmail`
+directly, so those exact names are load-bearing): `screen`
+(`'login' | 'locked' | 'entry'`), `sessionToken`, `staffName`, `userEmail`,
+`authError`.
+
+| File | Notes |
+|---|---|
+| `js/session.js` (new) | Device identity, session persistence (`{staffName, userEmail, sessionToken, locked}` — v1's `shop` dropped, branch memory is an entry-state concern), Google Sign-In — ported from v1 `js/session.js`, adapted to `store.js` instead of the `A` global/`$`/`showScr`. `bcn2_device`/`bcn2_session`, **not** seeded from v1's `deviceId`/`userSession`: sharing either would let v1 and v2 collide on one Sessions row, so either app's logout/lock would invalidate the other. `lockSession()` keeps the stored token (a lock is a client-side UX gate, matching v1 — only `forgetDevice()` actually revokes anything) so an unlock reuses it via `apiAuthenticate`'s `existingToken` instead of minting a new session row. **No lock/logout UI this phase** — `lockSession`/`clearSession` are exported unused, for Phase 3's menu to wire up. |
+| `js/app.js` | Boot rewritten: theme → language → `restoreSession()` **before** the first render → `mountEntryScreen()` unconditionally (cheap — no fetch, just DOM refs + config.js dropdowns, safe regardless of which screen results) → `initGoogleSignIn()` → one subscriber (`authError` early-return → `onAuthError`; else translate + `routeScreen` + `renderEntry`) → one initial paint. `routeScreen(state)` is a pure `.hidden`-class toggle driven by `state.screen`; `onAuthError(code)` calls `forgetDevice()`, warns on `AUTH_DENIED`, and resets `screen` to `'login'`. |
+| `index.html` | Two new screens (`#screen-login`, `#screen-locked`, both starting `hidden`, `#screen-entry` now starts `hidden` too), the GSI platform script in `<head>` (`async defer` — a sanctioned exception for a third-party loader, not a v1-constraint change). Locked screen shows `lockTitle` as a heading, the signed-in name in `#locked-user`, and its own Google button (`#g-signin-btn-locked`) — the same callback re-signs-in-as-the-same-account, which **is** the unlock. |
+| `css/components.css` | Login/locked card — ported from v1 `css/app.css`, unchanged values. |
+
+`js/ui.js` is untouched this phase (screen routing lives in `app.js`, not as
+a generic helper — nothing else needs it yet).
+
+### Locked-screen copy reuses existing i18n keys only
+
+v1 has no dedicated locked-screen strings (it reuses the login screen
+outright). Rather than add new `i18n/lang_*.js` keys — those files are
+outside `v2/`, off-limits per this phase's hard constraints — the locked
+screen reuses `lockTitle` (heading) and `googleSignInHint` (button hint); the
+signed-in name itself is data, not UI copy, so it needs no key.
+
+### Local testing caveat
+
+Google Sign-In validates the page origin against the OAuth client's
+authorized origins. `http://localhost:8000` is almost certainly **not**
+authorized — sign-in fails there with an origin error even when the code is
+correct. Either add it to the OAuth client's Authorized JavaScript origins
+(dev-only, remove later) or test at `https://bcn.felismp.xyz/v2/`, which
+already is. *(Not verified in this environment — see below.)*
+
+### Not verified live in this session
+
+Both `index.html` and v2's own config block hold placeholder
+`GOOGLE_CLIENT_ID`/`SCRIPT_URL` values in this checkout — no real backend was
+reachable to run this phase's mandatory live smoke test (sign in, submit one
+entry, confirm `staffName`/`userEmail` land correctly, confirm restore/expiry
+routing) or the browser checks for the three `screen` states. All static
+checks pass: `node --check` on both new/changed JS files, every required
+`index.html` id/script present, no unprefixed `localStorage` keys, no
+`userSession`/`deviceId` literals, v1 untouched, `service-worker.js` and
+`i18n/` untouched, `v2/` not in `ASSETS`. **Run the browser + live smoke
+tests against a real deployment before treating this phase as done**, and
+revert `index.html` to placeholder config before that commit.
 
 ### Phase 1 follow-up
 

@@ -3,25 +3,78 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BuncheeNgern v2 — entry screen (Phase 1, not in use)</title>
+<title>BuncheeNgern v2 — entry + auth (Phase 1.5, not in use)</title>
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/components.css">
+<!-- Google Identity Services — async/defer, exactly as v1. A sanctioned
+     external-loader exception: CLAUDE.md's plain-<script>-only rule is about
+     ordering this app's own sequential slices, not a third-party loader that
+     has no such dependency. Placed early so it's fetching in parallel from
+     the first possible moment; initGoogleSignIn() (js/session.js) retries
+     until google.accounts.id exists, so load order relative to the scripts
+     below doesn't matter. -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
 <!--
   Phase 1 per bcn-v2-phase1-entry-prompt.md: the entry screen only (type,
   item, currency + inline add, payment toggles, amount(s), branch, slip,
-  confirmation sheet, submit). Not linked from v1, not registered with any
-  service worker, not in service-worker.js's ASSETS — unreachable to real
-  users unless they type the URL directly. v1 is completely untouched.
+  confirmation sheet, submit). Phase 1.5 per bcn-v2-phase1.5-auth-prompt.md
+  adds the login/locked screens and the session that makes submitting
+  possible at all. Not linked from v1, not registered with any service
+  worker, not in service-worker.js's ASSETS — unreachable to real users
+  unless they type the URL directly. v1 is completely untouched.
 
-  Not in this phase: dashboard, sidebar, settings, the rich item picker with
-  grouped suggestions, accent presets, Thai/Lao type pass. See v2/README.md.
+  Not in this phase: dashboard, sidebar, settings, whitelist management UI,
+  the rich item picker with grouped suggestions, accent presets, Thai/Lao
+  type pass. See v2/README.md.
 -->
 
-<div id="screen-entry" class="screen">
+<!-- Login — shown when there is no session at all. Ported from v1 #scr-login,
+     minus the theme toggle and language switch (Phase 3). -->
+<div id="screen-login" class="screen hidden">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="lc-head">
+        <div class="lc-logo">🧾</div>
+        <div class="lc-title">BuncheeNgern</div>
+        <div class="lc-sub" data-i18n="tagline">Income &amp; Expense Tracking System</div>
+      </div>
+      <div class="g-signin-row">
+        <div id="g-signin-btn"></div>
+        <div class="g-signin-hint" data-i18n="googleSignInHint">Sign in with Google to get started</div>
+        <div class="g-signin-hint hidden" id="g-signin-warn"></div>
+      </div>
+    </div>
+  </div>
+  <p class="login-footer" data-i18n="footerCopy">© 2026 FelisiaCH — Released under the MIT License</p>
+</div>
+
+<!-- Locked — shown when the stored session has locked:true. Same Google
+     flow, same callback (handleGoogleCredential) — signing back in as the
+     same account IS the unlock, reusing the still-valid stored token via
+     apiAuthenticate's existingToken instead of minting a new session row.
+     No new i18n key for "locked": reuses lockTitle + googleSignInHint. -->
+<div id="screen-locked" class="screen hidden">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="lc-head">
+        <div class="lc-logo">🧾</div>
+        <div class="lc-title" data-i18n="lockTitle">Lock</div>
+        <div class="lc-sub" id="locked-user">—</div>
+      </div>
+      <div class="g-signin-row">
+        <div id="g-signin-btn-locked"></div>
+        <div class="g-signin-hint" data-i18n="googleSignInHint">Sign in with Google to get started</div>
+        <div class="g-signin-hint hidden" id="g-signin-warn-locked"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="screen-entry" class="screen hidden">
   <header class="app-hdr">
     <div class="hdr-brand">
       <div class="hdr-badge">🧾</div>
@@ -191,6 +244,7 @@ const SCRIPT_URL       = "YOUR_APPS_SCRIPT_URL_HERE";
 <script src="js/config.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/api.js"></script>
+<script src="js/session.js"></script>
 <script src="js/entry.js"></script>
 <script src="js/app.js"></script>
 </body>

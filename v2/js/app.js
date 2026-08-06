@@ -1,15 +1,55 @@
-// Boot: language, theme, mount the entry screen, one store subscription,
-// one initial render. Per bcn-v2-phase1-entry-prompt.md §5.
+// Boot: theme, language, session restore, mount, Google Sign-In, one store
+// subscription, one initial render. Per bcn-v2-phase1-entry-prompt.md §5 and
+// bcn-v2-phase1.5-session-auth.md's boot rewrite.
+//
+// mountEntryScreen() runs unconditionally (step 4) regardless of which
+// screen restoreSession() lands on — it only caches DOM refs and populates
+// currency/branch dropdowns from config.js, no auth or fetch involved, so
+// it's safe to always mount. Screen visibility is purely a function of
+// state.screen via routeScreen() below; nothing else needs to re-mount on
+// sign-in/unlock.
 
 document.documentElement.setAttribute('data-theme', getTheme());
-
 initLang();
+restoreSession(); // before first paint — stops a signed-in user seeing a login flash
 mountEntryScreen();
+initGoogleSignIn();
+
+// Toggles .hidden on the three screens by state.screen (defaults to
+// 'login' if unset). When locked, paints the signed-in name into
+// #locked-user. Does NOT touch the sign-in warn slots — those are session.js's
+// concern (shown on failure, hidden on success), not screen-routing's.
+function routeScreen(state) {
+  const screen = state.screen || 'login';
+  document.getElementById('screen-login')?.classList.toggle('hidden', screen !== 'login');
+  document.getElementById('screen-locked')?.classList.toggle('hidden', screen !== 'locked');
+  document.getElementById('screen-entry')?.classList.toggle('hidden', screen !== 'entry');
+  if (screen === 'locked') {
+    const el = document.getElementById('locked-user');
+    if (el) el.textContent = state.staffName || '';
+  }
+}
+
+// api.js's _checkAuthError already does store.set({sessionToken:null,
+// authError}) on AUTH_EXPIRED/AUTH_DENIED — this is the listener that was
+// missing. forgetDevice() revokes locally; AUTH_DENIED additionally warns
+// (not allow-listed, distinct from a merely expired token). The final
+// store.set clears authError, which re-fires this subscriber on the clean
+// path — the `if (state.authError)` early-return in the subscriber below
+// stops that from looping.
+function onAuthError(code) {
+  forgetDevice();
+  if (code === 'AUTH_DENIED') showSignInWarn('errAuthDenied');
+  store.set({ sessionToken: null, staffName: null, userEmail: null, screen: 'login', authError: null });
+}
 
 store.subscribe(state => {
+  if (state.authError) { onAuthError(state.authError); return; }
   applyTranslationsToDom();
-  renderEntry(state);
+  routeScreen(state);
+  renderEntry(state); // no-ops until mountEntryScreen() has run — guarded in entry.js
 });
 
 applyTranslationsToDom();
+routeScreen(store.get());
 renderEntry(store.get());
