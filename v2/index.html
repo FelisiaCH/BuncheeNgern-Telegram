@@ -80,6 +80,10 @@
       <div class="hdr-badge">🧾</div>
       <span class="hdr-name">BuncheeNgern</span>
     </div>
+    <nav class="mini-nav">
+      <button type="button" class="mini-nav-btn" data-action="navRecord" data-i18n="navRecord">Record</button>
+      <button type="button" class="mini-nav-btn" data-action="navDash" data-i18n="navSummary">Summary</button>
+    </nav>
   </header>
 
   <div class="tab-body">
@@ -182,6 +186,110 @@
   </div>
 </div>
 
+<!-- Dashboard — Phase 2b per bcn-v2-phase2b-dashboard.md. Content area only
+     (top bar, currency tabs, donut + tiles + expense strip, entry list) —
+     the mockup's grouped sidebar, accent/identity and Lao/Thai type pass are
+     Phase 3; "minimal nav" here is the two-button .mini-nav in the header. -->
+<div id="screen-dash" class="screen hidden">
+  <header class="app-hdr">
+    <div class="hdr-brand">
+      <div class="hdr-badge">🧾</div>
+      <span class="hdr-name">BuncheeNgern</span>
+    </div>
+    <nav class="mini-nav">
+      <button type="button" class="mini-nav-btn" data-action="navRecord" data-i18n="navRecord">Record</button>
+      <button type="button" class="mini-nav-btn" data-action="navDash" data-i18n="navSummary">Summary</button>
+    </nav>
+  </header>
+
+  <div class="dash-body">
+    <div class="top">
+      <div>
+        <div class="crumb" data-i18n="navSummary">Summary</div>
+        <div class="h1" data-i18n="dashTitle">Daily Summary</div>
+      </div>
+      <div class="top-r">
+        <select id="dash-branch" class="filt" data-bind="dashBranch"></select>
+        <div class="period-seg" id="dash-period-seg">
+          <button type="button" data-action="selectPeriod" data-period="today">Today</button>
+          <button type="button" data-action="selectPeriod" data-period="week">This week</button>
+          <button type="button" data-action="selectPeriod" data-period="month">This month</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ctabs" id="dash-ctabs"></div>
+
+    <div class="dash-grid">
+      <div class="donut-card">
+        <div>
+          <div class="card-t" data-i18n="chartIncomeSplit">Income mix</div>
+          <div class="card-s" id="dn-sub"></div>
+        </div>
+        <div class="donut-body">
+          <svg width="150" height="150" viewBox="0 0 120 120" style="flex-shrink:0">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="var(--bg-input)" stroke-width="15"/>
+            <circle id="dn-cash" cx="60" cy="60" r="52" fill="none" stroke="var(--amber)" stroke-width="15" stroke-dasharray="0 327" transform="rotate(-90 60 60)"/>
+            <circle id="dn-qr" cx="60" cy="60" r="52" fill="none" stroke="var(--indigo)" stroke-width="15" stroke-dasharray="0 327" transform="rotate(-90 60 60)"/>
+          </svg>
+          <div class="leg">
+            <div class="leg-i"><span class="dot" style="background:var(--amber)"></span> <span data-i18n="payCash">Cash</span> <b id="pc-cash">—</b></div>
+            <div class="leg-i"><span class="dot" style="background:var(--indigo)"></span> <span data-i18n="payQR">Online Payment</span> <b id="pc-qr">—</b></div>
+            <div class="leg-tot" id="leg-total"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tiles">
+        <div class="tile">
+          <div class="tl" data-i18n="cardNetTotal">Net Total</div>
+          <div class="tv-row"><span class="tv" id="tv-net">0</span><span id="td-net"></span></div>
+          <svg class="spark" id="sp-net" viewBox="0 0 300 34" preserveAspectRatio="none"></svg>
+        </div>
+        <div class="tile">
+          <div class="tl" data-i18n="cardCashOnHand">Cash on Hand</div>
+          <div class="tv-row"><span class="tv" id="tv-onhand">0</span><span id="td-onhand"></span></div>
+          <svg class="spark" id="sp-onhand" viewBox="0 0 300 34" preserveAspectRatio="none"></svg>
+        </div>
+        <div class="tile">
+          <div class="tl">Income</div>
+          <div class="tv-row"><span class="tv" id="tv-income">0</span><span id="td-income"></span></div>
+          <svg class="spark" id="sp-income" viewBox="0 0 300 34" preserveAspectRatio="none"></svg>
+        </div>
+        <div class="tile">
+          <div class="tl" data-i18n="cardExpense">Total Expenses</div>
+          <div class="tv-row"><span class="tv" id="tv-expense">0</span><span id="td-expense"></span></div>
+          <svg class="spark" id="sp-expense" viewBox="0 0 300 34" preserveAspectRatio="none"></svg>
+        </div>
+      </div>
+
+      <div class="exp-card">
+        <div class="exp-head">
+          <div>
+            <div class="card-t" data-i18n="chartExpenseRatio">Expenses vs income</div>
+            <div class="card-s" id="exp-sub"></div>
+          </div>
+          <div class="exp-pct" id="pc-exp">—</div>
+        </div>
+        <div class="bar-track"><div class="bar-fill" id="bar-exp"></div></div>
+        <div class="exp-foot">
+          <div class="exp-cap" id="exp-cap"></div>
+          <div class="exp-stats">
+            <span>Cash spent<b style="color:var(--amber)" id="exp-cash-spent">0</b></span>
+            <span>Online spent<b style="color:var(--indigo)" id="exp-qr-spent">0</b></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="list-hd">
+      <div class="lt" data-i18n="recentEntries">Recent Entries</div>
+      <div class="lc" id="d-cnt"></div>
+    </div>
+    <div class="list" id="d-list"></div>
+  </div>
+</div>
+
 <!-- Confirmation sheet — reuses the .ov backdrop + .ov-card shell. -->
 <div id="cfm-sheet" class="ov hidden" data-action="confirmBackdrop">
   <div class="ov-card cfm-card">
@@ -246,6 +354,7 @@ const SCRIPT_URL       = "YOUR_APPS_SCRIPT_URL_HERE";
 <script src="js/api.js"></script>
 <script src="js/session.js"></script>
 <script src="js/entry.js"></script>
+<script src="js/dashboard.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

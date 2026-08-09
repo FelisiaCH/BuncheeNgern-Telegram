@@ -280,3 +280,113 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:none;box-s
   .login-card{padding:32px 18px 26px}
   .lc-title{font-size:20px}
 }
+
+/* 🧭 Minimal nav — Phase 2b's "reach the dashboard" requirement, NOT the
+   grouped sidebar (Phase 3). Each screen's header carries its own copy;
+   app.js keeps every copy's .on state in sync via routeScreen(). */
+.mini-nav{display:flex;gap:4px;margin-left:auto;background:var(--bg-input);border:1px solid var(--brd);border-radius:var(--r-sm);padding:3px}
+.mini-nav-btn{padding:7px 14px;border:none;background:transparent;border-radius:var(--r-xs);color:var(--txt-sub);font-size:13px;font-weight:600;font-family:'Outfit',system-ui,sans-serif;cursor:pointer;transition:background var(--ease),color var(--ease)}
+.mini-nav-btn.on{background:var(--bg-hover);color:var(--txt)}
+
+/* 📊 Dashboard (Phase 2b) — structure and values ported from
+   bcn-v2-dashboard-structure-mockup.html's content area. New tokens (not in
+   tokens.css, whose scope is the ported-from-v1 primitive set): a sparkline
+   stroke/fill derived from --txt-sub so it's theme-adaptive without a
+   separate light-mode override, and a softer border for the entry list's
+   inter-row dividers. */
+:root{
+  --spark:var(--txt-sub);
+  --spark-fill:color-mix(in srgb, var(--txt-sub) 10%, transparent);
+  --brd-soft:color-mix(in srgb, var(--brd) 60%, transparent);
+}
+
+.dash-body{padding:74px 20px 40px;max-width:1200px;margin:0 auto;width:100%}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.crumb{font-size:12px;color:var(--txt-muted);margin-bottom:2px}
+.h1{font-size:21px;font-weight:800;letter-spacing:-.5px;color:var(--txt)}
+.top-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.filt{
+  font-size:12.5px;font-weight:600;color:var(--txt-sub);background:var(--bg-input);
+  border:1px solid var(--brd);border-radius:var(--r-sm);padding:8px 30px 8px 12px;
+  outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7FA3' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;background-size:14px
+}
+.period-seg{display:flex;background:var(--bg-input);border:1px solid var(--brd);border-radius:var(--r-sm);padding:3px;gap:2px}
+.period-seg button{font-size:12.5px;font-weight:600;color:var(--txt-sub);padding:6px 12px;border-radius:var(--r-xs);border:none;background:transparent;cursor:pointer;font-family:'Outfit',system-ui,sans-serif;transition:background var(--ease),color var(--ease)}
+.period-seg button.on{background:var(--bg-hover);color:var(--txt);font-weight:700}
+
+/* Currency tabs */
+.ctabs{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap}
+.ctab{font-size:13px;font-weight:600;color:var(--txt-sub);padding:7px 14px;border-radius:20px;border:1px solid transparent;background:transparent;cursor:pointer;font-family:'Outfit',system-ui,sans-serif}
+.ctab.on{background:var(--bg-input);border-color:var(--brd);color:var(--txt);font-weight:700}
+
+/* Top zone: donut (left) + KPI tiles (right); expense strip spans the bottom */
+.dash-grid{display:grid;grid-template-columns:340px 1fr;grid-template-areas:'pie tiles' 'exp exp';gap:16px}
+
+.donut-card{grid-area:pie;background:var(--bg-card);border:1px solid var(--brd);border-radius:var(--r);padding:18px 20px;display:flex;flex-direction:column}
+.card-t{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:2px}
+.card-s{font-size:12px;color:var(--txt-muted)}
+.donut-body{flex:1;display:flex;align-items:center;gap:22px;margin-top:6px}
+.leg{display:flex;flex-direction:column;gap:11px}
+.leg-i{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--txt-sub)}
+.dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.leg-i b{color:var(--txt);font-weight:700;margin-left:3px}
+.leg-tot{color:var(--txt-muted);font-size:12px;margin-top:2px}
+
+/* KPI tiles — 2×2, each: label / number+delta / full-width sparkline */
+.tiles{grid-area:tiles;display:grid;grid-template-columns:repeat(2,1fr);border:1px solid var(--brd);border-radius:var(--r);overflow:hidden;background:var(--bg-card)}
+.tile{padding:15px 18px 12px;border-right:1px solid var(--brd);border-bottom:1px solid var(--brd);display:flex;flex-direction:column;min-width:0}
+.tile:nth-child(2n){border-right:none}
+.tile:nth-child(n+3){border-bottom:none}
+.tl{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--txt-sub)}
+.tv-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-top:9px}
+.tv{font-size:25px;font-weight:800;letter-spacing:-.6px;font-variant-numeric:tabular-nums;color:var(--txt)}
+.delta{font-size:12.5px;font-weight:700;white-space:nowrap;color:var(--txt-muted)}
+.up{color:var(--green)} .down{color:var(--red)}
+.gv{color:var(--green)} .rv{color:var(--red)}
+.spark{width:100%;height:34px;display:block;margin-top:11px}
+
+/* Expense ratio — dense full-width strip */
+.exp-card{grid-area:exp;background:var(--bg-card);border:1px solid var(--brd);border-radius:var(--r);padding:16px 20px 18px}
+.exp-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;gap:12px}
+.exp-pct{font-size:22px;font-weight:800;letter-spacing:-.5px;color:var(--red)}
+.bar-track{height:12px;border-radius:6px;background:var(--bg-input);overflow:hidden;border:1px solid var(--brd)}
+.bar-fill{height:100%;background:var(--red);width:0%;transition:width var(--ease)}
+.exp-foot{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:10px;flex-wrap:wrap}
+.exp-cap{font-size:12px;color:var(--txt-muted)}
+.exp-stats{display:flex;gap:20px;font-size:13px;color:var(--txt-sub)}
+.exp-stats b{font-weight:700;margin-left:5px}
+
+/* Recent entries */
+.list-hd{display:flex;align-items:center;justify-content:space-between;margin:28px 0 10px;gap:12px}
+.list-hd .lt{font-size:15px;font-weight:800;letter-spacing:-.3px;color:var(--txt)}
+.list-hd .lc{font-size:12.5px;color:var(--txt-sub);font-weight:600}
+.list{border:1px solid var(--brd);border-radius:var(--r);overflow:hidden;background:var(--bg-card)}
+.ei{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--brd-soft)}
+.ei:last-child{border-bottom:none}
+.ei-ic{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0}
+.ei-ic.inc{background:var(--green-dim);color:var(--green)}
+.ei-ic.exp{background:var(--red-dim);color:var(--red)}
+.ei-info{flex:1;min-width:0}
+.ei-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt)}
+.ei-meta{font-size:11.5px;color:var(--txt-sub);margin-top:1px}
+.ei-right{text-align:right;flex-shrink:0}
+.ei-amt{font-size:14px;font-weight:800;font-variant-numeric:tabular-nums}
+.pm-b{display:inline-block;margin-top:3px;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px}
+.pm-cash{background:var(--amber-dim);color:var(--amber)}
+.pm-qr{background:var(--indigo-dim);color:var(--indigo)}
+.slip-a{color:var(--accent);text-decoration:underline}
+.empty{padding:28px 18px;text-align:center;color:var(--txt-muted);font-size:13.5px}
+
+@media(max-width:960px){
+  .dash-grid{grid-template-columns:1fr;grid-template-areas:'pie' 'tiles' 'exp'}
+}
+@media(max-width:560px){
+  .dash-body{padding:74px 14px 32px}
+  .tiles{grid-template-columns:1fr}
+  .tile{border-right:none}
+  .tile:nth-child(3){border-bottom:1px solid var(--brd)}
+  .mini-nav-btn{padding:7px 10px;font-size:12px}
+}

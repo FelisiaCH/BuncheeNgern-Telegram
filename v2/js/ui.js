@@ -30,6 +30,13 @@ function esc(s) {
   return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
+// 🔗 safeUrl — ported unchanged from v1 js/session.js. https-only guard for
+// slip links rendered as href — first needed by the dashboard's entry list.
+function safeUrl(u) {
+  const s = String(u || '').trim();
+  return /^https:\/\//i.test(s) ? s : '';
+}
+
 // 💰 Amount helpers — ported unchanged from v1 js/core.js. Inputs display
 // grouped values ("1,234.56") but every read goes through amt()/parseAmount()
 // so the backend always receives raw numbers.
@@ -94,6 +101,7 @@ function hideOv() {
 
 // Explicit export line per bcn-v2-phase1-entry-prompt.md §1b.
 window.esc          = esc;
+window.safeUrl      = safeUrl;
 window.parseAmount  = parseAmount;
 window.amt          = amt;
 window.formatAmount = formatAmount;
