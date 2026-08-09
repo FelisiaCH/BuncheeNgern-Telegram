@@ -80,6 +80,13 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  // v2/ is a separate, unshipped app sharing this origin — never in ASSETS,
+  // so passing its requests through the asset branch below only corrupts
+  // them (fetch(e.request) on a non-precached style/script request comes
+  // back unusable to the page, even though the bytes are correct). Let the
+  // browser handle v2/ requests directly, untouched by this worker.
+  if (new URL(e.request.url).pathname.startsWith('/v2/')) return;
+
   // Network-first for navigation/HTML so updates reach installed devices immediately.
   if (e.request.mode === 'navigate' || e.request.destination === 'document') {
     e.respondWith(
