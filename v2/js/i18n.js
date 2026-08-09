@@ -39,6 +39,10 @@ function initLang() {
   }
   const lang = (window.LANGS && window.LANGS[saved]) ? saved : detectDeviceLang();
   store.set({ lang });
+  document.documentElement.lang = lang; // :lang(lo)/:lang(th) CSS depends on this; set
+  // directly here rather than relying on a later applyTranslationsToDom() call —
+  // initLang() runs before the store has any subscriber, so store.set() alone
+  // doesn't reach it yet.
   return lang;
 }
 
@@ -54,6 +58,7 @@ function setLang(lang) {
   if (!window.LANGS || !window.LANGS[lang] || lang === store.get().lang) return;
   localStorage.setItem(LANG_KEY, lang);
   store.set({ lang }); // subscribers (screens) re-render with the new t()
+  document.documentElement.lang = lang; // see initLang()'s comment
 }
 
 // Generic, screen-agnostic pass — the same four data-i18n-* attribute forms

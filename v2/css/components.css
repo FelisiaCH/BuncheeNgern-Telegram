@@ -343,6 +343,11 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:none;box-s
 .tl{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--txt-sub)}
 .tv-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-top:9px}
 .tv{font-size:25px;font-weight:800;letter-spacing:-.6px;font-variant-numeric:tabular-nums;color:var(--txt)}
+/* Latin digits only — stays tight, doesn't inherit the :lang(lo)/:lang(th)
+   1.65 from base.css. Descendant form (0,2,0) is required to out-specify
+   the :lang rule (0,1,0); a bare .tv (0,1,0) would tie and could lose the
+   cascade depending on source order. */
+:lang(lo) .tv, :lang(th) .tv{line-height:1.2}
 .delta{font-size:12.5px;font-weight:700;white-space:nowrap;color:var(--txt-muted)}
 .up{color:var(--green)} .down{color:var(--red)}
 .gv{color:var(--green)} .rv{color:var(--red)}
