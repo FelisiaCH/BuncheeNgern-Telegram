@@ -42,6 +42,7 @@ function doGet(e) {
     switch (action) {
       case 'getTodayData': return respond(getDateData(e.parameter.date || todayTab()));
       case 'getDateData':  return respond(getDateData(e.parameter.date));
+      case 'getRangeData': return respond(getRangeData(e.parameter.startDate, e.parameter.endDate));
       default:             return respond({ error: `Unknown GET action: ${action}` });
     }
   } catch (err) {
@@ -457,6 +458,42 @@ function getDateData(dateTab) {
 function normalizeTimestamp(value, timeZone) {
   if (value instanceof Date) return Utilities.formatDate(value, timeZone, TIMESTAMP_FORMAT);
   return String(value || '');
+}
+
+// 📊 Multi-Day Entries Lookup — raw per-day rows, no aggregation (buildTotals
+// stays client-only and single-sourced, see CLAUDE.md). v2 Phase 2.
+// Spike: ~0.3s/day, 30d≈10s safe, 60d≈14-18s flaky past the 15s timeout.
+// Dashboard never requests >31d; deltas use two parallel ≤31d calls instead
+// of one wide range. See bcn-v2-phase2-getrangedata-dashboard.md.
+const MAX_RANGE_DAYS = 31;
+
+function parseDdMmYyyy(s) {
+  const m = /^(\d{2})-(\d{2})-(\d{4})$/.exec(String(s || ''));
+  if (!m) return null;
+  const day = Number(m[1]), month = Number(m[2]), year = Number(m[3]);
+  const ms  = Date.UTC(year, month - 1, day);
+  // Reject strings that parse but aren't a real calendar date (e.g. 31-02-2026).
+  const d = new Date(ms);
+  if (d.getUTCFullYear() !== year || d.getUTCMonth() !== month - 1 || d.getUTCDate() !== day) return null;
+  return ms;
+}
+
+function getRangeData(startDate, endDate) {
+  const startMs = parseDdMmYyyy(startDate);
+  const endMs   = parseDdMmYyyy(endDate);
+  if (startMs === null || endMs === null || endMs < startMs) {
+    return { error: 'Invalid date range' };
+  }
+  const dayCount = Math.round((endMs - startMs) / 86400000) + 1;
+  if (dayCount > MAX_RANGE_DAYS) {
+    return { error: `Range exceeds ${MAX_RANGE_DAYS}-day limit` };
+  }
+  const days = [];
+  for (let ms = startMs; ms <= endMs; ms += 86400000) {
+    const tab = Utilities.formatDate(new Date(ms), 'Etc/UTC', 'dd-MM-yyyy');
+    days.push({ date: tab, entries: getDateData(tab).entries });
+  }
+  return { days };
 }
 
 // 📤 Slip Upload to Drive
