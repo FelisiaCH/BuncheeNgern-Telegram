@@ -57,23 +57,29 @@ signed-in name itself is data, not UI copy, so it needs no key.
 Google Sign-In validates the page origin against the OAuth client's
 authorized origins. `http://localhost:8000` is almost certainly **not**
 authorized — sign-in fails there with an origin error even when the code is
-correct. Either add it to the OAuth client's Authorized JavaScript origins
-(dev-only, remove later) or test at `https://bcn.felismp.xyz/v2/`, which
-already is. *(Not verified in this environment — see below.)*
+correct — confirmed live: a local `localhost:8123` origin got a 403 on the
+GSI button iframe. Either add it to the OAuth client's Authorized JavaScript
+origins (dev-only, remove later) or test at `https://bcn.felismp.xyz/v2/`,
+which already is (see "Live smoke — passed" below).
 
-### Not verified live in this session
+### Live smoke — passed
 
-Both `index.html` and v2's own config block hold placeholder
-`GOOGLE_CLIENT_ID`/`SCRIPT_URL` values in this checkout — no real backend was
-reachable to run this phase's mandatory live smoke test (sign in, submit one
-entry, confirm `staffName`/`userEmail` land correctly, confirm restore/expiry
-routing) or the browser checks for the three `screen` states. All static
-checks pass: `node --check` on both new/changed JS files, every required
-`index.html` id/script present, no unprefixed `localStorage` keys, no
-`userSession`/`deviceId` literals, v1 untouched, `service-worker.js` and
-`i18n/` untouched, `v2/` not in `ASSETS`. **Run the browser + live smoke
-tests against a real deployment before treating this phase as done**, and
-revert `index.html` to placeholder config before that commit.
+Run against the real deployment at `https://bcn.felismp.xyz/v2/` with real
+config temporarily in place (reverted to placeholder after): sign in via GSI
+→ real `sessionToken`/`staffName`/`userEmail` landed in the store, routed
+login → entry; submitted a real entry, `staffName`/`userEmail` correctly
+attached (form reset confirmed the write); reloaded mid-session → restored
+straight to `entry`, no login flash; corrupted `sessionToken` and submitted
+→ `AUTH_EXPIRED` routed cleanly back to `login` with the warn message shown.
+All three `screen` states rendered correctly in the browser.
+
+Found and fixed one bug in the process, unrelated to this phase's own code:
+v1's `service-worker.js` (scope `/`) was intercepting `/v2/` asset requests
+even though `v2/` is never in `ASSETS` — its fetch-through path corrupted
+stylesheets specifically (200, correct bytes, but rules never applied), so
+every screen rendered unstyled and stacked. Fixed with an early return for
+`/v2/` paths in the fetch handler, before the navigate/asset branches;
+verified live post-fix. See the `fix(sw)` commit.
 
 ### Phase 1 follow-up
 
