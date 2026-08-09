@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 3.1 — Lao/Thai type diagnostic (THROWAWAY, not shipped)</title>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/components.css">
+<script src="../i18n/lang_lo.js"></script>
+<script src="../i18n/lang_th.js"></script>
+<style>
+  /* Diagnostic-only chrome. Not part of the app; never linked from index.html,
+     never added to service-worker ASSETS. */
+  body{padding:24px;max-width:1100px;margin:0 auto}
+  h2.diag-h{font-size:18px;font-weight:800;margin:36px 0 4px;color:var(--txt)}
+  p.diag-sub{font-size:12px;color:var(--txt-muted);margin-bottom:14px}
+  .role{border:1px solid var(--brd);border-radius:8px;padding:14px;margin-bottom:22px;background:var(--bg-card)}
+  .role-hd{font-size:12px;font-weight:700;color:var(--txt-muted);margin-bottom:10px;font-family:monospace}
+  .grid4{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .cell{border:1px solid var(--brd);border-radius:6px;overflow:hidden}
+  .cell-lbl{font-size:10px;font-family:monospace;padding:3px 6px;background:var(--bg-input);color:var(--txt-muted);display:flex;justify-content:space-between}
+  .box{position:relative;padding:0 8px}
+  .box.clip{height:1lh;overflow:hidden;outline:2px solid #e5484d;outline-offset:-2px}
+  .box.open{overflow:visible;outline:2px dashed var(--txt-muted);outline-offset:-1px}
+  .lang-tag{display:inline-block;font-size:10px;font-family:monospace;padding:1px 5px;border-radius:3px;background:var(--accent-dim,#234);color:var(--accent,#8cf);margin-right:6px}
+  .measured{font-size:10px;font-family:monospace;color:var(--txt-muted)}
+  .ellipsis-frame{width:150px;border:1px dashed var(--txt-muted)}
+  .font-row{display:flex;gap:16px;flex-wrap:wrap}
+  .font-cell{flex:1;min-width:220px}
+</style>
+</head>
+<body>
+
+<h2 class="diag-h" style="margin-top:0">Phase 3.1 — Lao/Thai type clip diagnostic</h2>
+<p class="diag-sub">
+  Throwaway page, not linked from index.html, not shipped. Loads real
+  v2/css and real i18n/lang_lo.js + lang_th.js strings via &lt;script&gt;, no
+  hand-copied unicode. Each role: RED outline box = height:1lh + overflow:hidden
+  (recreates production clip risk exactly). Dashed box = same text,
+  overflow:visible (true glyph extent, for comparison). Left column = current
+  CSS as shipped (no line-height set → browser default "normal"). Right column
+  = candidate line-height 1.65. "measured" line shows the live computed
+  line-height/font-family Chrome actually used.
+</p>
+
+<div id="roles"></div>
+
+<h2 class="diag-h">Font-stack check</h2>
+<p class="diag-sub">
+  'Outfit' has no Lao/Thai glyphs, so the browser already silently falls back
+  per-character — the question is only which fallback and whether it's
+  legible/clips less. Comparing declared stacks; actual glyph substitution is
+  eyeballed from the screenshot, not from computed style (Chrome does not
+  expose which physical font painted a given character).
+</p>
+<div class="role">
+  <div class="font-row">
+    <div class="font-cell">
+      <div class="cell-lbl"><span>current: 'Outfit',system-ui,sans-serif</span></div>
+      <div class="box open" style="font-family:'Outfit',system-ui,sans-serif;font-size:20px;padding:8px" id="ff-a"></div>
+    </div>
+    <div class="font-cell">
+      <div class="cell-lbl"><span>candidate: 'Noto Sans Lao','Noto Sans Thai',system-ui,sans-serif</span></div>
+      <div class="box open" style="font-family:'Noto Sans Lao','Noto Sans Thai',system-ui,sans-serif;font-size:20px;padding:8px" id="ff-b"></div>
+    </div>
+    <div class="font-cell">
+      <div class="cell-lbl"><span>candidate: system-ui,sans-serif (skip Outfit entirely)</span></div>
+      <div class="box open" style="font-family:system-ui,sans-serif;font-size:20px;padding:8px" id="ff-c"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const L = window.I18N_PARTS.lo, T = window.I18N_PARTS.th;
+
+// role, css class(es) to replicate, key(s) into L/T, extra inline style,
+// whether to wrap in the real fixed-width ellipsis frame (.ei-name only)
+const ROLES = [
+  { role: 'screen title (.h1)', cls: 'h1', keys: ['dashTitle'] },
+  { role: 'tile big-number (.tv) — worst-case text in that slot\'s metrics; .tv itself is normally digits only', cls: 'tv', keys: ['cardNetTotal'] },
+  { role: 'uppercase tile label (.tl)', cls: 'tl', keys: ['cardCashOnHand'] },
+  { role: 'form label (.fl)', cls: 'fl', keys: ['labelAmount'] },
+  { role: 'card title (.card-t)', cls: 'card-t', keys: ['chartIncomeSplit'] },
+  { role: 'card subtitle (.card-s)', cls: 'card-s', keys: ['chartExpenseRatio'] },
+  { role: 'legend line (.leg-i)', cls: 'leg-i', keys: ['cardCashOnHand'] },
+  { role: 'entry name (.ei-name) — nowrap+ellipsis, 150px frame', cls: 'ei-name', keys: ['itemSuggestions.1.cat'], ellipsis: true },
+  { role: 'primary button (.btn.btn-primary)', cls: 'btn btn-primary', keys: ['submitBtn'], inline: true },
+  { role: 'nav item (.mini-nav-btn / .navRecord label text)', cls: 'tl', keys: ['navRecord', 'navSummary'] },
+  { role: 'payment badge (.pm-b)', cls: 'pm-b', keys: ['payCash'] },
+  { role: 'list header title (.list-hd .lt)', cls: 'lt', keys: ['recentEntries'] },
+];
+
+function dig(obj, path) {
+  return path.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
+}
+
+function cellHtml(text, langCode, extraCls, candidate, ellipsis) {
+  const lhStyle = candidate ? 'line-height:1.65' : '';
+  const wrapOpen = ellipsis ? '<div class="ellipsis-frame">' : '';
+  const wrapClose = ellipsis ? '</div>' : '';
+  return `
+    <div class="cell">
+      <div class="cell-lbl"><span><span class="lang-tag">${langCode}</span>${candidate ? 'candidate 1.65' : 'current (normal)'}</span><span class="measured" data-measure></span></div>
+      ${wrapOpen}<div class="box clip ${extraCls}" lang="${langCode}" style="${lhStyle}">${text}</div>${wrapClose}
+      ${wrapOpen}<div class="box open ${extraCls}" lang="${langCode}" style="${lhStyle}">${text}</div>${wrapClose}
+    </div>`;
+}
+
+const container = document.getElementById('roles');
+ROLES.forEach(r => {
+  const section = document.createElement('div');
+  section.className = 'role';
+  const loText = r.keys.map(k => dig(L, k)).join(' / ');
+  const thText = r.keys.map(k => dig(T, k)).join(' / ');
+  section.innerHTML = `
+    <div class="role-hd">${r.role} — class="${r.cls}" — keys: ${r.keys.join(', ')}</div>
+    <div class="grid4">
+      ${cellHtml(loText, 'lo', r.cls, false, r.ellipsis)}
+      ${cellHtml(loText, 'lo', r.cls, true, r.ellipsis)}
+      ${cellHtml(thText, 'th', r.cls, false, r.ellipsis)}
+      ${cellHtml(thText, 'th', r.cls, true, r.ellipsis)}
+    </div>`;
+  container.appendChild(section);
+});
+
+document.getElementById('ff-a').lang = 'lo';
+document.getElementById('ff-a').textContent = L.cardCashOnHand + ' — ' + T.cardCashOnHand;
+document.getElementById('ff-b').lang = 'lo';
+document.getElementById('ff-b').textContent = L.cardCashOnHand + ' — ' + T.cardCashOnHand;
+document.getElementById('ff-c').lang = 'lo';
+document.getElementById('ff-c').textContent = L.cardCashOnHand + ' — ' + T.cardCashOnHand;
+
+// Print live computed line-height + font-family next to each cell — the
+// actual numbers Chrome used, not a guess.
+document.querySelectorAll('.cell').forEach(cell => {
+  const box = cell.querySelector('.box.clip');
+  const cs = getComputedStyle(box);
+  cell.querySelector('[data-measure]').textContent =
+    `lh:${cs.lineHeight} fs:${cs.fontSize} ff:${cs.fontFamily.split(',')[0]}`;
+});
+</script>
+</body>
+</html>
