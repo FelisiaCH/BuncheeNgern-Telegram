@@ -40,4 +40,7 @@ ok "secret scan clean"
 printf '  service worker: %s\n' "$(grep -o "buncheengern-v[0-9.]*" service-worker.js)"
 
 printf '\nDeploying…\n'
-npx wrangler pages deploy . --commit-dirty=true
+# "$@" passes through extra flags (e.g. --branch=main when deploying from a
+# worktree, whose git branch isn't main — wrangler infers the deploy target
+# from the branch name and would otherwise ship a preview, not production).
+npx wrangler pages deploy . --commit-dirty=true "$@"
