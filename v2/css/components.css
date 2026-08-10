@@ -266,6 +266,24 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:none;box-s
 
 /* ⚙️ Settings sheet (3.4) — reuses .ov/.ov-card/.cfm-title/.cfm-btns/.seg-wrap above. */
 .settings-sec-lbl{font-size:12.5px;color:var(--txt-sub);font-weight:600;margin-bottom:8px}
+.settings-sec-lbl + .settings-sec-lbl{margin-top:16px}
+
+/* 🎨 Accent presets (3.4b) — swatches show their OWN preset color, not the
+   currently-active --accent, so all five stay visible/selectable at once.
+   Deliberately NOT var(--accent): that token is the active preset, and a
+   swatch showing it would just repaint itself when clicked. */
+.accent-swatches{display:flex;gap:10px}
+.accent-sw{
+  width:32px;height:32px;border-radius:50%;border:2px solid transparent;
+  cursor:pointer;padding:0;transition:border-color var(--ease),transform var(--ease)
+}
+.accent-sw:hover{transform:scale(1.08)}
+.accent-sw.on{border-color:var(--txt)}
+.accent-sw.periwinkle{background:#5763EE}
+.accent-sw.blue{background:#0057FF}
+.accent-sw.violet{background:#6A00F4}
+.accent-sw.pink{background:#FF4696}
+.accent-sw.indigo{background:#3A0CA3}
 
 /* 🔔 Toast */
 .toast{

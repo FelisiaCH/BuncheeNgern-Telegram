@@ -11,6 +11,7 @@
 const BRANCHES_KEY_V2   = 'bcn2_branches';
 const CURRENCIES_KEY_V2 = 'bcn2_currencies';
 const THEME_KEY_V2      = 'bcn2_theme';
+const ACCENT_KEY_V2     = 'bcn2_accent';
 
 const BRANCHES_KEY_V1   = 'savedBranches';
 const CURRENCIES_KEY_V1 = 'savedCurrencies';
@@ -118,6 +119,31 @@ function setTheme(theme) {
   return t;
 }
 
+// Accent presets (3.4b) — swap ONLY --accent/--accent-2 via [data-accent] in
+// tokens.css; Periwinkle's dark/oled/light neutrals never change per-preset.
+// No v1 key to seed from — v1 has no accent presets at all. An inherited
+// value outside the known set (or absent) falls back to 'periwinkle', same
+// pattern as getTheme().
+const ACCENTS = ['periwinkle', 'blue', 'violet', 'pink', 'indigo'];
+
+function getAccent() {
+  const v = safeGet(ACCENT_KEY_V2);
+  return ACCENTS.includes(v) ? v : 'periwinkle';
+}
+
+// Applies data-accent to the root immediately, same as setTheme() — every
+// caller gets a correct render for free. 'periwinkle' clears the attribute
+// rather than setting data-accent="periwinkle": tokens.css has no
+// [data-accent="periwinkle"] block (it's :root's default), so leaving the
+// attribute set to that value would be inert but misleading to inspect.
+function setAccent(accent) {
+  const a = ACCENTS.includes(accent) ? accent : 'periwinkle';
+  safeSet(ACCENT_KEY_V2, a);
+  if (a === 'periwinkle') document.documentElement.removeAttribute('data-accent');
+  else document.documentElement.setAttribute('data-accent', a);
+  return a;
+}
+
 // Explicit export line per bcn-v2-phase1-entry-prompt.md §1b — top-level
 // `const`/`function` bindings are visible to later <script> tags by identifier
 // lookup, but NOT as window.* properties. Anything reaching for window.getX
@@ -127,3 +153,5 @@ window.getCurrencies = getCurrencies;
 window.addCurrency   = addCurrency;
 window.getTheme      = getTheme;
 window.setTheme      = setTheme;
+window.getAccent     = getAccent;
+window.setAccent     = setAccent;

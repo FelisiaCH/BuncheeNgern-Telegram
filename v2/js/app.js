@@ -10,6 +10,10 @@
 // sign-in/unlock.
 
 document.documentElement.setAttribute('data-theme', getTheme());
+// data-accent applied the same way (3.4b) — periwinkle omits the attribute
+// entirely (see setAccent()'s comment), so only call setAttribute when the
+// stored preset actually needs a tokens.css override.
+if (getAccent() !== 'periwinkle') document.documentElement.setAttribute('data-accent', getAccent());
 initLang();
 restoreSession(); // before first paint — stops a signed-in user seeing a login flash
 mountEntryScreen();
