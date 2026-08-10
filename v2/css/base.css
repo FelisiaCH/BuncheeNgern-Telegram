@@ -18,15 +18,29 @@ button{cursor:pointer;touch-action:manipulation}
 .hidden{display:none!important}
 .screen{min-height:100dvh;display:flex;flex-direction:column}
 
-/* ── Thai/Lao typography — NOT YET DONE ─────────────────────────────────
-   §9 calls this out as new and overdue: "Thai and Lao stack vowels and tone
-   marks above and below the baseline and get clipped at Latin line-heights.
-   v2 sets script-aware line-height and font stacks, and every layout gets
-   checked in Lao."
-   The design doc does not give concrete line-height/font-stack values, and
-   this needs actual visual verification in Lao (the primary language here),
-   not a guessed number — so nothing is set below. Do not ship Phase 3 without
-   filling this in and checking real Lao/Thai text against it.
+/* ── Thai/Lao typography ─────────────────────────────────────────────────
+   Phase 3.1 measured real Lao/Thai UI strings against every type role in
+   Chrome (v2/type-diag.html, see v2/README.md): the browser's default
+   ("normal") line-height clips stacked tone marks/upper vowels at the top
+   and subscript vowels at the bottom on every role ≤15px; 1.65 eliminated
+   every clip observed, 10.5–25px, both languages. No font-stack change
+   needed — 'Outfit' has no Lao/Thai glyphs so the browser already
+   substitutes per character regardless of what's declared, and three
+   candidate stacks rendered identically.
+   Depends on document.documentElement.lang tracking the active language —
+   see initLang()/setLang() in v2/js/i18n.js. One exception lives in the
+   dashboard CSS (2b): .tv (tile number, Latin digits only) overrides back
+   to 1.2 with a more specific selector.
 
-   :lang(th), :lang(lo) { line-height: ???; font-family: ???, 'Outfit', ...; }
+   Scoped to the root (html:lang(...)) so 1.65 is an INHERITED value, not
+   re-declared on every descendant. A bare :lang(lo) selector matches every
+   element at specificity (0,1,0) and ties any component rule that sets its
+   own line-height at equal specificity — source order then decides, and
+   components.css (loaded after this file) silently won every such tie.
+   Confirmed live: .msg (line-height:1.6, components.css) computed 20.8px
+   under lang="lo" instead of the intended 1.65 — an undocumented second
+   exemption beyond the one intentional .tv override. Inheritance has no
+   specificity to tie against, so any element's own line-height (.msg, .tv,
+   future components) now wins predictably regardless of file order.
 */
+html:lang(lo), html:lang(th) { line-height: 1.65; }

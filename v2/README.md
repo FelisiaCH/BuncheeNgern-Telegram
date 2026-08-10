@@ -161,3 +161,68 @@ Not built:
 - `git status`/`git diff` confirm zero changes to any v1 file, and
   `service-worker.js`'s `ASSETS` array (and thus what's cached/served to
   installed PWAs) is untouched.
+
+</details>
+
+## Phase 3.1 — Lao/Thai type measurement (measure only, no fix shipped)
+
+`bcn-v2-phase3-kickoff-type-measurement.md`. Built `v2/type-diag.html`
+(throwaway, not linked from `index.html`, not in `ASSETS` — v2/ already
+excludes it), loading real `v2/css` and pulling real strings straight from
+`i18n/lang_lo.js` / `lang_th.js` via `<script>` (no hand-copied unicode).
+Every type role the app uses got two side-by-side line-heights — current
+(unset → browser "normal") vs. candidate `1.65` — each rendered twice: once
+in a `height:1lh;overflow:hidden` box (recreates the exact clip a fixed-height
+`.tiles`/`.list`/card row would apply in production) and once
+`overflow:visible` next to it as a reference for the glyph's true extent.
+Measured live in Chrome via `python3 -m http.server` + zoomed screenshots,
+not by eye alone.
+
+### Result: clips at every size tested, current line-height
+
+| Role | Class | Size | Clip verdict (current/normal) | At 1.65 |
+|---|---|---|---|---|
+| Screen title | `.h1` | 21px | No visible clip (enough headroom at this size) | — |
+| Tile big-number slot | `.tv` | 25px | **Clips** — Thai `สุทธิ`'s ุ (subscript vowel) disappears entirely at the bottom | Fixed, ุ fully visible |
+| Uppercase tile label | `.tl` | 11px | **Clips** — top of ິ/ົ/ັ marks cut | Fixed |
+| Form label | `.fl` | 12px | Same pattern as `.tl`, less severe | Fixed |
+| Card title | `.card-t` | 13px | **Clips** — tone mark ່/่ flattened at top | Fixed |
+| Card subtitle | `.card-s` | 12px | Same pattern | Fixed |
+| Entry name | `.ei-name` | 14px | No visible vertical clip in the one string tested; horizontal ellipsis truncates at a clean boundary (browser respects grapheme clusters, no broken glyph) | — |
+| Primary button | `.btn` | 15px | Minor clip, top marks slightly flattened | Fixed |
+| Nav item | `.tl` | 11px | **Clips**, same as tile label (same class) | Fixed |
+| Payment badge | `.pm-b` | 10.5px | **Clips** worst of all roles tested — top marks visibly cut, most legible-impacting | Fixed |
+| List header | `.lt` | 16px | No visible clip | — |
+
+Pattern: clipping severity scales inversely with font-size — everything
+≤15px clips at the current line-height, both top (tone marks / upper vowels)
+and bottom (subscript vowels, confirmed on `.tv`'s `สุทธิ`). `.h1` (21px) and
+`.lt` (16px) had enough headroom in "normal" to escape it in the strings
+tested, but that's headroom, not a rule — don't assume other strings at
+those sizes are safe.
+
+**Candidate `line-height: 1.65` eliminated every clip observed**, at every
+size from 10.5px to 25px, both languages. No container needed a height/
+overflow change beyond what the line-height fix already resolves — `.tiles`/
+`.list`/cards clip via their fixed-height rows being N × line-height, so
+fixing the line-height fixes the row height that derives from it.
+
+### Font stack: no action indicated
+
+`'Outfit'` has no Lao/Thai glyphs so the browser already silently substitutes
+per character regardless of what's declared. Compared `'Outfit',system-ui,
+sans-serif` (current) against `'Noto Sans Lao','Noto Sans Thai',system-ui,
+sans-serif` and bare `system-ui,sans-serif` — all three rendered visually
+identical on this machine (Noto Sans Lao/Thai aren't installed locally, so
+the declared stack falls through to the same OS fallback regardless).
+Chrome doesn't expose which physical font painted a given character, so this
+was eyeballed from the screenshot, not computed style. No tofu, no obviously
+wrong substitution. Not flagging a font-stack change for 3.2 — revisit only
+if a real Android/Windows device shows a bad substitution, since OS-bundled
+Thai/Lao fonts vary by platform and this machine only proves macOS is fine.
+
+### For 3.2
+
+Set `:lang(th),:lang(lo){line-height:1.65}` in `v2/css/base.css` (the
+placeholder block already there). No font-stack change. Re-check `.ei-name`
+under more strings before declaring it clip-free — one sample isn't proof.
