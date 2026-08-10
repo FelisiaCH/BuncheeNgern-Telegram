@@ -159,6 +159,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:none;box-s
 .seg.exp.on{background:var(--red-dim);color:var(--red);font-weight:700}
 .seg.cash.on{background:var(--amber-dim);color:var(--amber);font-weight:700}
 .seg.qr.on{background:var(--accent-dim);color:var(--accent);font-weight:700}
+.seg.theme.on{background:var(--accent-dim);color:var(--accent);font-weight:700}
 
 /* 🏪 Branch chip picker */
 .branch-grid{display:flex;flex-wrap:wrap;gap:6px}
@@ -262,6 +263,9 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:none;box-s
 .cfm-v{font-size:13.5px;font-weight:600;text-align:right;word-break:break-word}
 .cfm-btns{display:flex;gap:10px;margin-top:14px}
 .cfm-btns .btn{flex:1;margin-top:0}
+
+/* ⚙️ Settings sheet (3.4) — reuses .ov/.ov-card/.cfm-title/.cfm-btns/.seg-wrap above. */
+.settings-sec-lbl{font-size:12.5px;color:var(--txt-sub);font-weight:600;margin-bottom:8px}
 
 /* 🔔 Toast */
 .toast{

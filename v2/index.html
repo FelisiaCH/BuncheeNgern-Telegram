@@ -83,6 +83,7 @@
     <nav class="mini-nav">
       <button type="button" class="mini-nav-btn" data-action="navRecord" data-i18n="navRecord">Record</button>
       <button type="button" class="mini-nav-btn" data-action="navDash" data-i18n="navSummary">Summary</button>
+      <button type="button" class="mini-nav-btn" data-action="openSettings">⚙</button>
     </nav>
   </header>
 
@@ -199,6 +200,7 @@
     <nav class="mini-nav">
       <button type="button" class="mini-nav-btn" data-action="navRecord" data-i18n="navRecord">Record</button>
       <button type="button" class="mini-nav-btn" data-action="navDash" data-i18n="navSummary">Summary</button>
+      <button type="button" class="mini-nav-btn" data-action="openSettings">⚙</button>
     </nav>
   </header>
 
@@ -304,6 +306,23 @@
   </div>
 </div>
 
+<!-- Settings sheet (3.4) — theme switcher only; sidebar shell + accent presets
+     are a later slice. Reuses the .ov backdrop + .ov-card/.cfm-* shell. -->
+<div id="settings-sheet" class="ov hidden" data-action="settingsBackdrop">
+  <div class="ov-card cfm-card">
+    <div class="cfm-title" data-i18n="settingsTitle">Settings</div>
+    <div class="settings-sec-lbl" data-i18n="sectionTheme">🎨 Customization</div>
+    <div class="seg-wrap">
+      <button type="button" class="seg theme" data-action="setThemeMode" data-value="dark" data-i18n="themeDark">Dark</button>
+      <button type="button" class="seg theme" data-action="setThemeMode" data-value="oled" id="theme-oled-btn">OLED</button>
+      <button type="button" class="seg theme" data-action="setThemeMode" data-value="light" data-i18n="themeLight">Light</button>
+    </div>
+    <div class="cfm-btns">
+      <button type="button" class="btn btn-ghost" data-action="closeSettings">✕</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast -->
 <div id="toast" class="toast"><span id="toast-txt"></span></div>
 
@@ -359,6 +378,7 @@ const API_URL          = USE_WORKER ? WORKER_URL : SCRIPT_URL;
 <script src="js/session.js"></script>
 <script src="js/entry.js"></script>
 <script src="js/dashboard.js"></script>
+<script src="js/settings.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
