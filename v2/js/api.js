@@ -8,12 +8,19 @@
 // Apps Script backend, the same way the upload-progress feature should have
 // been checked before it shipped (see CLAUDE.md).
 //
-// Deliberately does NOT include XHR / upload-progress. Uploading progress is
-// impossible against this backend (CORS preflight vs Apps Script does not
-// answer OPTIONS) — see CLAUDE.md and §3/§11 of the design doc. fetch() only.
+// Deliberately does NOT include XHR / upload-progress. Still fetch() only —
+// this file's scope didn't change. Note for future work, not acted on here:
+// CLAUDE.md's "Known impossibilities" reason was that Apps Script never
+// answers a CORS preflight OPTIONS, and an xhr.upload listener forces one.
+// Since B0 (see bcn-backend-b0-worker-cache.md), requests go through a
+// Cloudflare Worker that DOES answer OPTIONS correctly (verified live) —
+// the preflight blocker is gone. Actually adding upload-progress is a
+// separate, unrequested UI change and CLAUDE.md's impossibility note should
+// be updated to reflect this before anyone relies on it being still true.
 //
-// Config (SCRIPT_URL) stays inline in index.html per CLAUDE.md's standing
-// invariant — read here as a global, not imported.
+// Config (API_URL, resolved from SCRIPT_URL/WORKER_URL) stays inline in
+// index.html per CLAUDE.md's standing invariant — read here as a global,
+// not imported.
 
 const API_TIMEOUT = 15000; // ms — matches v1; Apps Script has been observed to
                             // take up to this long under load.
@@ -58,16 +65,16 @@ function _apiFetch(input, init) {
 }
 
 function apiGet(params) {
-  if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return Promise.reject(new Error('SCRIPT_URL is not set — see README for setup instructions'));
-  const url = new URL(SCRIPT_URL);
+  if (!API_URL || API_URL.startsWith('YOUR_')) return Promise.reject(new Error('SCRIPT_URL is not set — see README for setup instructions'));
+  const url = new URL(API_URL);
   Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, String(v)));
   url.searchParams.set('sessionToken', store.get().sessionToken || '');
   return _apiFetch(url, { redirect: 'follow' });
 }
 
 function apiPost(bodyObj) {
-  if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return Promise.reject(new Error('SCRIPT_URL is not set — see README for setup instructions'));
-  return _apiFetch(SCRIPT_URL, {
+  if (!API_URL || API_URL.startsWith('YOUR_')) return Promise.reject(new Error('SCRIPT_URL is not set — see README for setup instructions'));
+  return _apiFetch(API_URL, {
     method:  'POST',
     redirect: 'follow',
     headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
@@ -78,8 +85,8 @@ function apiPost(bodyObj) {
 // Exchange a one-time Google id_token for an app session token. Carries no
 // session token itself — this IS the authentication step.
 function apiAuthenticate(idToken, deviceInfo) {
-  if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return Promise.reject(new Error('SCRIPT_URL is not set — see README for setup instructions'));
-  return _apiFetch(SCRIPT_URL, {
+  if (!API_URL || API_URL.startsWith('YOUR_')) return Promise.reject(new Error('SCRIPT_URL is not set — see README for setup instructions'));
+  return _apiFetch(API_URL, {
     method:  'POST',
     redirect: 'follow',
     headers: { 'Content-Type': 'text/plain;charset=UTF-8' },

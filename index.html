@@ -374,7 +374,11 @@
 <script>
 // ⚙️ Configuration
 const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID_HERE";
-const SCRIPT_URL       = "YOUR_APPS_SCRIPT_URL_HERE";
+const SCRIPT_URL       = "YOUR_APPS_SCRIPT_URL_HERE"; // kept live (not just commented) — flipping USE_WORKER
+                                                        // to false below is the entire B0 rollback, no other edit needed
+const WORKER_URL       = "YOUR_WORKER_URL_HERE"; // Cloudflare Worker edge cache in front of SCRIPT_URL (B0)
+const USE_WORKER       = true; // flip to false + redeploy to bypass the Worker, zero data loss (Sheets untouched)
+const API_URL          = USE_WORKER ? WORKER_URL : SCRIPT_URL;
 
 // 🛠️ DOM Helper (must be defined before any early init calls below)
 const $ = id => document.getElementById(id);
