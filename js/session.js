@@ -83,10 +83,10 @@ function _apiFetch(input, init) {
 // Sends device info + any stored token so the backend can reuse this device's
 // session (re-login / unlock) instead of minting a new row.
 function apiAuthenticate(idToken) {
-  if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return Promise.reject(new Error('SCRIPT_URL is not set — see README for setup instructions'));
+  if (!API_URL || API_URL.startsWith('YOUR_')) return Promise.reject(new Error('SCRIPT_URL is not set — see README for setup instructions'));
   const stored = loadSession();
   const info   = getDeviceInfo();
-  return _apiFetch(SCRIPT_URL, {
+  return _apiFetch(API_URL, {
     method:  'POST',
     redirect: 'follow',
     headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
@@ -101,15 +101,15 @@ function apiAuthenticate(idToken) {
   });
 }
 function apiGet(params) {
-  if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return Promise.reject(new Error('SCRIPT_URL is not set — see README for setup instructions'));
-  const url = new URL(SCRIPT_URL);
+  if (!API_URL || API_URL.startsWith('YOUR_')) return Promise.reject(new Error('SCRIPT_URL is not set — see README for setup instructions'));
+  const url = new URL(API_URL);
   Object.entries(params).forEach(([k,v]) => url.searchParams.set(k, String(v)));
   url.searchParams.set('sessionToken', A.sessionToken || '');
   return _apiFetch(url, { redirect:'follow' });
 }
 function apiPost(bodyObj) {
-  if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return Promise.reject(new Error('SCRIPT_URL is not set — see README for setup instructions'));
-  return _apiFetch(SCRIPT_URL, {
+  if (!API_URL || API_URL.startsWith('YOUR_')) return Promise.reject(new Error('SCRIPT_URL is not set — see README for setup instructions'));
+  return _apiFetch(API_URL, {
     method:  'POST',
     redirect: 'follow',
     headers: { 'Content-Type': 'text/plain;charset=UTF-8' },

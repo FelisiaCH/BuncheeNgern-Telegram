@@ -1,0 +1,12 @@
+{
+  "name": "bcn-api",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-10",
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  "kv_namespaces": [
+    { "binding": "CACHE", "id": "c4bef463bb914d79981f76aa9c4d16d2" }
+  ]
+}

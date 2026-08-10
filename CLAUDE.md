@@ -110,12 +110,19 @@ contradicts its path, so existing clients self-heal. Don't remove either check.
 
 ## Known impossibilities
 
-**Upload progress cannot work on this backend.** Attaching any listener to
-`xhr.upload` makes the request non-simple, forcing a CORS preflight `OPTIONS`
-that Apps Script does not answer; the request fails outright. `fetch` works
-precisely because it cannot report upload progress. Verified in production.
-Don't retry without first putting a proxy in front of Apps Script that answers
-`OPTIONS`.
+**Upload progress cannot work talking to Apps Script directly.** Attaching
+any listener to `xhr.upload` makes the request non-simple, forcing a CORS
+preflight `OPTIONS` that Apps Script does not answer; the request fails
+outright. `fetch` works precisely because it cannot report upload progress.
+Verified in production.
+
+Since B0 (`bcn-backend-b0-worker-cache.md`), requests go through a Cloudflare
+Worker in front of Apps Script that DOES answer `OPTIONS` correctly (verified
+live) — the precondition this note used to require ("a proxy in front of
+Apps Script that answers OPTIONS") now exists. Upload progress itself is
+still NOT implemented — no client code was changed to use XHR/upload
+listeners, this only removes the blocker. Don't assume it works without
+building and testing it; do assume it's worth trying now.
 
 ## Verification
 
