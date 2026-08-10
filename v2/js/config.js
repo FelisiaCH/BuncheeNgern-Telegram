@@ -101,13 +101,20 @@ function addCurrency(code, symbol) {
   return entry;
 }
 
+// Three modes (3.3): 'dark' (default) | 'oled' | 'light'. v1's key only ever
+// held 'light'/'dark' — an inherited value outside this set (or absent) falls
+// back to 'dark', same as before.
 function getTheme() {
-  return safeGet(THEME_KEY_V2) === 'light' ? 'light' : 'dark';
+  const v = safeGet(THEME_KEY_V2);
+  return (v === 'oled' || v === 'light') ? v : 'dark';
 }
 
+// Applies data-theme to the root immediately (not left to the caller) so
+// every caller — including 3.4's switcher — gets a correct render for free.
 function setTheme(theme) {
-  const t = theme === 'light' ? 'light' : 'dark';
+  const t = (theme === 'oled' || theme === 'light') ? theme : 'dark';
   safeSet(THEME_KEY_V2, t);
+  document.documentElement.setAttribute('data-theme', t);
   return t;
 }
 

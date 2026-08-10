@@ -1,24 +1,32 @@
 /* Design tokens — three layers: primitives → scales → semantic aliases.
    Ported from v1 (css/app.css), per bcn-v2-system-design.md §9: "that
-   architecture worked." Values are v1's proven, WCAG-AA-checked set —
-   NOT redesigned here. The customisable-accent-preset system described in
-   §9 is Phase 3 scope and does not exist yet; --accent* below is still the
-   single fixed neutral accent carried over from v1.
+   architecture worked." Values were v1's proven, WCAG-AA-checked neutral
+   set; Phase 3.3 replaces the palette with the locked identity —
+   Periwinkle, accent #5763EE — while keeping this same primitive/semantic
+   structure and every existing token name unchanged.
+
+   Three modes: :root = dark (default), [data-theme="oled"], [data-theme=
+   "light"]. Accent tokens are identical across all three and live only in
+   :root — oled/light never override them. Income green / expense red stay
+   the data colors in every mode; accent is chrome only, never a data color.
 */
 :root{
   /* ─── Primitives — raw values. Components never reference these directly. ─── */
-  --n-950:#06090F;
-  --n-900:#0B1020;
-  --n-850:#0E1526;
-  --n-800:#131D30;
+  --n-950:#202024;
+  --n-900:#17171A;
+  --n-850:#24242A;
+  --n-800:#2A2A30;
   --n-fg:#EDF0FF;
-  --n-fg-sub:#6B7FA3;
-  --n-fg-muted:#2A3550;
+  --n-fg-sub:#7C89A8;
+  --n-fg-muted:#3A4560;
   --n-fg-rgb:237,240,255;
-  --n-line:rgba(255,255,255,.10);
+  --n-line:rgba(255,255,255,.11);
+
+  --n-accent:#5763EE;
+  --n-accent-2:#9AA2FF;
 
   --h-green:48,214,126;
-  --h-red:255,77,109;
+  --h-red:255,90,120;
   --h-indigo:129,140,248;
   --h-amber:255,170,51;
 
@@ -51,17 +59,18 @@
   --brd:var(--n-line);
   --brd-focus:rgba(var(--n-fg-rgb),.45);
 
-  --accent:var(--n-fg);
-  --accent-fg:var(--n-950);
-  --accent-dim:rgba(var(--n-fg-rgb),.08);
+  --accent:var(--n-accent);
+  --accent-fg:#FFFFFF;
+  --accent-2:var(--n-accent-2);
+  --accent-dim:color-mix(in srgb, var(--n-accent) 14%, transparent);
   --accent-glow:rgba(var(--n-fg-rgb),.14);
   --accent-brd:rgba(var(--n-fg-rgb),.20);
 
   --green:rgb(var(--h-green));
-  --green-dim:rgba(var(--h-green),.08);
+  --green-dim:rgba(var(--h-green),.15);
   --green-brd:rgba(var(--h-green),.22);
   --red:rgb(var(--h-red));
-  --red-dim:rgba(var(--h-red),.08);
+  --red-dim:rgba(var(--h-red),.15);
   --red-brd:rgba(var(--h-red),.22);
   --indigo:rgb(var(--h-indigo));
   --indigo-dim:rgba(var(--h-indigo),.08);
@@ -77,25 +86,36 @@
   --shadow:var(--shadow-lg);
   --ease:.22s cubic-bezier(.4,0,.2,1);
 }
+
+/* OLED — identical to dark except pure-black bg (cards/input/hover/text/
+   accent/data colors all fall through to :root unchanged). */
+[data-theme="oled"]{
+  --n-950:#000000;
+}
+
 [data-theme="light"]{
-  --n-950:#F4F6FB;
-  --n-900:#FFFFFF;
-  --n-850:#EEF1F8;
-  --n-800:#E4E9F4;
-  --n-fg:#10172A;
-  --n-fg-sub:#5B6B8C;
-  --n-fg-muted:#A9B4CC;
-  --n-fg-rgb:16,23,42;
-  --n-line:rgba(16,23,42,.10);
-  --shadow-sm:0 1px 2px rgba(16,23,42,.05);
-  --shadow-md:0 4px 16px rgba(16,23,42,.06);
-  --shadow-lg:0 8px 40px rgba(16,23,42,.08);
-  --brd-focus:rgba(16,23,42,.45);
-  /* Data-hue triples overridden here only (not globally) — dark theme already
-     clears WCAG AA and must not be touched; see the light-theme contrast fix
-     this same session. */
-  --h-green:15,122,71;
+  --n-950:#F3F3F8;
+  --n-900:#FBFBFB;
+  --n-850:#ECECF2;
+  --n-800:#E4E4EC;
+  --n-fg:#141821;
+  --n-fg-sub:#5B6472;
+  --n-fg-muted:#A6AEBB;
+  --n-fg-rgb:20,24,33;
+  --n-line:rgba(0,0,0,.12);
+  --shadow-sm:0 1px 2px rgba(20,24,33,.05);
+  --shadow-md:0 4px 16px rgba(20,24,33,.06);
+  --shadow-lg:0 8px 40px rgba(20,24,33,.08);
+  --brd-focus:rgba(20,24,33,.45);
+  /* accent/--accent-fg/--accent-2/--accent-dim intentionally NOT overridden
+     here — #5763EE reads fine on light per the locked identity decision. */
+  --h-green:13,148,90;
+  --green-dim:rgba(var(--h-green),.12);
+  --h-red:216,42,74;
+  --red-dim:rgba(var(--h-red),.12);
+  /* indigo/amber contrast overrides predate 3.3 and are untouched by it —
+     not part of the locked identity table, kept as-is so .branch-chip.on/
+     .pm-qr/.pm-cash/.seg.cash.on don't silently regress on the new light bg. */
   --h-indigo:79,70,229;
   --h-amber:180,83,9;
-  --h-red:225,29,72;
 }
