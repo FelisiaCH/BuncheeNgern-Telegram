@@ -266,7 +266,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:none;box-s
 
 /* ⚙️ Settings sheet (3.4) — reuses .ov/.ov-card/.cfm-title/.cfm-btns/.seg-wrap above. */
 .settings-sec-lbl{font-size:12.5px;color:var(--txt-sub);font-weight:600;margin-bottom:8px}
-.settings-sec-lbl + .settings-sec-lbl{margin-top:16px}
+.seg-wrap + .settings-sec-lbl{margin-top:16px}
 
 /* 🎨 Accent presets (3.4b) — swatches show their OWN preset color, not the
    currently-active --accent, so all five stay visible/selectable at once.

@@ -3,16 +3,9 @@
 // bcn-v2-phase3.4b-accent-presets.md. The grouped sidebar nav shell is the
 // one piece of that "Next" pointer still not started.
 //
-// ── v2-local string — OLED has no v1 key (v1's theme toggle is 2-way,
-// light/dark only) and isn't a translatable concept, same as "QR" — folded
-// into shared i18n/lang_*.js only if a real translation need shows up later,
-// same convention dashboard.js set for DASH_STRINGS.
-const SETTINGS_STRINGS = { themeOled: 'OLED' };
-
-function mountSettings() {
-  const btn = document.getElementById('theme-oled-btn');
-  if (btn) btn.textContent = SETTINGS_STRINGS.themeOled;
-}
+// index.html's OLED button carries the literal text "OLED" directly (no
+// data-i18n) — it has no v1 key (v1's theme toggle is 2-way, light/dark
+// only) and isn't a translatable concept, same as "QR".
 
 // Paints .on onto the segment/swatch matching the currently active theme/
 // accent — called every time the sheet opens so it can never show a stale
@@ -47,5 +40,3 @@ window.__actions.setAccentMode = el => {
   setAccent(el.dataset.value); // applies/clears data-accent on <html>, see config.js
   renderSettings();
 };
-
-mountSettings();
