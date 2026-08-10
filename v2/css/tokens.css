@@ -87,6 +87,18 @@
   --ease:.22s cubic-bezier(.4,0,.2,1);
 }
 
+/* Accent presets (3.4b) — swap ONLY --accent/--accent-2; the Periwinkle
+   neutrals above (bg/card/text/border per mode) never change per-preset.
+   Orthogonal to [data-theme]: both attributes live on <html> at once, so
+   any accent composes with any mode. --accent-fg/--accent-dim/--accent-glow/
+   --accent-brd are untouched here — they already reference var(--accent) in
+   :root above, so they auto-follow whichever preset is active. Periwinkle
+   itself needs no override block; :root's --accent:var(--n-accent) is it. */
+[data-accent="blue"]{   --accent:#0057FF; --accent-2:#93B4FF; }
+[data-accent="violet"]{ --accent:#6A00F4; --accent-2:#B794F6; }
+[data-accent="pink"]{   --accent:#FF4696; --accent-2:#C77DFF; }
+[data-accent="indigo"]{ --accent:#3A0CA3; --accent-2:#7C6BD8; }
+
 /* OLED — identical to dark except pure-black bg (cards/input/hover/text/
    accent/data colors all fall through to :root unchanged). */
 [data-theme="oled"]{
