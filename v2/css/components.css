@@ -313,11 +313,19 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:none;box-s
 }
 [data-theme="light"] .app-nav{background:rgba(244,246,251,.88)}
 
-.nav-primary{margin-left:auto;display:flex;gap:4px;background:var(--bg-input);border:1px solid var(--brd);border-radius:var(--r-sm);padding:3px}
+/* position:relative + z-index:95 — belt-and-suspenders now that
+   .nav-backdrop lives outside #app-nav in the DOM (see index.html): #app-nav
+   as a whole (z-index:100) already paints above the backdrop (z-index:90) as
+   one stacking-context unit, so click order is correct without this. Kept
+   explicit in case the backdrop ever moves back inside #app-nav, where it
+   would matter again (a nested backdrop, being positioned, paints above
+   non-positioned siblings within #app-nav's own local stacking context
+   regardless of the parent's z-index). */
+.nav-primary{position:relative;z-index:95;margin-left:auto;display:flex;gap:4px;background:var(--bg-input);border:1px solid var(--brd);border-radius:var(--r-sm);padding:3px}
 .nav-primary .nav-item{padding:7px 12px;border:none;background:transparent;border-radius:var(--r-xs);color:var(--txt-sub);font-size:12px;font-weight:600;font-family:'Outfit',system-ui,sans-serif;cursor:pointer;transition:background var(--ease),color var(--ease)}
 .nav-primary .nav-item.on{background:var(--bg-hover);color:var(--txt)}
 
-.nav-more{margin-left:8px;border:none;background:transparent;color:var(--txt-sub);font-size:18px;line-height:1;cursor:pointer;padding:4px 6px}
+.nav-more{position:relative;z-index:95;margin-left:8px;border:none;background:transparent;color:var(--txt-sub);font-size:18px;line-height:1;cursor:pointer;padding:4px 6px}
 
 /* Shared row look for the Management/Settings drawer — same on desktop
    (where .nav-secondary is the always-visible lower sidebar) and mobile
@@ -349,9 +357,6 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:none;box-s
   .nav-more{display:none}
   .nav-secondary{position:static;display:block;width:auto;border:none;background:none;padding:0;margin-top:8px}
   .nav-backdrop,.nav-backdrop.open{display:none}
-
-  .tab-body{padding-top:32px;padding-left:calc(220px + 24px)}
-  .dash-body{padding-top:32px;padding-left:calc(220px + 24px)}
 }
 
 /* 📊 Dashboard (Phase 2b) — structure and values ported from
@@ -459,4 +464,20 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:none;box-s
   .tiles{grid-template-columns:1fr}
   .tile{border-right:none}
   .tile:nth-child(3){border-bottom:1px solid var(--brd)}
+}
+
+/* Desktop sidebar inset (Phase 3.4c fix pass) — the offset lives on the
+   SCREEN container, not on .tab-body/.dash-body's own padding: those already
+   carry max-width + margin:0 auto, and box-sizing:border-box (base.css)
+   means padding eats into that max-width instead of sitting outside it.
+   Putting padding-left there previously squeezed a 480px-max-width body
+   into ~220px of actual content. Placed last on purpose: .dash-body{padding-
+   top:32px} is a class rule (0,1,0) and must out-order the base .dash-body
+   shorthand (also 0,1,0, defined above) to survive the cascade; #screen-*'s
+   padding-left is an ID rule (1,0,0) and would win from anywhere, but the
+   whole block stays here for one place to read the desktop layout. */
+@media(min-width:900px){
+  #screen-entry,#screen-dash{padding-left:220px}
+  .tab-body{padding-top:32px}
+  .dash-body{padding-top:32px}
 }

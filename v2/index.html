@@ -87,17 +87,26 @@
     <button type="button" class="nav-item" data-action="navRecord" data-i18n="navRecord">Record</button>
     <button type="button" class="nav-item" data-action="navDash" data-i18n="navSummary">Summary</button>
   </div>
-  <button type="button" class="nav-more" data-action="openNavMenu" data-i18n-aria="ariaMoreMenu" aria-label="More options">⋮</button>
+  <button type="button" class="nav-more" data-action="openNavMenu" data-i18n-aria="ariaMoreMenu" aria-label="More options" aria-haspopup="menu" aria-expanded="false">⋮</button>
   <div class="nav-secondary">
     <div class="nav-sec-lbl" data-i18n="menuManagement">Management</div>
-    <div class="nav-item is-disabled" aria-disabled="true" data-i18n="labelBranch">Branch</div>
-    <div class="nav-item is-disabled" aria-disabled="true" data-i18n="menuManageCurrencies">Manage Currencies</div>
-    <div class="nav-item is-disabled" aria-disabled="true" data-i18n="menuLanguage">Language</div>
-    <div class="nav-item is-disabled" aria-disabled="true" data-i18n="menuAccount">Account</div>
+    <button type="button" class="nav-item is-disabled" disabled data-i18n="labelBranch">Branch</button>
+    <button type="button" class="nav-item is-disabled" disabled data-i18n="menuManageCurrencies">Manage Currencies</button>
+    <button type="button" class="nav-item is-disabled" disabled data-i18n="menuLanguage">Language</button>
+    <button type="button" class="nav-item is-disabled" disabled data-i18n="menuAccount">Account</button>
     <button type="button" class="nav-item" data-action="openSettings" data-i18n="navSettings">Settings</button>
   </div>
-  <div class="nav-backdrop" data-action="navMenuBackdrop"></div>
 </nav>
+<!-- .nav-backdrop is a SIBLING of #app-nav, not a child (fix pass) — #app-nav
+     has backdrop-filter, which establishes a containing block for
+     position:fixed descendants (same as transform/filter/will-change). A
+     backdrop nested inside #app-nav had "inset:0" resolve against #app-nav's
+     own 58px-tall box instead of the viewport, so it only covered the top
+     bar and tapping page content below it never reached navMenuBackdrop.
+     As a sibling, #app-nav's z-index:100 already paints the whole nav
+     (bar + popup) above the backdrop's z-index:90 as one stacking-context
+     unit — no per-child z-index trick needed for correct click order. -->
+<div class="nav-backdrop" data-action="navMenuBackdrop"></div>
 
 <div id="screen-entry" class="screen hidden">
   <div class="tab-body">
