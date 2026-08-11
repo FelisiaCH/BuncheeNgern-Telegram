@@ -74,19 +74,41 @@
   </div>
 </div>
 
-<div id="screen-entry" class="screen hidden">
-  <header class="app-hdr">
-    <div class="hdr-brand">
-      <div class="hdr-badge">🧾</div>
-      <span class="hdr-name">BuncheeNgern</span>
-    </div>
-    <nav class="mini-nav">
-      <button type="button" class="mini-nav-btn" data-action="navRecord" data-i18n="navRecord">Record</button>
-      <button type="button" class="mini-nav-btn" data-action="navDash" data-i18n="navSummary">Summary</button>
-      <button type="button" class="mini-nav-btn" data-action="openSettings">⚙</button>
-    </nav>
-  </header>
+<!-- Responsive nav (Phase 3.4c) — one hoisted #app-nav: desktop left sidebar,
+     mobile top bar + 3-dot popup. Replaces the per-screen .mini-nav/.app-hdr
+     — exactly one DOM instance of each nav target now. Visibility (shown
+     only for entry/dash) and .on sync are app.js's routeScreen(). -->
+<nav id="app-nav" class="app-nav hidden">
+  <div class="hdr-brand">
+    <div class="hdr-badge">🧾</div>
+    <span class="hdr-name">BuncheeNgern</span>
+  </div>
+  <div class="nav-primary">
+    <button type="button" class="nav-item" data-action="navRecord" data-i18n="navRecord">Record</button>
+    <button type="button" class="nav-item" data-action="navDash" data-i18n="navSummary">Summary</button>
+  </div>
+  <button type="button" class="nav-more" data-action="openNavMenu" data-i18n-aria="ariaMoreMenu" aria-label="More options" aria-haspopup="menu" aria-expanded="false">⋮</button>
+  <div class="nav-secondary">
+    <div class="nav-sec-lbl" data-i18n="menuManagement">Management</div>
+    <button type="button" class="nav-item is-disabled" disabled data-i18n="labelBranch">Branch</button>
+    <button type="button" class="nav-item is-disabled" disabled data-i18n="menuManageCurrencies">Manage Currencies</button>
+    <button type="button" class="nav-item is-disabled" disabled data-i18n="menuLanguage">Language</button>
+    <button type="button" class="nav-item is-disabled" disabled data-i18n="menuAccount">Account</button>
+    <button type="button" class="nav-item" data-action="openSettings" data-i18n="navSettings">Settings</button>
+  </div>
+</nav>
+<!-- .nav-backdrop is a SIBLING of #app-nav, not a child (fix pass) — #app-nav
+     has backdrop-filter, which establishes a containing block for
+     position:fixed descendants (same as transform/filter/will-change). A
+     backdrop nested inside #app-nav had "inset:0" resolve against #app-nav's
+     own 58px-tall box instead of the viewport, so it only covered the top
+     bar and tapping page content below it never reached navMenuBackdrop.
+     As a sibling, #app-nav's z-index:100 already paints the whole nav
+     (bar + popup) above the backdrop's z-index:90 as one stacking-context
+     unit — no per-child z-index trick needed for correct click order. -->
+<div class="nav-backdrop" data-action="navMenuBackdrop"></div>
 
+<div id="screen-entry" class="screen hidden">
   <div class="tab-body">
     <div class="tab-top">
       <h1 class="tab-ttl" data-i18n="navRecord">Record</h1>
@@ -188,22 +210,9 @@
 </div>
 
 <!-- Dashboard — Phase 2b per bcn-v2-phase2b-dashboard.md. Content area only
-     (top bar, currency tabs, donut + tiles + expense strip, entry list) —
-     the mockup's grouped sidebar, accent/identity and Lao/Thai type pass are
-     Phase 3; "minimal nav" here is the two-button .mini-nav in the header. -->
+     (top bar, currency tabs, donut + tiles + expense strip, entry list).
+     Nav is the hoisted #app-nav above (Phase 3.4c). -->
 <div id="screen-dash" class="screen hidden">
-  <header class="app-hdr">
-    <div class="hdr-brand">
-      <div class="hdr-badge">🧾</div>
-      <span class="hdr-name">BuncheeNgern</span>
-    </div>
-    <nav class="mini-nav">
-      <button type="button" class="mini-nav-btn" data-action="navRecord" data-i18n="navRecord">Record</button>
-      <button type="button" class="mini-nav-btn" data-action="navDash" data-i18n="navSummary">Summary</button>
-      <button type="button" class="mini-nav-btn" data-action="openSettings">⚙</button>
-    </nav>
-  </header>
-
   <div class="dash-body">
     <div class="top">
       <div>
