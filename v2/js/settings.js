@@ -22,6 +22,7 @@ function renderSettings() {
 }
 
 window.__actions.openSettings = () => {
+  window.__actions.closeNavMenu();
   renderSettings();
   document.getElementById('settings-sheet')?.classList.remove('hidden');
 };
