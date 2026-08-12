@@ -1,34 +1,41 @@
 /* Design tokens — three layers: primitives → scales → semantic aliases.
    Ported from v1 (css/app.css), per bcn-v2-system-design.md §9: "that
-   architecture worked." Values were v1's proven, WCAG-AA-checked neutral
-   set; Phase 3.3 replaces the palette with the locked identity —
-   Periwinkle, accent #5763EE — while keeping this same primitive/semantic
-   structure and every existing token name unchanged.
+   architecture worked." Phase 3.3 replaced the palette with Periwinkle +
+   dark/oled/light modes. v3 Phase 1 (bcn-v3-phase1-foundation.md) replaces
+   that with the Ledgerline identity: full light-mono, single mode. Every
+   token NAME below is unchanged from 3.3; only values were remapped.
 
-   Three modes: :root = dark (default), [data-theme="oled"], [data-theme=
-   "light"]. Accent tokens are identical across all three and live only in
-   :root — oled/light never override them. Income green / expense red stay
-   the data colors in every mode; accent is chrome only, never a data color.
+   Single mode: :root only. The former [data-theme="oled"]/[data-theme=
+   "light"] and [data-accent=*] blocks are gone — Ledgerline has no chroma
+   accent and no dark mode. The theme/accent switcher UI (settings.js)
+   still sets these attributes; with no matching rules left, it's now
+   inert by construction (goes away in Phase 4). Income green / expense red
+   survive as muted data colors (see accent note below) — accent is chrome
+   only, never a data color.
 */
 :root{
   /* ─── Primitives — raw values. Components never reference these directly. ─── */
-  --n-950:#202024;
-  --n-900:#17171A;
-  --n-850:#24242A;
-  --n-800:#2A2A30;
-  --n-fg:#EDF0FF;
-  --n-fg-sub:#7C89A8;
-  --n-fg-muted:#3A4560;
-  --n-fg-rgb:237,240,255;
-  --n-line:rgba(255,255,255,.11);
+  --n-950:#eeeeea;
+  --n-900:#ffffff;
+  --n-850:#f0f0ea;
+  --n-800:#ecece5;
+  --n-fg:#1a1a17;
+  --n-fg-sub:#55554e;
+  --n-fg-muted:#6a6a61; /* task doc specified #6f6f66; measured 4.36:1 on --bg
+    (below AA's 4.5:1) where muted text sits directly on the page background
+    (.crumb, .login-footer) — 5.07:1 on --bg-card, so the failure only shows
+    on-page. Nudged darker to clear 4.5:1 everywhere it's actually used
+    (4.69:1 on --bg, 5.46:1 on --bg-card); same faint-muted intent. */
+  --n-fg-rgb:26,26,23;
+  --n-line:#e2e2db;
 
-  --n-accent:#5763EE;
-  --n-accent-2:#9AA2FF;
+  --n-accent:#1a1a17;
+  --n-accent-2:#55554e;
 
-  --h-green:48,214,126;
-  --h-red:255,90,120;
-  --h-indigo:129,140,248;
-  --h-amber:255,170,51;
+  --h-green:47,125,95;
+  --h-red:180,72,58;
+  --h-indigo:70,70,63;
+  --h-amber:157,157,147;
 
   /* ─── Scales ─── */
   --radius-xs:6px;
@@ -39,101 +46,61 @@
   --sp-1:4px;  --sp-2:8px;  --sp-3:12px; --sp-4:16px;
   --sp-5:20px; --sp-6:24px; --sp-8:32px;
 
-  --shadow-sm:0 1px 2px rgba(0,0,0,.24);
-  --shadow-md:0 2px 8px rgba(0,0,0,.30);
-  --shadow-lg:0 8px 24px rgba(0,0,0,.40);
+  --shadow-sm:0 1px 2px rgba(20,20,16,.04);
+  --shadow-md:0 1px 3px rgba(20,20,16,.06);
+  --shadow-lg:0 4px 16px rgba(20,20,16,.07);
 
   --ring-w:2px;
-  --ring:0 0 0 var(--ring-w) rgba(var(--n-fg-rgb),.55);
+  --ring:0 0 0 var(--ring-w) rgba(var(--n-fg-rgb),.25);
+
+  --font-sans:'Geist',system-ui,sans-serif;
+  --font-mono:'Geist Mono',ui-monospace,monospace;
 
   /* ─── Semantic layer — this is what component rules use ─── */
   --bg:var(--n-950);
   --bg-card:var(--n-900);
   --bg-input:var(--n-850);
   --bg-hover:var(--n-800);
+  --bg-panel:#fafaf8; /* sidebar/subtle panels — latent, no primitive (new in v3) */
 
   --txt:var(--n-fg);
   --txt-sub:var(--n-fg-sub);
   --txt-muted:var(--n-fg-muted);
 
   --brd:var(--n-line);
-  --brd-focus:rgba(var(--n-fg-rgb),.45);
+  --brd-focus:rgba(var(--n-fg-rgb),.35);
 
   --accent:var(--n-accent);
   --accent-fg:#FFFFFF;
-  --accent-2:var(--n-accent-2);
-  --accent-dim:color-mix(in srgb, var(--accent) 14%, transparent);
-  --accent-glow:rgba(var(--n-fg-rgb),.14);
-  --accent-brd:rgba(var(--n-fg-rgb),.20);
+  --accent-2:var(--n-accent-2); /* latent — no CSS consumer, see 3.4b note below */
+  --accent-dim:#ecece5; /* flat, not color-mix — matches the mockup's active nav row exactly */
+  --accent-glow:rgba(var(--n-fg-rgb),.06);
+  --accent-brd:#d8d8cf;
 
   --green:rgb(var(--h-green));
-  --green-dim:rgba(var(--h-green),.15);
-  --green-brd:rgba(var(--h-green),.22);
+  --green-dim:rgba(var(--h-green),.10);
+  --green-brd:rgba(var(--h-green),.24);
   --red:rgb(var(--h-red));
-  --red-dim:rgba(var(--h-red),.15);
-  --red-brd:rgba(var(--h-red),.22);
+  --red-dim:rgba(var(--h-red),.10);
+  --red-brd:rgba(var(--h-red),.24);
+  /* Donut cash/online — muted placeholders; real two-tone is a Phase 3 call. */
   --indigo:rgb(var(--h-indigo));
   --indigo-dim:rgba(var(--h-indigo),.08);
   --indigo-brd:rgba(var(--h-indigo),.22);
   --amber:rgb(var(--h-amber));
   --amber-dim:rgba(var(--h-amber),.08);
   --amber-brd:rgba(var(--h-amber),.22);
-  --red-solid:#E11D48;   /* expense button bg — clears 4.5:1 in both themes */
+  --red-solid:#b4483a;   /* expense button bg — verify AA on white (flagged, see task doc) */
 
   --r:var(--radius-md);
   --r-sm:var(--radius-sm);
   --r-xs:var(--radius-xs);
-  --shadow:var(--shadow-lg);
+  --shadow:var(--shadow-md); /* cards lean on hairline borders, not shadow, in Ledgerline */
   --ease:.22s cubic-bezier(.4,0,.2,1);
 }
 
-/* Accent presets (3.4b) — swap ONLY --accent; the Periwinkle neutrals above
-   (bg/card/text/border per mode) never change per-preset. Orthogonal to
-   [data-theme]: both attributes live on <html> at once, so any accent
-   composes with any mode. --accent-fg/--accent-dim/--accent-glow/--accent-brd
-   are untouched here — they reference var(--accent) in :root above, so they
-   auto-follow whichever preset is active. Periwinkle itself needs no
-   override block; :root's --accent:var(--n-accent) is it.
-
-   --accent-2 is NOT overridden per preset — it has no CSS consumer. The
-   donut's cash/online colors are --amber/--indigo, a separate data-color
-   decision, not this token; repointing the donut at --accent-2 would be a
-   real design call, not something to smuggle in under "presets." Left
-   defined once in :root as latent surface for whenever that call is made. */
-[data-accent="blue"]{   --accent:#0057FF; }
-[data-accent="violet"]{ --accent:#6A00F4; }
-[data-accent="pink"]{   --accent:#FF4696; }
-[data-accent="indigo"]{ --accent:#3A0CA3; }
-
-/* OLED — identical to dark except pure-black bg (cards/input/hover/text/
-   accent/data colors all fall through to :root unchanged). */
-[data-theme="oled"]{
-  --n-950:#000000;
-}
-
-[data-theme="light"]{
-  --n-950:#F3F3F8;
-  --n-900:#FBFBFB;
-  --n-850:#ECECF2;
-  --n-800:#E4E4EC;
-  --n-fg:#141821;
-  --n-fg-sub:#5B6472;
-  --n-fg-muted:#A6AEBB;
-  --n-fg-rgb:20,24,33;
-  --n-line:rgba(0,0,0,.12);
-  --shadow-sm:0 1px 2px rgba(20,24,33,.05);
-  --shadow-md:0 4px 16px rgba(20,24,33,.06);
-  --shadow-lg:0 8px 40px rgba(20,24,33,.08);
-  --brd-focus:rgba(20,24,33,.45);
-  /* accent/--accent-fg/--accent-2/--accent-dim intentionally NOT overridden
-     here — #5763EE reads fine on light per the locked identity decision. */
-  --h-green:13,148,90;
-  --green-dim:rgba(var(--h-green),.12);
-  --h-red:216,42,74;
-  --red-dim:rgba(var(--h-red),.12);
-  /* indigo/amber contrast overrides predate 3.3 and are untouched by it —
-     not part of the locked identity table, kept as-is so .branch-chip.on/
-     .pm-qr/.pm-cash/.seg.cash.on don't silently regress on the new light bg. */
-  --h-indigo:79,70,229;
-  --h-amber:180,83,9;
-}
+/* Accent presets (3.4b), theme modes (3.3) — retired by v3 Phase 1's
+   full-light-mono decision. No [data-accent=*] / [data-theme=*] blocks
+   remain: Ledgerline's accent IS ink and there is only one mode. The
+   settings.js switcher still writes these attributes; with nothing left to
+   match, that's inert rather than broken (Phase 4 removes the UI itself). */

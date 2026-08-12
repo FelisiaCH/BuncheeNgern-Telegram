@@ -6,13 +6,13 @@
 
 html{height:100%}
 body{
-  font-family:'Outfit',system-ui,sans-serif;
+  font-family:var(--font-sans);
   background:var(--bg);color:var(--txt);
   min-height:100dvh;overflow-x:hidden;
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
   transition:background var(--ease),color var(--ease);
 }
-input,select,button{font-family:'Outfit',system-ui,sans-serif}
+input,select,button{font-family:var(--font-sans)}
 button{cursor:pointer;touch-action:manipulation}
 
 .hidden{display:none!important}
