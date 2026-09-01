@@ -125,6 +125,8 @@ function renderSplitBuilder(wrap, line) {
     });
     wrap.append(addBtn, sel);
   }
+
+  updateSlipVisibility();   // toggling Cash/Online here changes whether a slip applies
 }
 
 function setPrimaryPay(val, btn) {
@@ -142,8 +144,13 @@ function setPrimaryPay(val, btn) {
   $('split-grp-0').classList.toggle('hidden', !isSplit);
   updateSlipVisibility();
 }
+// A slip is only needed when money actually moves online: an Online line, or
+// a Split whose Online bucket is toggled on. A cash-only Split needs none.
+function hasOnlineBucket(line) {
+  return (line.splitBuckets || []).some(b => b.on && b.source === 'Online');
+}
 function updateSlipVisibility() {
-  const needs = A.fd.pay === 'Online' || A.fd.pay === 'Split';
+  const needs = A.fd.pay === 'Online' || (A.fd.pay === 'Split' && hasOnlineBucket(A.fd));
   $('slip-grp').classList.toggle('hidden', !needs);
   if (!needs) clearSlip();
 }
@@ -241,7 +248,8 @@ async function doSubmit() {
     if (!primaryParts.length) { setMsg('f-msg', t('warnSplitNeedOne'),'warn'); return; }
   } else if (!price || price <= 0) { setMsg('f-msg', t('warnEnterValidAmount'),'warn'); return; }
 
-  const needsSlip = A.fd.pay === 'Online' || A.fd.pay === 'Split';
+  const needsSlip = A.fd.pay === 'Online'
+    || (isPrimarySplit && primaryParts.some(p => p.source === 'Online'));
   if (needsSlip && !A.slip) { setMsg('f-msg', t('warnAttachSlip'),'warn'); return; }
 
   const toPayMethod = p => p === 'Online' ? 'Online Payment' : p === 'Split' ? 'Split' : 'Cash';
@@ -369,7 +377,7 @@ function onConfirmBackdrop(e) { if (e.target === $('cfm-sheet')) cancelConfirm()
 function resetForm() {
   $('f-item').value = ''; closeCombo(); $('f-price').value = ''; renderPriceSuggest(); $('f-cur').value = CURRENCIES.length ? CURRENCIES[0].code : '';
   A.fd.pay = 'Cash'; A.fd.splitBuckets = [];
-  clearSlip(); setMsg('f-msg');
+  clearSlip(); updateSlipVisibility(); setMsg('f-msg');
   document.querySelectorAll('#sg-type .seg').forEach((s,i) => s.classList.toggle('on', i===0));
   A.fd.type = 'income';
   const sb = $('sub-btn');
